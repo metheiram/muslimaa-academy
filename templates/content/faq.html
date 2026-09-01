@@ -1,0 +1,76 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}FAQ | Muslimaa Academy{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width: 700px;">
+        <h1 class="section-title">Frequently Asked <span class="highlight">Questions</span></h1>
+        
+        <div class="faq-list" style="margin-top: 2rem;">
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    Who can join Muslimaa Academy?
+                    <span class="icon" aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    Muslim women and girls seeking meaningful learning experiences are welcome to join. We welcome learners of all backgrounds and experience levels.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    Are the courses online?
+                    <span class="icon" aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    Yes. Our courses and workshops are delivered online with a mix of live sessions and recorded materials for your convenience.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    How do I enroll in a course?
+                    <span class="icon" aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    Visit our courses page, select the course you're interested in, and follow the enrollment instructions. You'll need to create an account to complete your registration.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    Will I have access to course materials?
+                    <span class="icon" aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    Yes. Upon enrollment, you'll have access to all course materials, resources, and recordings throughout the course duration.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    What if I have more questions?
+                    <span class="icon" aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    Please visit our <a href="{% url 'content:contact' %}">contact page</a> or email us at info@muslimaaacademy.com. We're here to help!
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const faqButtons = document.querySelectorAll('.faq-question');
+        faqButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !expanded);
+            });
+        });
+    });
+</script>
+{% endblock %}

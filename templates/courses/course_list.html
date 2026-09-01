@@ -1,0 +1,1134 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Courses | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --brand-700: #471820;
+        --brand-800: #3d1319;
+        --accent-gold: #d4a574;
+        --text-secondary: #5a4a55;
+        --text-muted: #8a7a85;
+        --font-serif: 'Playfair Display', Georgia, serif;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        background: #faf6f1;
+        color: #2d0d0f;
+    }
+
+    /* COURSES HERO SECTION */
+    .courses-hero {
+        background: linear-gradient(180deg, #faf6f1 0%, #f5ede4 100%);
+        padding: 4rem 0 3rem;
+        text-align: center;
+    }
+
+    .courses-hero-header {
+        margin-bottom: 2rem;
+    }
+
+    .courses-hero-title {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .flourish-divider {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .courses-hero-subtitle {
+        font-family: var(--font-sans);
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    /* BOOK ILLUSTRATION */
+    .courses-illustration {
+        margin: 2.5rem auto;
+    }
+
+    .courses-illustration svg {
+        max-width: 180px;
+        height: auto;
+    }
+
+    /* SEARCH BAR */
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .search-bar {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        background: #ffffff;
+        border: 1.5px solid rgba(71, 24, 32, 0.15);
+        border-radius: 50px;
+        padding: 0.5rem 0.5rem 0.5rem 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    /* BUTTONS */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 2rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        text-align: center;
+        line-height: 1.4;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: #471820;
+        color: #ffffff;
+        box-shadow: 0 4px 20px rgba(71, 24, 32, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: #3d1319;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(71, 24, 32, 0.4);
+    }
+
+    .btn:active {
+        transform: translateY(0) scale(0.98);
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--brand-700);
+        box-shadow: 0 4px 20px rgba(71, 24, 32, 0.1);
+    }
+
+    .search-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .search-bar input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        background: transparent;
+    }
+
+    .search-bar input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .search-btn {
+        background: var(--brand-700);
+        color: #ffffff;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background: var(--brand-800);
+        transform: scale(1.02);
+    }
+
+    /* FILTER BUTTONS */
+    .filter-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .filter-btn {
+        background: transparent;
+        border: 1.5px solid var(--brand-700);
+        color: var(--brand-700);
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-family: var(--font-sans);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: var(--brand-700);
+        color: #ffffff;
+    }
+
+    /* LEARNING PATH SECTION */
+    .learning-path-section {
+        background: 
+            linear-gradient(180deg, rgba(71, 24, 32, 0.85) 0%, rgba(61, 19, 25, 0.88) 100%),
+            url("{% static 'images/learning-path-bg.jpg' %}") center/cover no-repeat;
+        padding: 3rem 0;
+        position: relative;
+    }
+
+    .learning-path-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.1'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .learning-path-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .learning-path-title {
+        font-family: var(--font-serif);
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .learning-path-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .learning-path-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        border: 2px solid #d4a574;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .learning-path-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        background: #ffffff;
+    }
+
+    .learning-path-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 2px solid #d4a574;
+    }
+
+    .learning-path-card h3 {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.01em;
+    }
+
+    .learning-path-card p {
+        font-family: var(--font-sans);
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+        flex: 1;
+    }
+
+    .learning-path-meta {
+        display: flex;
+        justify-content: center;
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(71, 24, 32, 0.08);
+    }
+
+    .learning-path-meta span {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .learning-path-card .btn {
+        width: 100%;
+    }
+
+    /* LEARNING EXPERIENCE SECTION */
+    .learning-experience-section {
+        background: #faf6f1;
+        padding: 3rem 0;
+    }
+
+    .learning-experience-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .learning-experience-title {
+        font-family: var(--font-serif);
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .learning-experience-subtitle {
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .learning-experience-steps {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .learning-experience-card {
+        background: #ffffff;
+        padding: 1.75rem 1.25rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(71, 24, 32, 0.06);
+        border: 1px solid rgba(71, 24, 32, 0.05);
+        flex: 1;
+        max-width: 220px;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .learning-experience-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(71, 24, 32, 0.12);
+    }
+
+    .step-badge {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1rem;
+    }
+
+    .step-number {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 24px;
+        height: 24px;
+        background: var(--brand-700);
+        color: #ffffff;
+        font-size: 0.65rem;
+        font-weight: 700;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+    }
+
+    .step-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(71, 24, 32, 0.05);
+        border-radius: 50%;
+        border: 2px solid #d4a574;
+    }
+
+    .learning-experience-card h3 {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .learning-experience-card p {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .step-connector {
+        width: 40px;
+        height: 2px;
+        border-top: 2px dashed rgba(71, 24, 32, 0.2);
+        margin-top: 55px;
+        flex-shrink: 0;
+    }
+
+    .learning-experience-cta {
+        text-align: center;
+        margin-top: 2.5rem;
+    }
+
+    /* FAQ SECTION */
+    .faq-section {
+        background: #faf6f1;
+        padding: 0 0 4rem;
+    }
+
+    .faq-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .faq-title {
+        font-family: var(--font-serif);
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .faq-subtitle {
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .faq-list {
+        max-width: 700px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .faq-item {
+        background: #ffffff;
+        border-radius: 10px;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 2px 8px rgba(71, 24, 32, 0.04);
+    }
+
+    .faq-item:hover {
+        border-color: rgba(212, 165, 116, 0.4);
+    }
+
+    .faq-question {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        background: transparent;
+        border: none;
+        font-family: var(--font-serif);
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: var(--brand-700);
+        cursor: pointer;
+        text-align: left;
+        transition: all 0.3s ease;
+        gap: 1rem;
+    }
+
+    .faq-question:hover {
+        background: rgba(71, 24, 32, 0.04);
+    }
+
+    .faq-icon {
+        font-size: 1.3rem;
+        color: #d4a574;
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
+        font-weight: 700;
+    }
+
+    .faq-question[aria-expanded="true"] .faq-icon {
+        transform: rotate(45deg);
+    }
+
+    .faq-answer {
+        padding: 0 1.5rem 1.25rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        display: none;
+    }
+
+    .faq-question[aria-expanded="true"] + .faq-answer {
+        display: block;
+    }
+
+    .faq-support {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .faq-support p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .faq-support a {
+        color: var(--brand-700);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .faq-support a:hover {
+        color: #d4a574;
+    }
+
+    /* COURSES GRID */
+    .courses-section {
+        padding: 3rem 0 4rem;
+    }
+
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .course-card {
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 2px 10px rgba(71, 24, 32, 0.04);
+    }
+
+    .course-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(71, 24, 32, 0.12);
+    }
+
+    .course-card .thumb {
+        height: 180px;
+        background: linear-gradient(135deg, var(--brand-700) 0%, var(--accent-gold) 100%);
+        overflow: hidden;
+    }
+
+    .course-card .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .course-card .content {
+        padding: 1.25rem;
+    }
+
+    .course-card .badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--brand-700);
+        background: rgba(71, 24, 32, 0.06);
+        padding: 0.3rem 0.75rem;
+        border-radius: 50px;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(71, 24, 32, 0.1);
+    }
+
+    .course-card h3 {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .course-card p {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .course-card .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(71, 24, 32, 0.06);
+    }
+
+    .course-card .meta small {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .course-card .meta a {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--brand-700);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .course-card .meta a:hover {
+        color: var(--accent-gold);
+    }
+
+    .no-courses {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-muted);
+        font-size: 1rem;
+        grid-column: 1 / -1;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-on-scroll.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    .stagger-6 { transition-delay: 0.6s; }
+
+    .courses-hero-title {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .courses-hero-subtitle {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+        opacity: 0;
+    }
+
+    .courses-illustration {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+        opacity: 0;
+    }
+
+    .search-container {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+        opacity: 0;
+    }
+
+    .filter-buttons {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+        opacity: 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .courses-hero {
+            padding: 3rem 0 2rem;
+        }
+
+        .search-container {
+            flex-direction: column;
+        }
+
+        .search-bar {
+            width: 100%;
+        }
+
+        .learning-path-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .learning-experience-steps {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .step-connector {
+            width: 2px;
+            height: 20px;
+            border-top: none;
+            border-left: 2px dashed rgba(71, 24, 32, 0.2);
+            margin: 0;
+        }
+
+        .learning-experience-card {
+            max-width: 100%;
+        }
+
+        .courses-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- COURSES HERO -->
+<section class="courses-hero">
+    <div class="container">
+        <header class="courses-hero-header">
+            <h1 class="courses-hero-title">Explore Our Sacred Courses</h1>
+            <div class="flourish-divider">
+                <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="60" cy="10" r="3" fill="#471820"/>
+                </svg>
+            </div>
+            <p class="courses-hero-subtitle">Structured programs designed for sisters and children to master Quranic recitation, Tajweed, and Hifz from foundational to advanced levels.</p>
+        </header>
+
+        <!-- BOOK ILLUSTRATION -->
+        <div class="courses-illustration">
+            <svg width="180" height="80" viewBox="0 0 180 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Clouds -->
+                <ellipse cx="50" cy="45" rx="25" ry="15" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+                <ellipse cx="35" cy="42" rx="18" ry="12" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+                <ellipse cx="65" cy="42" rx="18" ry="12" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+                
+                <ellipse cx="130" cy="40" rx="22" ry="14" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+                <ellipse cx="118" cy="38" rx="16" ry="11" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+                <ellipse cx="142" cy="38" rx="16" ry="11" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+
+                <ellipse cx="90" cy="35" rx="28" ry="16" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+                <ellipse cx="72" cy="32" rx="20" ry="13" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+                <ellipse cx="108" cy="32" rx="20" ry="13" fill="rgba(71, 24, 32, 0.05)" stroke="#471820" stroke-width="1"/>
+
+                <!-- Small decorative stars -->
+                <path d="M30 25L32 20L34 25L39 27L34 29L32 34L30 29L25 27L30 25Z" fill="#d4a574" opacity="0.6"/>
+                <path d="M150 20L151.5 16L153 20L157 21.5L153 23L151.5 27L150 23L146 21.5L150 20Z" fill="#d4a574" opacity="0.6"/>
+                <path d="M85 15L86 12L87 15L90 16L87 17L86 20L85 17L82 16L85 15Z" fill="#d4a574" opacity="0.5"/>
+                <path d="M95 60L96 57L97 60L100 61L97 62L96 65L95 62L92 61L95 60Z" fill="#d4a574" opacity="0.4"/>
+                <path d="M60 55L61 52L62 55L65 56L62 57L61 60L60 57L57 56L60 55Z" fill="#d4a574" opacity="0.4"/>
+                <path d="M120 55L121 52L122 55L125 56L122 57L121 60L120 57L117 56L120 55Z" fill="#d4a574" opacity="0.4"/>
+            </svg>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="search-container">
+            <div class="search-bar">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="2" stroke-linecap="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="M21 21L16.65 16.65"/>
+                </svg>
+                <input type="text" placeholder="Search Courses (e.g., Tajweed, Hifz)...">
+                <button class="search-btn">Go</button>
+            </div>
+        </div>
+
+        <!-- FILTER BUTTONS -->
+        <div class="filter-buttons">
+            <button class="filter-btn active">For Sisters</button>
+            <button class="filter-btn">For Kids</button>
+        </div>
+    </div>
+</section>
+
+<!-- START YOUR LEARNING PATH -->
+<section class="learning-path-section">
+    <div class="container">
+        <header class="learning-path-header">
+            <h2 class="learning-path-title">Start Your Learning Path.</h2>
+            <div class="flourish-divider">
+                <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="60" cy="10" r="3" fill="#471820"/>
+                </svg>
+            </div>
+        </header>
+
+        <div class="learning-path-cards">
+            <!-- Card 1: Tajweed Mastery -->
+            <div class="learning-path-card">
+                <div class="learning-path-icon">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 38V22L24 16L36 22V38L24 32L12 38Z" stroke="#471820" stroke-width="1.8" stroke-linejoin="round"/>
+                        <path d="M24 16V32" stroke="#471820" stroke-width="1.5"/>
+                        <path d="M16 24L24 20L32 24" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        <path d="M16 28L24 24L32 28" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3>Tajweed Mastery Course</h3>
+                <p>Learn precise articulation rules (Makharij) and recitation with clarity under expert guidance.</p>
+                <div class="learning-path-meta">
+                    <span>⏱️ 3 Months</span>
+                    <span>👩‍🎓 For Sisters</span>
+                </div>
+                <a class="btn btn-primary" href="{% url 'courses:course_list' %}">View Details</a>
+            </div>
+
+            <!-- Card 2: Hifz & Memorization -->
+            <div class="learning-path-card">
+                <div class="learning-path-icon">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="8" width="28" height="32" rx="2" stroke="#471820" stroke-width="1.8"/>
+                        <path d="M10 14H38" stroke="#471820" stroke-width="1.2"/>
+                        <path d="M10 34H38" stroke="#471820" stroke-width="1.2"/>
+                        <path d="M18 20H30" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M18 24H30" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M18 28H26" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M6 18L10 14" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M6 38L10 34" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3>Hifz & Memorization Program</h3>
+                <p>A structured, step-by-step Quran memorization program tailored with regular revision cycles.</p>
+                <div class="learning-path-meta">
+                    <span>📅 Self-Paced</span>
+                    <span>👩‍🎓 For Sisters & Kids</span>
+                </div>
+                <a class="btn btn-primary" href="{% url 'courses:course_list' %}">View Details</a>
+            </div>
+
+            <!-- Card 3: Nazra & Kids -->
+            <div class="learning-path-card">
+                <div class="learning-path-icon">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="10" width="32" height="28" rx="2" stroke="#471820" stroke-width="1.8"/>
+                        <path d="M8 16H40" stroke="#471820" stroke-width="1.2"/>
+                        <path d="M16 22H32" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M16 26H32" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M16 30H28" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M24 6L25.5 10L30 11L26.5 14L27.5 18L24 16L20.5 18L21.5 14L18 11L22.5 10L24 6Z" stroke="#471820" stroke-width="1.2" fill="rgba(212, 165, 116, 0.3)"/>
+                    </svg>
+                </div>
+                <h3>Nazra & Kids Quran Classes</h3>
+                <p>Engaging and friendly interactive classes designed to help children read the Quran fluently from scratch.</p>
+                <div class="learning-path-meta">
+                    <span>🔄 Ongoing</span>
+                    <span>👶 For Kids</span>
+                </div>
+                <a class="btn btn-primary" href="{% url 'courses:course_list' %}">View Details</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- YOUR LEARNING EXPERIENCE -->
+<section class="learning-experience-section">
+    <div class="container">
+        <header class="learning-experience-header">
+            <h2 class="learning-experience-title">Your Learning Experience.</h2>
+            <div class="flourish-divider">
+                <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="60" cy="10" r="3" fill="#471820"/>
+                </svg>
+            </div>
+            <p class="learning-experience-subtitle">A simple, structured path to mastering the Quran with personalized guidance.</p>
+        </header>
+
+        <div class="learning-experience-steps">
+            <!-- Step 1 -->
+            <div class="learning-experience-card">
+                <div class="step-badge">
+                    <span class="step-number">01</span>
+                    <div class="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5" stroke-linecap="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2"/>
+                            <path d="M16 2v4M8 2v4M3 10h18"/>
+                            <circle cx="12" cy="15" r="2"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3>Choose Your Path</h3>
+                <p>Select the ideal course and flexible schedule that fits your daily routine.</p>
+            </div>
+
+            <div class="step-connector"></div>
+
+            <!-- Step 2 -->
+            <div class="learning-experience-card">
+                <div class="step-badge">
+                    <span class="step-number">02</span>
+                    <div class="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5" stroke-linecap="round">
+                            <rect x="2" y="4" width="20" height="14" rx="2"/>
+                            <path d="M8 22h8M12 18v4"/>
+                            <circle cx="12" cy="11" r="3"/>
+                            <path d="M8 11h0M16 11h0"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3>Meet Your Qariya</h3>
+                <p>Connect with a certified, qualified female scholar for 1-on-1 live interactive sessions.</p>
+            </div>
+
+            <div class="step-connector"></div>
+
+            <!-- Step 3 -->
+            <div class="learning-experience-card">
+                <div class="step-badge">
+                    <span class="step-number">03</span>
+                    <div class="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5" stroke-linecap="round">
+                            <path d="M4 19V5a2 2 0 012-2h8l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2z"/>
+                            <path d="M14 3v6h6"/>
+                            <path d="M9 13h6M9 17h4"/>
+                            <path d="M17 15l2 2 4-4"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3>Interactive Practice</h3>
+                <p>Recite, correct your Makharij, and receive immediate, gentle feedback.</p>
+            </div>
+
+            <div class="step-connector"></div>
+
+            <!-- Step 4 -->
+            <div class="learning-experience-card">
+                <div class="step-badge">
+                    <span class="step-number">04</span>
+                    <div class="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5" stroke-linecap="round">
+                            <rect x="4" y="2" width="16" height="20" rx="2"/>
+                            <path d="M8 6h8M8 10h8M8 14h4"/>
+                            <path d="M12 18l2 2 4-4"/>
+                            <path d="M16 2l2 2-2 2"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3>Track & Flourish</h3>
+                <p>Monitor your spiritual growth with weekly progress reports and completion certificates.</p>
+            </div>
+        </div>
+
+        <div class="learning-experience-cta">
+            <a class="btn btn-primary" href="{% url 'accounts:register' %}">Book a Free Assessment Session</a>
+        </div>
+    </div>
+</section>
+
+<!-- COURSES GRID -->
+<section class="courses-section">
+    <div class="courses-grid">
+        {% for course in courses %}
+        <article class="course-card animate-on-scroll stagger-{{ forloop.counter }}">
+            <div class="thumb">
+                {% if course.image_url %}
+                <img src="{{ course.image_url }}" alt="{{ course.title }}">
+                {% elif course.image %}
+                <img src="{{ course.image.url }}" alt="{{ course.title }}">
+                {% endif %}
+            </div>
+            <div class="content">
+                <span class="badge">{{ course.category|default:"Islamic Learning" }}</span>
+                <h3>{{ course.title }}</h3>
+                <p>{{ course.description }}</p>
+                <div class="meta">
+                    <small>{{ course.duration|default:"6 weeks" }} · {{ course.level|default:"Beginner" }}</small>
+                    <a href="{% url 'courses:course_detail' course.slug %}">View Course →</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="faq-section">
+    <div class="container">
+        <header class="faq-header">
+            <h2 class="faq-title">Frequently Asked Questions.</h2>
+            <div class="flourish-divider">
+                <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="60" cy="10" r="3" fill="#471820"/>
+                </svg>
+            </div>
+            <p class="faq-subtitle">Got questions? We're here to answer everything you need to know about our classes.</p>
+        </header>
+
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    Are the classes one-on-one or in groups?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    All classes are strictly 1-on-1 with certified female Qariyas to ensure personal attention and proper Tajweed correction.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    What platform is used for the live sessions?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    Classes are conducted via Zoom or Google Meet at your preferred flexible schedule.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    Are there separate batches for kids and adult sisters?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    Yes, we provide specialized curricula and customized pacing tailored separately for young children and adult sisters.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    How does the free assessment session work?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    Simply book a session, check your current reading level with our expert instructor, and pick your routine with zero commitment.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-support">
+            <p>Have more questions? <a href="https://chat.whatsapp.com/By6RP0uCP3L9t8ybOPfT2N" target="_blank">Contact our support team via WhatsApp.</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll animations
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(function(el) {
+            observer.observe(el);
+        });
+
+        // Filter buttons
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-bar input');
+        const searchBtn = document.querySelector('.search-btn');
+        
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value.toLowerCase();
+            const cards = document.querySelectorAll('.course-card');
+            cards.forEach(function(card) {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const desc = card.querySelector('p').textContent.toLowerCase();
+                if (title.includes(query) || desc.includes(query) || query === '') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+
+        // FAQ accordion
+        const faqButtons = document.querySelectorAll('.faq-question');
+        faqButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !expanded);
+            });
+        });
+    });
+</script>
+{% endblock %}

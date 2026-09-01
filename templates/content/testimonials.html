@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Testimonials | Muslimaa Academy{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="section-title">What Our <span class="highlight">Learners Say</span></h1>
+        <p class="section-subtitle">Hear from women who have transformed their lives through Muslimaa Academy.</p>
+        
+        <div class="cards-grid" style="margin-top: 2rem;">
+            {% for testimonial in testimonials %}
+            <figure class="testimonial-card">
+                <blockquote>{{ testimonial.quote }}</blockquote>
+                <figcaption>
+                    — {{ testimonial.author }}
+                    {% if testimonial.course_or_program %}<span> · {{ testimonial.course_or_program }}</span>{% endif %}
+                </figcaption>
+            </figure>
+            {% empty %}
+            <p style="text-align: center; padding: 2rem;">Join our community and share your story!</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

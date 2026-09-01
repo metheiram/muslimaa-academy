@@ -1,0 +1,13 @@
+# Muslimaa Academy
+
+Project scaffold for Muslimaa Academy Django site.
+
+Run setup:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python manage.py check
+```

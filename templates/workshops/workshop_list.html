@@ -1,0 +1,37 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Workshops | Muslimaa Academy{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="section-title">Upcoming <span class="highlight">Workshops</span></h1>
+        <p class="section-subtitle">Learn beyond the classroom with our specialized workshops designed for meaningful growth.</p>
+        
+        <div class="cards-grid" style="margin-top: 2rem;">
+            {% for workshop in workshops %}
+            <article class="course-card">
+                <div class="content">
+                    <h3>{{ workshop.title }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: var(--space-sm);">
+                        {{ workshop.date }} · {{ workshop.time }}
+                    </p>
+                    <p>{{ workshop.description }}</p>
+                    {% if workshop.instructor %}
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--space-md);">
+                        <strong>Instructor:</strong> {{ workshop.instructor.get_full_name|default:workshop.instructor.username }}
+                    </p>
+                    {% endif %}
+                    <div class="meta" style="border-top: none; padding-top: 0; margin-top: auto;">
+                        <a class="btn btn-link" href="{% url 'workshops:workshop_detail' workshop.slug %}">View Details</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <p style="text-align: center; padding: 2rem;">New workshops are coming soon. Check back later!</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

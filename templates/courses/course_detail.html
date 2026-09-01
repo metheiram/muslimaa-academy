@@ -1,0 +1,43 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} | Muslimaa Academy{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <a href="{% url 'courses:course_list' %}">← Back to Courses</a>
+        </div>
+        
+        {% if course.image_url or course.image %}
+        <img src="{% if course.image_url %}{{ course.image_url }}{% elif course.image %}{{ course.image.url }}{% endif %}" 
+             alt="{{ course.title }}" 
+             style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 2rem;">
+        {% endif %}
+        
+        <h1 class="section-title">{{ course.title }}</h1>
+        
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <div>
+                <p class="section-subtitle" style="margin-top: 1rem;">{{ course.description }}</p>
+            </div>
+            
+            <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 12px;">
+                <h3>Course Details</h3>
+                <p><strong>Category:</strong> {{ course.category }}</p>
+                <p><strong>Level:</strong> {{ course.level }}</p>
+                <p><strong>Duration:</strong> {{ course.duration }}</p>
+                {% if course.price %}
+                <p><strong>Price:</strong> ${{ course.price }}</p>
+                {% endif %}
+                {% if course.instructor %}
+                <p><strong>Instructor:</strong> {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                {% endif %}
+                
+                <a class="btn btn-primary" href="{% url 'accounts:register' %}" style="width: 100%; margin-top: 1rem;">Enroll Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

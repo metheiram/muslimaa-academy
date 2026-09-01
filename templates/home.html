@@ -1,0 +1,2301 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* ========================================
+       ROOT VARIABLES — Design System  
+       ======================================== */
+    :root {
+        /* Primary burgundy (#471820) palette */
+        --brand-50: #fef5f8;
+        --brand-100: #fce7f0;
+        --brand-200: #f8d4e3;
+        --brand-300: #f1b8d0;
+        --brand-400: #e99cbd;
+        --brand-500: #d67e9f;
+        --brand-600: #b85276;
+        --brand-700: #471820;
+        --brand-800: #3d1319;
+        --brand-900: #2d0d0f;
+
+        /* Gold/Cream accents */
+        --accent-gold: #d4a574;
+        --accent-light: #f5f0e8;
+        --accent-cream: #fdf7f0;
+
+        /* Neutrals */
+        --neutral-50: #fafafa;
+        --neutral-100: #f5f5f5;
+        --neutral-200: #e5e5e5;
+        --neutral-300: #d4d4d4;
+        --neutral-400: #a3a3a3;
+        --neutral-500: #737373;
+        --neutral-600: #525252;
+        --neutral-700: #404040;
+        --neutral-800: #262626;
+        --neutral-900: #171717;
+
+        /* Semantic */
+        --white: #ffffff;
+        --black: #0a0a0a;
+        --text-primary: #2d0d0f;
+        --text-secondary: #5a4a55;
+        --text-muted: #8a7a85;
+        --bg-body: #fdf8f5;
+
+        /* Fonts */
+        --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+        /* Spacing */
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+        --space-2xl: 3rem;
+        --space-3xl: 4rem;
+        --space-4xl: 5rem;
+
+        /* Radius */
+        --radius-sm: 6px;
+        --radius-md: 12px;
+        --radius-lg: 20px;
+        --radius-xl: 28px;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px rgba(71, 24, 32, 0.04);
+        --shadow-md: 0 4px 16px rgba(71, 24, 32, 0.08);
+        --shadow-lg: 0 12px 40px rgba(71, 24, 32, 0.12);
+        --shadow-xl: 0 20px 60px rgba(71, 24, 32, 0.15);
+
+        /* Transitions */
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        --duration-smooth: 0.5s;
+        --duration-brisk: 0.3s;
+    }
+
+    /* ========================================
+       RESET & BASE
+       ======================================== */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        background: var(--bg-body);
+        color: var(--text-primary);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    img {
+        max-width: 100%;
+        display: block;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    /* ========================================
+       UTILITY
+       ======================================== */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 var(--space-lg);
+    }
+
+    .section {
+        padding: var(--space-4xl) 0;
+    }
+
+    .section--soft {
+        background: var(--accent-light);
+    }
+
+    .section--cream {
+        background: var(--accent-cream);
+    }
+
+    .section--surface {
+        background: var(--white);
+        border-top: 1px solid rgba(71, 24, 32, 0.05);
+        border-bottom: 1px solid rgba(71, 24, 32, 0.05);
+    }
+
+    .section-header {
+        max-width: 700px;
+        margin-bottom: var(--space-2xl);
+    }
+
+    .section-title {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        color: var(--brand-700);
+    }
+
+    .section-title .highlight {
+        color: var(--accent-gold);
+    }
+
+    .section-subtitle {
+        font-size: 1.08rem;
+        color: var(--text-secondary);
+        margin-top: var(--space-sm);
+        max-width: 60ch;
+        line-height: 1.8;
+    }
+
+    /* ========================================
+       BUTTONS
+       ======================================== */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-sm);
+        padding: 0.85rem 2rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        transition: all var(--duration-brisk) var(--ease-out);
+        text-align: center;
+        line-height: 1.4;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: var(--brand-700);
+        color: var(--white);
+        box-shadow: 0 4px 20px rgba(71, 24, 32, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: var(--brand-800);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(71, 24, 32, 0.4);
+    }
+
+    .btn-secondary {
+        background: var(--accent-gold);
+        color: var(--white);
+        box-shadow: 0 4px 15px rgba(212, 165, 116, 0.25);
+    }
+
+    .btn-secondary:hover {
+        background: #c89464;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 165, 116, 0.35);
+    }
+
+    .btn-link {
+        background: transparent;
+        color: var(--brand-700);
+        padding: 0.75rem 1rem;
+        font-weight: 700;
+    }
+
+    .btn-outline-brand {
+        background: transparent;
+        border: 2px solid var(--brand-700);
+        color: var(--brand-700);
+    }
+
+    .btn-outline-brand:hover {
+        background: var(--brand-700);
+        color: var(--white);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(71, 24, 32, 0.3);
+    }
+
+    .btn-outline-light {
+        background: transparent;
+        border: 2px solid var(--white);
+        color: var(--white);
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* ========================================
+       HERO SECTION
+       ======================================== */
+    .hero {
+        padding: var(--space-xl) 0 var(--space-2xl);
+        background: linear-gradient(160deg, #fdf9f5 0%, #faf3eb 30%, #f7ede2 60%, #f5e8da 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        right: -5%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(212, 165, 116, 0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(71, 24, 32, 0.04) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero .container {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: var(--space-3xl);
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-eyebrow {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--brand-700);
+        background: rgba(71, 24, 32, 0.06);
+        padding: 0.5rem 1.4rem;
+        border-radius: 50px;
+        margin-bottom: var(--space-lg);
+        border: 1px solid rgba(71, 24, 32, 0.12);
+    }
+
+    .hero-title {
+        font-family: var(--font-serif);
+        font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        color: var(--brand-700);
+        margin-bottom: var(--space-md);
+    }
+
+    .hero-title .accent {
+        color: var(--accent-gold);
+        display: block;
+        font-style: italic;
+    }
+
+    .hero-lead {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        max-width: 48ch;
+        line-height: 1.8;
+        margin-bottom: var(--space-md);
+    }
+
+    .hero-ctas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        margin-top: var(--space-lg);
+    }
+
+    .trust-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-lg);
+        margin-top: var(--space-xl);
+        padding-top: var(--space-lg);
+        border-top: 1px solid rgba(71, 24, 32, 0.1);
+    }
+
+    .trust-list div {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+
+    .trust-list div::before {
+        content: '✓';
+        color: var(--accent-gold);
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .hero-media {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: -1.5rem;
+    }
+
+    .hero-media::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        width: 120px;
+        height: 120px;
+        border: 2px solid rgba(212, 165, 116, 0.2);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero-media::after {
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        right: -30px;
+        width: 80px;
+        height: 80px;
+        border: 2px solid rgba(71, 24, 32, 0.1);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero-media .image {
+        width: 100%;
+        max-width: 340px;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+        background: linear-gradient(145deg, #f5e6d8 0%, #e8d5c4 50%, #d4c4b0 100%);
+        aspect-ratio: 4/5;
+        position: relative;
+    }
+
+    .hero-media .image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(145deg, rgba(71, 24, 32, 0.05) 0%, rgba(212, 165, 116, 0.1) 100%);
+    }
+
+    .image-placeholder .placeholder-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+    }
+
+    .image-placeholder p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-style: italic;
+        line-height: 1.6;
+    }
+
+    .floating-card {
+        position: absolute;
+        bottom: -1rem;
+        right: -1rem;
+        background: rgba(255, 255, 255, 0.95);
+        padding: var(--space-lg) var(--space-xl);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        max-width: 240px;
+        border: 1px solid rgba(71, 24, 32, 0.1);
+        border-left: 4px solid var(--accent-gold);
+        backdrop-filter: blur(10px);
+    }
+
+    .floating-card h4 {
+        font-family: var(--font-serif);
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 4px;
+    }
+
+    .floating-card p {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    /* ========================================
+       TRUST STRIP
+       ======================================== */
+    .trust-section {
+        background: #faf6f1;
+        padding: var(--space-3xl) 0;
+    }
+
+    .trust-strip {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-xl);
+        text-align: center;
+    }
+
+    .trust-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: var(--space-lg);
+    }
+
+    .trust-item strong {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+    }
+
+    .trust-item span {
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        font-weight: 400;
+    }
+
+    /* ========================================
+       ABOUT US SECTION
+       ======================================== */
+    .about-section {
+        background: #faf6f1;
+        padding: var(--space-4xl) 0;
+    }
+
+    .about-header {
+        text-align: center;
+        margin-bottom: var(--space-3xl);
+    }
+
+    .about-title {
+        font-family: var(--font-serif);
+        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-md);
+    }
+
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-3xl);
+        align-items: start;
+    }
+
+    .about-left {
+        text-align: center;
+    }
+
+    .about-icon {
+        margin-bottom: var(--space-xl);
+    }
+
+    .about-mission {
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .about-right {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+        padding-top: var(--space-lg);
+    }
+
+    .about-value h3 {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 8px;
+    }
+
+    .about-value p {
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .about-cta {
+        text-align: center;
+        margin-top: var(--space-3xl);
+    }
+
+    /* ========================================
+       WHY CHOOSE US SECTION
+       ======================================== */
+    .why-choose-section {
+        background: #faf6f1;
+        padding: var(--space-4xl) 0;
+    }
+
+    .why-choose-header {
+        text-align: center;
+        margin-bottom: var(--space-3xl);
+    }
+
+    .why-choose-title {
+        font-family: var(--font-serif);
+        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-md);
+    }
+
+    .why-choose-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-xl);
+    }
+
+    .why-choose-card {
+        background: var(--white);
+        padding: var(--space-2xl) var(--space-xl);
+        border-radius: var(--radius-md);
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(71, 24, 32, 0.06);
+        transition: all var(--duration-brisk) var(--ease-out);
+        border: 1px solid rgba(71, 24, 32, 0.05);
+    }
+
+    .why-choose-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(71, 24, 32, 0.1);
+    }
+
+    .why-choose-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto var(--space-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(71, 24, 32, 0.05);
+        border-radius: 50%;
+        border: 2px solid #d4a574;
+    }
+
+    .why-choose-card h3 {
+        font-family: var(--font-serif);
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 10px;
+        letter-spacing: -0.01em;
+    }
+
+    .why-choose-card p {
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .why-choose-cta {
+        text-align: center;
+        margin-top: var(--space-3xl);
+    }
+
+    /* ========================================
+       TESTIMONIALS SECTION
+       ======================================== */
+    .testimonials-section {
+        background: 
+            linear-gradient(180deg, rgba(71, 24, 32, 0.85) 0%, rgba(61, 19, 25, 0.88) 100%),
+            url("{% static 'images/testimonials-bg.jpg' %}") center/cover no-repeat;
+        padding: var(--space-3xl) 0;
+        position: relative;
+    }
+
+    .testimonials-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.1'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .testimonials-header {
+        text-align: center;
+        margin-bottom: var(--space-2xl);
+        position: relative;
+        z-index: 1;
+    }
+
+    .testimonials-title {
+        font-family: var(--font-serif);
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-sm);
+    }
+
+    .testimonials-subtitle {
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: var(--space-md);
+    }
+
+    .testimonials-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-lg);
+        position: relative;
+        z-index: 1;
+    }
+
+    .testimonial-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: var(--space-lg);
+        border-radius: var(--radius-md);
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all var(--duration-brisk) var(--ease-out);
+        border: 2px solid #d4a574;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .testimonial-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #471820;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        background: var(--white);
+    }
+
+    .testimonial-avatar {
+        width: 52px;
+        height: 52px;
+        margin: 0 auto var(--space-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 2px solid #d4a574;
+    }
+
+    .testimonial-avatar svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .testimonial-role {
+        font-family: var(--font-sans);
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+    }
+
+    .testimonial-stars {
+        color: #d4a574;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        margin-bottom: var(--space-sm);
+    }
+
+    .testimonial-quote {
+        font-family: var(--font-sans);
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        font-style: italic;
+        margin: 0 0 var(--space-md) 0;
+        flex: 1;
+    }
+
+    .testimonial-author {
+        padding-top: var(--space-sm);
+        border-top: 1px solid rgba(71, 24, 32, 0.08);
+    }
+
+    .testimonial-author strong {
+        font-family: var(--font-serif);
+        font-size: 0.9rem;
+        color: var(--brand-700);
+        font-weight: 700;
+    }
+
+    .testimonials-cta {
+        text-align: center;
+        margin-top: var(--space-2xl);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ========================================
+       OUR COURSES SECTION
+       ======================================== */
+    .our-courses-section {
+        background: 
+            linear-gradient(180deg, rgba(71, 24, 32, 0.85) 0%, rgba(61, 19, 25, 0.88) 100%),
+            url("{% static 'images/courses-bg.jpg' %}") center/cover no-repeat;
+        padding: var(--space-4xl) 0 var(--space-3xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .our-courses-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.1'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .our-courses-header {
+        text-align: center;
+        margin-bottom: var(--space-3xl);
+        position: relative;
+        z-index: 1;
+    }
+
+    .our-courses-title {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 3.5vw, 2.8rem);
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-md);
+    }
+
+    .flourish-divider {
+        display: flex;
+        justify-content: center;
+        margin-bottom: var(--space-lg);
+        opacity: 0.8;
+    }
+
+    .flourish-divider svg path,
+    .flourish-divider svg circle {
+        stroke: #d4a574;
+        fill: #d4a574;
+    }
+
+    .our-courses-subtitle {
+        font-family: var(--font-serif);
+        font-size: clamp(1.1rem, 2vw, 1.35rem);
+        font-weight: 600;
+        color: #ffffff;
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
+    .courses-cards-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--space-lg);
+        position: relative;
+        z-index: 1;
+    }
+
+    .course-feature-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: var(--space-2xl) var(--space-xl);
+        border-radius: var(--radius-md);
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all var(--duration-brisk) var(--ease-out);
+        border: 2px solid #d4a574;
+    }
+
+    .course-feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        background: var(--white);
+        border-color: #c89464;
+    }
+
+    .course-feature-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto var(--space-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 2px solid #d4a574;
+    }
+
+    .course-feature-card h3 {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 6px;
+        letter-spacing: -0.01em;
+    }
+
+    .course-feature-card p {
+        font-family: var(--font-sans);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* ========================================
+       COURSE GRID
+       ======================================== */
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--space-lg);
+    }
+
+    .course-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        transition: all var(--duration-smooth) var(--ease-out);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .course-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(212, 165, 116, 0.3);
+    }
+
+    .course-card .thumb {
+        height: 180px;
+        background: linear-gradient(135deg, var(--brand-700) 0%, var(--accent-gold) 100%);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .course-card .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.9;
+    }
+
+    .course-card .content {
+        padding: var(--space-lg);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .course-card .badge {
+        display: inline-block;
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--brand-700);
+        background: rgba(71, 24, 32, 0.08);
+        padding: 0.3rem 0.85rem;
+        border-radius: 50px;
+        align-self: flex-start;
+        margin-bottom: var(--space-md);
+        border: 1px solid rgba(71, 24, 32, 0.12);
+    }
+
+    .course-card h3 {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: var(--space-xs);
+        line-height: 1.3;
+    }
+
+    .course-card .instructor {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: var(--space-md);
+    }
+
+    .course-card p {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        flex: 1;
+        margin-bottom: var(--space-md);
+    }
+
+    .course-card .course-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        margin-bottom: var(--space-md);
+        padding-bottom: var(--space-md);
+        border-bottom: 1px solid rgba(71, 24, 32, 0.06);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    .course-card .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    /* ========================================
+       WHY CHOOSE US
+       ======================================== */
+    .why-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-lg);
+        margin-top: var(--space-2xl);
+    }
+
+    .why-item {
+        background: var(--white);
+        padding: var(--space-xl);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        transition: all var(--duration-brisk) var(--ease-out);
+        border-left: 4px solid var(--accent-gold);
+    }
+
+    .why-item:hover {
+        border-left-color: var(--brand-700);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-3px);
+    }
+
+    .why-item .icon {
+        font-size: 2.5rem;
+        margin-bottom: var(--space-md);
+    }
+
+    .why-item strong {
+        display: block;
+        font-family: var(--font-serif);
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 6px;
+    }
+
+    .why-item p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+
+    /* ========================================
+       INSTRUCTOR SECTION
+       ======================================== */
+    .instructor-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--space-xl);
+        margin-top: var(--space-2xl);
+    }
+
+    .instructor-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        transition: all var(--duration-smooth) var(--ease-out);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .instructor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .instructor-card .avatar {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, var(--accent-gold) 0%, var(--brand-700) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .instructor-card .info {
+        padding: var(--space-lg);
+        text-align: center;
+    }
+
+    .instructor-card h4 {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 4px;
+    }
+
+    .instructor-card .specialty {
+        font-size: 0.85rem;
+        color: var(--accent-gold);
+        font-weight: 700;
+        margin-bottom: var(--space-md);
+    }
+
+    .instructor-card p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    /* ========================================
+       TIMELINE
+       ======================================== */
+    .timeline {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-xl);
+        margin-top: var(--space-2xl);
+        position: relative;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 1.5rem;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+    }
+
+    .timeline-step {
+        position: relative;
+        z-index: 1;
+        background: var(--white);
+        padding: var(--space-lg);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        transition: all var(--duration-brisk) var(--ease-out);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-step:hover {
+        border-color: rgba(212, 165, 116, 0.3);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-3px);
+    }
+
+    .timeline-step .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+        font-weight: 900;
+        color: var(--white);
+        background: var(--brand-700);
+        border-radius: 50%;
+        margin-bottom: var(--space-md);
+        margin-left: -8px;
+    }
+
+    .timeline-step strong {
+        display: block;
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 4px;
+    }
+
+    .timeline-step p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    /* ========================================
+       CARDS GRID
+       ======================================== */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--space-lg);
+        margin-top: var(--space-2xl);
+    }
+
+    /* ========================================
+       TESTIMONIALS
+       ======================================== */
+    .testimonial-card {
+        background: var(--white);
+        padding: var(--space-lg);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        transition: all var(--duration-brisk) var(--ease-out);
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .testimonial-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-gold), var(--brand-700));
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .testimonial-card .whatsapp-style {
+        background: #dfe5e7;
+        padding: var(--space-md);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--space-md);
+    }
+
+    .testimonial-card blockquote {
+        font-size: 0.9rem;
+        color: #1a1a1a;
+        line-height: 1.6;
+    }
+
+    .testimonial-card figcaption {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-top: var(--space-md);
+        padding-top: var(--space-md);
+        border-top: 1px solid rgba(71, 24, 32, 0.06);
+    }
+
+    /* ========================================
+       FULL CTA
+       ======================================== */
+    .full-cta {
+        background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-800) 100%);
+        padding: var(--space-4xl) 0;
+        text-align: center;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .full-cta .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .full-cta h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+
+    .full-cta p {
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 60ch;
+        margin: var(--space-lg) auto 0;
+        font-size: 1.05rem;
+        line-height: 1.8;
+    }
+
+    .full-cta .cta-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        justify-content: center;
+        margin-top: var(--space-xl);
+    }
+
+    /* ========================================
+       FAQ
+       ======================================== */
+    .faq-list {
+        max-width: 750px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+        margin-top: var(--space-2xl);
+    }
+
+    .faq-item {
+        background: var(--white);
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        overflow: hidden;
+        transition: all var(--duration-brisk) var(--ease-out);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .faq-item:hover {
+        border-color: rgba(212, 165, 116, 0.3);
+    }
+
+    .faq-question {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-lg);
+        background: transparent;
+        border: 1px solid rgba(71, 24, 32, 0.08);
+        border-radius: var(--radius-sm);
+        font-family: var(--font-serif);
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: var(--brand-700);
+        cursor: pointer;
+        text-align: left;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        gap: var(--space-md);
+    }
+
+    .faq-question:hover {
+        background: rgba(71, 24, 32, 0.08);
+        border-color: rgba(71, 24, 32, 0.15);
+        transform: translateX(4px);
+    }
+
+    .faq-question .icon {
+        font-size: 1.4rem;
+        color: var(--accent-gold);
+        flex-shrink: 0;
+        transition: transform var(--duration-brisk) var(--ease-out);
+        font-weight: 700;
+    }
+
+    .faq-question[aria-expanded="true"] .icon {
+        transform: rotate(45deg);
+    }
+
+    .faq-answer {
+        padding: 0 var(--space-lg) var(--space-lg);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        display: none;
+    }
+
+    .faq-question[aria-expanded="true"]+.faq-answer {
+        display: block;
+    }
+
+    /* ========================================
+       FINAL CTA
+       ======================================== */
+    .final-cta {
+        text-align: center;
+        padding: var(--space-4xl) 0;
+    }
+
+    .final-cta .section-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .final-cta .btn {
+        margin-top: var(--space-lg);
+    }
+
+    /* ========================================
+       SCROLL ANIMATIONS
+       ======================================== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Animation classes */
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-on-scroll.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .animate-fade-in {
+        opacity: 0;
+        transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-fade-in.is-visible {
+        opacity: 1;
+    }
+
+    .animate-slide-left {
+        opacity: 0;
+        transform: translateX(-30px);
+        transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-slide-left.is-visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .animate-slide-right {
+        opacity: 0;
+        transform: translateX(30px);
+        transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-slide-right.is-visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .animate-scale {
+        opacity: 0;
+        transform: scale(0.9);
+        transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-scale.is-visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* Stagger delays */
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+
+    /* Button hover animations */
+    .btn {
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .btn:hover {
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    .btn:active {
+        transform: translateY(0) scale(0.98);
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 8px 25px rgba(71, 24, 32, 0.4);
+    }
+
+    .btn-secondary:hover {
+        box-shadow: 0 8px 25px rgba(212, 165, 116, 0.4);
+    }
+
+    .btn-outline-brand:hover {
+        box-shadow: 0 8px 25px rgba(71, 24, 32, 0.3);
+    }
+
+    /* Card hover animations */
+    .course-feature-card,
+    .why-choose-card,
+    .testimonial-card {
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .course-feature-card:hover,
+    .why-choose-card:hover,
+    .testimonial-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(71, 24, 32, 0.15);
+    }
+
+    /* Hero animations */
+    .hero-left {
+        animation: slideInLeft 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .hero-media {
+        animation: slideInRight 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+        opacity: 0;
+    }
+
+    .hero-eyebrow {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+        opacity: 0;
+    }
+
+    .hero-title {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+        opacity: 0;
+    }
+
+    .hero-lead {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+        opacity: 0;
+    }
+
+    .hero-ctas {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+        opacity: 0;
+    }
+
+    .trust-list {
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+        opacity: 0;
+    }
+
+    /* Floating card animation */
+    .floating-card {
+        animation: scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.8s forwards;
+        opacity: 0;
+    }
+
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    @media (max-width: 1024px) {
+        .hero .container {
+            grid-template-columns: 1fr;
+            gap: var(--space-2xl);
+            text-align: center;
+        }
+
+        .hero-lead {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-ctas {
+            justify-content: center;
+        }
+
+        .why-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .courses-cards-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .about-grid {
+            grid-template-columns: 1fr;
+            gap: var(--space-2xl);
+        }
+
+        .about-right {
+            padding-top: 0;
+        }
+
+        .why-choose-cards {
+            grid-template-columns: 1fr;
+            gap: var(--space-lg);
+        }
+
+        .testimonials-cards {
+            grid-template-columns: 1fr;
+            gap: var(--space-lg);
+        }
+
+        .timeline {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .timeline::before {
+            display: none;
+        }
+
+        .trust-strip {
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .trust-section {
+            padding: var(--space-2xl) 0;
+        }
+
+        .section {
+            padding: var(--space-2xl) 0;
+        }
+
+        .full-cta {
+            padding: var(--space-2xl) 0;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .hero {
+            padding: var(--space-lg) 0 var(--space-xl);
+        }
+
+        .hero-title {
+            font-size: 1.8rem;
+        }
+
+        .hero-ctas {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .hero-ctas .btn {
+            width: 100%;
+        }
+
+        .trust-strip {
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+            padding: var(--space-lg) 0;
+        }
+
+        .why-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .courses-cards-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .timeline {
+            grid-template-columns: 1fr;
+        }
+
+        .courses-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .instructor-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .full-cta h2 {
+            font-size: 1.8rem;
+        }
+
+        .full-cta .cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .full-cta .cta-buttons .btn {
+            width: 100%;
+        }
+
+        .container {
+            padding: 0 var(--space-md);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block title %}Muslimaa Academy | Learn, Grow & Lead with Purpose{% endblock %}
+
+{% block content %}
+
+<main>
+
+    <!-- HERO SECTION -->
+    <section class="hero section">
+        <div class="container">
+            <div class="hero-left">
+                <div class="hero-eyebrow">✨ Welcome to Muslimaa Academy</div>
+                <h1 class="hero-title">
+                    Empowering the Next Generation of
+                    <span class="accent">Knowledgeable Muslimahs.</span>
+                </h1>
+                <p class="hero-lead">
+                    A premium learning experience designed for Muslim women seeking excellence in Islamic knowledge, personal growth, and leadership.
+                </p>
+                <div class="hero-ctas">
+                    <a class="btn btn-outline-brand" href="{% url 'courses:course_list' %}">Explore Courses</a>
+                    <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start Your Journey Today</a>
+                </div>
+                <div class="trust-list">
+                    <div>Expert Islamic Educators</div>
+                    <div>Supportive Community</div>
+                    <div>Flexible Online Learning</div>
+                </div>
+            </div>
+
+            <div class="hero-media">
+                <div class="image">
+                    <img src="{% static 'images/hero.jpg' %}" alt="Young Muslim women in hijabs studying together in a modern bright library" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'image-placeholder\'><div class=\'placeholder-icon\'>📖</div><p>Young Muslim women studying together in a bright, modern library</p></div>';">
+                </div>
+                <div class="floating-card">
+                    <h4>🎓 Premium Learning</h4>
+                    <p>Courses crafted to inspire knowledge, confidence, and purpose.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRUST STRIP -->
+    <section class="trust-section">
+        <div class="container trust-strip">
+            <div class="trust-item">
+                <strong>Purposeful Education</strong>
+                <span>Learning designed for meaningful, lasting impact</span>
+            </div>
+            <div class="trust-item">
+                <strong>Expert Instructors</strong>
+                <span>Knowledgeable educators passionate about your growth</span>
+            </div>
+            <div class="trust-item">
+                <strong>Warm Community</strong>
+                <span>Sisters supporting sisters on their journey</span>
+            </div>
+            <div class="trust-item">
+                <strong>Flexible & Accessible</strong>
+                <span>Learn at your pace, from anywhere</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT US -->
+    <section class="about-section">
+        <div class="container">
+            <header class="about-header">
+                <h2 class="about-title">Empowering Through Sacred Knowledge</h2>
+                <div class="flourish-divider">
+                    <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="10" r="3" fill="#471820"/>
+                    </svg>
+                </div>
+            </header>
+
+            <div class="about-grid">
+                <div class="about-left">
+                    <div class="about-icon">
+                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="60" cy="60" r="55" stroke="#471820" stroke-width="1.5"/>
+                            <path d="M35 85V50L60 38L85 50V85L60 73L35 85Z" stroke="#471820" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M60 38V73" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M45 55L60 48L75 55" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M20 45C25 42 30 48 28 55" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M100 45C95 42 90 48 92 55" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M15 55C18 60 22 58 20 65" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M105 55C102 60 98 58 100 65" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M18 70C22 72 24 68 22 75" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M102 70C98 72 96 68 98 75" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <p class="about-mission">
+                        Muslimaa Academy is dedicated to providing accessible, high-quality Islamic education specifically for women and children. We offer a structured, supportive environment to learn Quran Reading, Tajweed, Hifz, and Nazra, guided by certified female scholars.
+                    </p>
+                </div>
+
+                <div class="about-right">
+                    <div class="about-value">
+                        <h3>Our Vision</h3>
+                        <p>To cultivate a generation of knowledgeable, confident, and spiritually connected Muslimahs who embody the teachings of the Quran and Sunnah.</p>
+                    </div>
+                    <div class="about-value">
+                        <h3>Our Mission</h3>
+                        <p>To make authentic Islamic learning flexible and engaging, fostering a global community of sisters and learners of all ages.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-cta">
+                <a class="btn btn-primary" href="{% url 'content:about' %}">Read Our Full Story</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- OUR COURSES -->
+    <section class="our-courses-section">
+        <div class="container">
+            <header class="our-courses-header">
+                <h2 class="our-courses-title">Our Courses</h2>
+                <div class="flourish-divider">
+                    <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="10" r="3" fill="#471820"/>
+                    </svg>
+                </div>
+                <p class="our-courses-subtitle">Learn Quran with Structured & Engaging Courses</p>
+            </header>
+
+            <div class="courses-cards-row">
+                <div class="course-feature-card">
+                    <div class="course-feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 32V12L20 6L32 12V32L20 26L8 32Z" stroke="#471820" stroke-width="1.8" stroke-linejoin="round"/>
+                            <path d="M20 6V26" stroke="#471820" stroke-width="1.5"/>
+                            <path d="M14 14L20 11L26 14" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M14 19L20 16L26 19" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Quran Reading</h3>
+                    <p>Learn to read Quran with Tajweed</p>
+                </div>
+
+                <div class="course-feature-card">
+                    <div class="course-feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="8" width="20" height="14" rx="3" stroke="#471820" stroke-width="1.8"/>
+                            <rect x="16" y="18" width="20" height="14" rx="3" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M10 13H18" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M10 16H15" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M22 23H30" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M22 26H27" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Tajweed Rules</h3>
+                    <p>Master Tajweed with expert guidance</p>
+                </div>
+
+                <div class="course-feature-card">
+                    <div class="course-feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="6" width="20" height="28" rx="2" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M10 10H30" stroke="#471820" stroke-width="1.5"/>
+                            <path d="M10 30H30" stroke="#471820" stroke-width="1.5"/>
+                            <path d="M15 16H25" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M15 20H25" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M15 24H22" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <circle cx="20" cy="8" r="1.5" fill="#471820"/>
+                        </svg>
+                    </div>
+                    <h3>Hifz Quran</h3>
+                    <p>Memorize Quran with proven techniques</p>
+                </div>
+
+                <div class="course-feature-card">
+                    <div class="course-feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 30V14L20 8L32 14V30L20 24L8 30Z" stroke="#471820" stroke-width="1.8" stroke-linejoin="round"/>
+                            <path d="M20 8V24" stroke="#471820" stroke-width="1.5"/>
+                            <path d="M14 16L20 13L26 16" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M8 32L12 28" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M32 32L28 28" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M5 34L9 30" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M35 34L31 30" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Nazra Quran</h3>
+                    <p>Fluent recitation with correct pronunciation</p>
+                </div>
+
+                <div class="course-feature-card">
+                    <div class="course-feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="20" cy="12" r="6" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M12 32C12 27.5817 15.5817 24 20 24C24.4183 24 28 27.5817 28 32" stroke="#471820" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M16 8C16 8 18 6 20 6C22 6 24 8 24 8" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M20 6V4" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M18 4H22" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Quran for Kids</h3>
+                    <p>Fun & Interactive Quran learning for kids</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY CHOOSE US -->
+    <section class="why-choose-section">
+        <div class="container">
+            <header class="why-choose-header">
+                <h2 class="why-choose-title">Why Choose Muslimaa Academy.</h2>
+                <div class="flourish-divider">
+                    <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="10" r="3" fill="#471820"/>
+                    </svg>
+                </div>
+            </header>
+
+            <div class="why-choose-cards">
+                <div class="why-choose-card">
+                    <div class="why-choose-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="16" r="8" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M16 12C16 12 18 9 24 9C30 9 32 12 32 12" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M24 9V7" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M21 7H27" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M12 38C12 31.3726 17.3726 26 24 26C30.6274 26 36 31.3726 36 38" stroke="#471820" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M18 32L24 29L30 32" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                            <path d="M10 42L14 38" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M38 42L34 38" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Certified Female Instructor</h3>
+                    <p>Learn from qualified and experienced female scholars dedicated to your personalized spiritual growth.</p>
+                </div>
+
+                <div class="why-choose-card">
+                    <div class="why-choose-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="24" r="18" stroke="#471820" stroke-width="1.8"/>
+                            <ellipse cx="24" cy="24" rx="8" ry="18" stroke="#471820" stroke-width="1.2"/>
+                            <path d="M6 24H42" stroke="#471820" stroke-width="1.2"/>
+                            <path d="M8 16H40" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                            <path d="M8 32H40" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                            <path d="M18 30L24 27L30 30L24 33L18 30Z" stroke="#471820" stroke-width="1.2" stroke-linejoin="round"/>
+                            <path d="M24 27V22" stroke="#471820" stroke-width="1"/>
+                            <path d="M21 24L24 22L27 24" stroke="#471820" stroke-width="1" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Flexible Online Learning</h3>
+                    <p>Access live, interactive classes from the comfort of your home, designed to fit your busy lifestyle and time zone.</p>
+                </div>
+
+                <div class="why-choose-card">
+                    <div class="why-choose-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="18" r="6" stroke="#471820" stroke-width="1.5"/>
+                            <circle cx="32" cy="18" r="6" stroke="#471820" stroke-width="1.5"/>
+                            <circle cx="24" cy="28" r="6" stroke="#471820" stroke-width="1.5"/>
+                            <path d="M10 36C10 31.5817 12.6863 28 16 28C19.3137 28 22 31.5817 22 36" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M26 44C26 39.5817 28.6863 36 32 36C35.3137 36 38 39.5817 38 44" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M18 44C18 40.6863 20.6863 38 24 38C27.3137 38 30 40.6863 30 44" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Supportive Community & Sisterhood</h3>
+                    <p>Join a nurturing environment that fosters spiritual connection, encouragement, and lifelong friendships among Muslimahs.</p>
+                </div>
+            </div>
+
+            <div class="why-choose-cta">
+                <a class="btn btn-primary" href="{% url 'accounts:register' %}">Book Your Free Trial Class</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials-section">
+        <div class="container">
+            <header class="testimonials-header">
+                <h2 class="testimonials-title">Voices of Our Community</h2>
+                <p class="testimonials-subtitle">Hear from students and parents whose lives have been transformed.</p>
+                <div class="flourish-divider">
+                    <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="10" r="3" fill="#471820"/>
+                    </svg>
+                </div>
+            </header>
+
+            <div class="testimonials-cards">
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="20" r="10" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M14 16C14 16 17 11 24 11C31 11 34 16 34 16" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M10 42C10 34.268 16.268 28 24 28C31.732 28 38 34.268 38 42" stroke="#471820" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M20 22C20 22 22 24 24 22C26 20 28 22 28 22" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="testimonial-role">Student</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <blockquote class="testimonial-quote">
+                        "Bestest Experience Mam... Allhumdullillah m kbs TAJWEED ki classes ki tlsh m thy R Apki community group m Ak feeling so Lucky!!! And Mam Jo cls le rhyn wo bht POLITE hyn... R apki trf s choty choty chzon ka khyll, Foran Replies to Our little messages... At the End i want to Say, Thank Youuu Soo Muchhhh!!"
+                    </blockquote>
+                    <div class="testimonial-author">
+                        <strong>Mawra</strong>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="20" r="10" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M14 16C14 16 17 11 24 11C31 11 34 16 34 16" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M10 42C10 34.268 16.268 28 24 28C31.732 28 38 34.268 38 42" stroke="#471820" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M20 22C20 22 22 24 24 22C26 20 28 22 28 22" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="testimonial-role">Teacher</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <blockquote class="testimonial-quote">
+                        "My I m so satisfied with my qariya teaching allhumdullillah find the best place to improve my tajweed + hifz."
+                    </blockquote>
+                    <div class="testimonial-author">
+                        <strong>Hafiza Safina</strong>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="20" r="10" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M14 16C14 16 17 11 24 11C31 11 34 16 34 16" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M10 42C10 34.268 16.268 28 24 28C31.732 28 38 34.268 38 42" stroke="#471820" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M20 22C20 22 22 24 24 22C26 20 28 22 28 22" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="testimonial-role">Student</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <blockquote class="testimonial-quote">
+                        "ALHAMDU LILLAH I've just started classes with Muslimaa Academy recently. My experience is good so far and the instructor is very cooperative and explains each and every basic detail calmly. I'm looking forward to seek more Quran knowledge!"
+                    </blockquote>
+                    <div class="testimonial-author">
+                        <strong>Narmeen</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonials-cta">
+                <a class="btn btn-primary" href="{% url 'content:testimonials' %}">Read More Stories</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section section--soft">
+        <div class="container">
+            <header class="section-header">
+                <h2 class="section-title">Your Learning <span class="highlight">Journey Starts Here</span></h2>
+            </header>
+
+            <div class="timeline">
+                <div class="timeline-step">
+                    <span class="step-number">1</span>
+                    <strong>Explore & Choose</strong>
+                    <p>Browse our course catalog and find courses that align with your learning goals.</p>
+                </div>
+                <div class="timeline-step">
+                    <span class="step-number">2</span>
+                    <strong>Register & Enroll</strong>
+                    <p>Create your account and gain instant access to your course materials.</p>
+                </div>
+                <div class="timeline-step">
+                    <span class="step-number">3</span>
+                    <strong>Learn & Engage</strong>
+                    <p>Participate in lessons and interact with your learning community.</p>
+                </div>
+                <div class="timeline-step">
+                    <span class="step-number">4</span>
+                    <strong>Grow & Transform</strong>
+                    <p>Apply your knowledge and continue your journey of growth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FULL CTA -->
+    <section class="full-cta">
+        <div class="container">
+            <h2>Ready to Transform Your Journey?</h2>
+            <p>
+                Join hundreds of Muslim women strengthening their faith, building confidence, and creating meaningful impact through Muslimaa Academy.
+            </p>
+            <div class="cta-buttons">
+                <a class="btn btn-secondary" href="{% url 'courses:course_list' %}">Explore Courses Now</a>
+                <a class="btn btn-outline-light" href="{% url 'accounts:register' %}">Start Your Journey Today</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--surface">
+        <div class="container">
+            <header class="section-header" style="margin-left:auto;margin-right:auto;text-align:center;">
+                <h2 class="section-title">Frequently Asked <span class="highlight">Questions</span></h2>
+            </header>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Who can join Muslimaa Academy?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Muslim women and girls of all ages and backgrounds are welcome! Whether you're a beginner or have previous knowledge, we have courses suited to your level.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Are the courses online?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Yes! All our courses are delivered online, giving you flexibility to learn at your own pace and from anywhere in the world.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How do I enroll?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Browse our courses, select the one you're interested in, click "Enroll," create an account, and you'll have immediate access to course materials.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="section final-cta">
+        <div class="container">
+            <h2 class="section-title">Begin Your <span class="highlight">Transformation Today</span></h2>
+            <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">
+                Your journey toward knowledge, faith, and personal growth awaits. Join Muslimaa Academy today.
+            </p>
+            <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start Your Journey Today</a>
+        </div>
+    </section>
+
+</main>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // FAQ accordion
+        const faqButtons = document.querySelectorAll('.faq-question');
+        faqButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !expanded);
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        const animatedElements = document.querySelectorAll(
+            '.animate-on-scroll, .animate-fade-in, .animate-slide-left, .animate-slide-right, .animate-scale'
+        );
+        animatedElements.forEach(function(el) {
+            observer.observe(el);
+        });
+
+        // About section animations
+        const aboutSection = document.querySelector('.about-section');
+        if (aboutSection) {
+            const aboutIcon = aboutSection.querySelector('.about-icon');
+            const aboutMission = aboutSection.querySelector('.about-mission');
+            const aboutValues = aboutSection.querySelectorAll('.about-value');
+            const aboutCta = aboutSection.querySelector('.about-cta');
+
+            if (aboutIcon) { aboutIcon.classList.add('animate-scale'); observer.observe(aboutIcon); }
+            if (aboutMission) { aboutMission.classList.add('animate-slide-right'); observer.observe(aboutMission); }
+            aboutValues.forEach(function(val, i) {
+                val.classList.add('animate-on-scroll', 'stagger-' + (i + 1));
+                observer.observe(val);
+            });
+            if (aboutCta) { aboutCta.classList.add('animate-fade-in'); observer.observe(aboutCta); }
+        }
+
+        // Courses section animations
+        const coursesSection = document.querySelector('.our-courses-section');
+        if (coursesSection) {
+            const courseCards = coursesSection.querySelectorAll('.course-feature-card');
+            courseCards.forEach(function(card, i) {
+                card.classList.add('animate-scale', 'stagger-' + (i + 1));
+                observer.observe(card);
+            });
+        }
+
+        // Why Choose Us animations
+        const whySection = document.querySelector('.why-choose-section');
+        if (whySection) {
+            const whyCards = whySection.querySelectorAll('.why-choose-card');
+            whyCards.forEach(function(card, i) {
+                card.classList.add('animate-on-scroll', 'stagger-' + (i + 1));
+                observer.observe(card);
+            });
+            const whyCta = whySection.querySelector('.why-choose-cta');
+            if (whyCta) { whyCta.classList.add('animate-fade-in'); observer.observe(whyCta); }
+        }
+
+        // Testimonials animations
+        const testimonialsSection = document.querySelector('.testimonials-section');
+        if (testimonialsSection) {
+            const testimonialCards = testimonialsSection.querySelectorAll('.testimonial-card');
+            testimonialCards.forEach(function(card, i) {
+                card.classList.add('animate-on-scroll', 'stagger-' + (i + 1));
+                observer.observe(card);
+            });
+        }
+
+        // Section headers animation
+        const sectionHeaders = document.querySelectorAll(
+            '.about-header, .our-courses-header, .why-choose-header, .testimonials-header'
+        );
+        sectionHeaders.forEach(function(header) {
+            header.classList.add('animate-fade-in');
+            observer.observe(header);
+        });
+
+        // Trust strip animation
+        const trustItems = document.querySelectorAll('.trust-item');
+        trustItems.forEach(function(item, i) {
+            item.classList.add('animate-on-scroll', 'stagger-' + (i + 1));
+            observer.observe(item);
+        });
+
+        // Timeline steps animation
+        const timelineSteps = document.querySelectorAll('.timeline-step');
+        timelineSteps.forEach(function(step, i) {
+            step.classList.add('animate-on-scroll', 'stagger-' + (i + 1));
+            observer.observe(step);
+        });
+
+        // CTA sections animation
+        const ctaSections = document.querySelectorAll('.full-cta, .final-cta');
+        ctaSections.forEach(function(cta) {
+            cta.classList.add('animate-fade-in');
+            observer.observe(cta);
+        });
+
+        // Smooth parallax effect on hero
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero && scrolled < 800) {
+                const heroMedia = hero.querySelector('.hero-media');
+                if (heroMedia) {
+                    heroMedia.style.transform = 'translateY(' + (scrolled * 0.1) + 'px)';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
