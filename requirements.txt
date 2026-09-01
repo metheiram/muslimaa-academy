@@ -3,3 +3,5 @@ djangorestframework
 python-dotenv
 psycopg2-binary
 pillow
+whitenoise
+gunicorn
