@@ -823,7 +823,7 @@
 
         <div class="learning-path-cards">
             <!-- Card 1: Tajweed Mastery -->
-            <div class="learning-path-card">
+            <div class="learning-path-card" data-audience="sisters">
                 <div class="learning-path-icon">
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 38V22L24 16L36 22V38L24 32L12 38Z" stroke="#471820" stroke-width="1.8" stroke-linejoin="round"/>
@@ -842,7 +842,7 @@
             </div>
 
             <!-- Card 2: Hifz & Memorization -->
-            <div class="learning-path-card">
+            <div class="learning-path-card" data-audience="sisters kids">
                 <div class="learning-path-icon">
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="10" y="8" width="28" height="32" rx="2" stroke="#471820" stroke-width="1.8"/>
@@ -865,7 +865,7 @@
             </div>
 
             <!-- Card 3: Nazra & Kids -->
-            <div class="learning-path-card">
+            <div class="learning-path-card" data-audience="kids">
                 <div class="learning-path-icon">
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="8" y="10" width="32" height="28" rx="2" stroke="#471820" stroke-width="1.8"/>
@@ -1088,49 +1088,66 @@
             observer.observe(el);
         });
 
-        // Filter buttons
+        // Filter buttons + Search - combined
         const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                filterBtns.forEach(function(b) { b.classList.remove('active'); });
-                this.classList.add('active');
-            });
-        });
-
-        // Search functionality - real-time search
         const searchInput = document.querySelector('.search-bar input');
         const searchBtn = document.querySelector('.search-btn');
-        
-        function performSearch() {
+        let activeFilter = 'all';
+
+        function filterAndSearch() {
             const query = searchInput.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.course-card');
-            let visibleCount = 0;
-            cards.forEach(function(card) {
+            const pathCards = document.querySelectorAll('.learning-path-card');
+            const courseCards = document.querySelectorAll('.course-card');
+
+            // Filter learning path cards
+            pathCards.forEach(function(card) {
+                const audience = card.getAttribute('data-audience') || '';
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const desc = card.querySelector('p').textContent.toLowerCase();
+                const matchFilter = activeFilter === 'all' || audience.includes(activeFilter);
+                const matchSearch = query === '' || title.includes(query) || desc.includes(query) || audience.includes(query);
+                if (matchFilter && matchSearch) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Filter dynamic course cards
+            courseCards.forEach(function(card) {
                 const title = card.querySelector('h3').textContent.toLowerCase();
                 const desc = card.querySelector('p').textContent.toLowerCase();
                 const badge = card.querySelector('.badge') ? card.querySelector('.badge').textContent.toLowerCase() : '';
-                const meta = card.querySelector('.meta small') ? card.querySelector('.meta small').textContent.toLowerCase() : '';
-                if (title.includes(query) || desc.includes(query) || badge.includes(query) || meta.includes(query) || query === '') {
-                    card.style.display = 'block';
-                    visibleCount++;
+                const matchSearch = query === '' || title.includes(query) || desc.includes(query) || badge.includes(query);
+                if (matchSearch) {
+                    card.style.display = '';
                 } else {
                     card.style.display = 'none';
                 }
             });
         }
 
+        filterBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                activeFilter = this.textContent.toLowerCase().includes('kids') ? 'kids' : (this.textContent.toLowerCase().includes('sisters') ? 'sisters' : 'all');
+                filterAndSearch();
+            });
+        });
+
         searchInput.addEventListener('input', function() {
-            performSearch();
+            filterAndSearch();
         });
 
         searchBtn.addEventListener('click', function() {
-            performSearch();
+            filterAndSearch();
         });
 
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                performSearch();
+                filterAndSearch();
             }
         });
 
