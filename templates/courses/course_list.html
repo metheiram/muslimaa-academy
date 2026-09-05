@@ -1097,27 +1097,40 @@
             });
         });
 
-        // Search functionality
+        // Search functionality - real-time search
         const searchInput = document.querySelector('.search-bar input');
         const searchBtn = document.querySelector('.search-btn');
         
-        searchBtn.addEventListener('click', function() {
-            const query = searchInput.value.toLowerCase();
+        function performSearch() {
+            const query = searchInput.value.toLowerCase().trim();
             const cards = document.querySelectorAll('.course-card');
+            let visibleCount = 0;
             cards.forEach(function(card) {
                 const title = card.querySelector('h3').textContent.toLowerCase();
                 const desc = card.querySelector('p').textContent.toLowerCase();
-                if (title.includes(query) || desc.includes(query) || query === '') {
+                const badge = card.querySelector('.badge') ? card.querySelector('.badge').textContent.toLowerCase() : '';
+                const meta = card.querySelector('.meta small') ? card.querySelector('.meta small').textContent.toLowerCase() : '';
+                if (title.includes(query) || desc.includes(query) || badge.includes(query) || meta.includes(query) || query === '') {
                     card.style.display = 'block';
+                    visibleCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
+        }
+
+        searchInput.addEventListener('input', function() {
+            performSearch();
+        });
+
+        searchBtn.addEventListener('click', function() {
+            performSearch();
         });
 
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                searchBtn.click();
+                e.preventDefault();
+                performSearch();
             }
         });
 
