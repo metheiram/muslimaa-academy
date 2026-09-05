@@ -13,6 +13,8 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
+    "muslimaaacademy.com",
+    "www.muslimaaacademy.com",
     "muslimaa-academy.vercel.app",
     ".vercel.app",
     "localhost",
