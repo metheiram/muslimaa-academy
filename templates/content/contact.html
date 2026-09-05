@@ -116,6 +116,18 @@
     .form-group textarea { resize: vertical; min-height: 120px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
+    /* Alert Messages */
+    .form-messages { margin-bottom: 1.5rem; }
+    .alert {
+        padding: 0.8rem 1rem; border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.5rem;
+    }
+    .alert-success {
+        background: #f0fdf4; color: #166534; border: 1px solid rgba(22, 101, 52, 0.15);
+    }
+    .alert-error {
+        background: #fef2f2; color: #b91c1c; border: 1px solid rgba(185, 28, 28, 0.15);
+    }
+
     /* Contact Info */
     .contact-info-wrapper {
         display: flex; flex-direction: column; gap: 1.5rem;
@@ -213,6 +225,15 @@
                 <div class="contact-form-wrapper animate-on-scroll">
                     <h2>Send Us a Message</h2>
                     <p>Fill out the form below and we'll get back to you within 24 hours.</p>
+                    
+                    {% if messages %}
+                    <div class="form-messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
                     <form method="POST" action="">
                         {% csrf_token %}
                         <div class="form-row">
