@@ -54,9 +54,16 @@ class CustomLoginView(LoginView):
 
 @login_required
 def profile(request):
-    """Display user profile."""
-    context = {'user': request.user}
-    return render(request, 'accounts/profile.html', context)
+    """Display user profile based on role."""
+    user = request.user
+    if user.is_superuser:
+        return redirect('dashboard:admin_dashboard')
+    elif user.is_staff:
+        template = 'accounts/teacher_profile.html'
+    else:
+        template = 'accounts/student_profile.html'
+    context = {'user': user}
+    return render(request, template, context)
 
 
 def custom_logout(request):
