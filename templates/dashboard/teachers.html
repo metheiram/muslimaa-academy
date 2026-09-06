@@ -74,7 +74,10 @@
             <li><a href="{% url 'workshops:workshop_list' %}"><span class="icon">🎓</span> Workshops</a></li>
             <li><a href="{% url 'admin:index' %}"><span class="icon">⚙️</span> Django Admin</a></li>
         </ul>
-        <div class="sidebar-footer"><a href="{% url 'home' %}">🏠 Back to Site</a></div>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+        </div>
     </aside>
 
     <main class="main-content">
