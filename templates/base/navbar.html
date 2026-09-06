@@ -19,9 +19,8 @@
         <nav id="site-nav" class="site-nav" role="navigation" aria-label="Main navigation">
             <ul class="nav-links">
                 <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
-                <li class="dropdown-wrapper">
-                    <a href="{% url 'courses:course_list' %}" class="nav-link">Courses</a>
-                </li>
+                <li><a href="{% url 'courses:course_list' %}" class="nav-link">Courses</a></li>
+                <li><a href="{% url 'workshops:workshop_list' %}" class="nav-link">Workshops</a></li>
                 <li><a href="{% url 'content:about' %}" class="nav-link">About</a></li>
                 <li><a href="{% url 'content:contact' %}" class="nav-link">Contact</a></li>
             </ul>

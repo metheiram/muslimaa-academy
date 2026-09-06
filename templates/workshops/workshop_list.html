@@ -1,37 +1,514 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Workshops | Muslimaa Academy{% endblock %}
+{% block title %}Free Workshops | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --brand-700: #471820;
+        --brand-800: #3d1319;
+        --accent-gold: #d4a574;
+        --text-secondary: #5a4a55;
+        --text-muted: #8a7a85;
+        --font-serif: 'Playfair Display', Georgia, serif;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #faf6f1; color: #2d0d0f; }
+
+    .workshops-hero {
+        background: linear-gradient(180deg, #faf6f1 0%, #f5ede4 100%);
+        padding: 4rem 0 3rem;
+        text-align: center;
+    }
+
+    .workshops-hero h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .flourish-divider {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .workshops-hero p {
+        font-family: var(--font-sans);
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    .free-badge {
+        display: inline-block;
+        background: rgba(71, 24, 32, 0.08);
+        border: 1.5px solid var(--brand-700);
+        color: var(--brand-700);
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1.5rem;
+    }
+
+    .section { padding: 3rem 0 4rem; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .workshops-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .workshop-card {
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        box-shadow: 0 2px 10px rgba(71, 24, 32, 0.04);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .workshop-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(71, 24, 32, 0.12);
+    }
+
+    .workshop-card-header {
+        background: linear-gradient(135deg, var(--brand-700) 0%, #6b2530 100%);
+        padding: 1.5rem;
+        position: relative;
+    }
+
+    .workshop-card-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .workshop-free-tag {
+        display: inline-block;
+        background: rgba(212, 165, 116, 0.2);
+        border: 1px solid rgba(212, 165, 116, 0.5);
+        color: var(--accent-gold);
+        padding: 0.3rem 0.9rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        position: relative;
+        z-index: 1;
+    }
+
+    .workshop-card-header h3 {
+        font-family: var(--font-serif);
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-top: 0.75rem;
+        position: relative;
+        z-index: 1;
+        line-height: 1.3;
+    }
+
+    .workshop-card-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .workshop-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .workshop-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .workshop-card-body p {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+        margin-bottom: 1.25rem;
+        flex: 1;
+    }
+
+    .workshop-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(71, 24, 32, 0.06);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.7rem 1.5rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--brand-700);
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(71, 24, 32, 0.25);
+    }
+
+    .btn-primary:hover {
+        background: var(--brand-800);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(71, 24, 32, 0.35);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--brand-700);
+        border: 1.5px solid var(--brand-700);
+    }
+
+    .btn-outline:hover {
+        background: var(--brand-700);
+        color: #ffffff;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 1.5rem;
+        grid-column: 1 / -1;
+    }
+
+    .empty-state .icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 2px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-state h3 {
+        font-family: var(--font-serif);
+        font-size: 1.3rem;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        max-width: 400px;
+        margin: 0 auto 1.5rem;
+        line-height: 1.6;
+    }
+
+    .why-section {
+        background: #f5ede4;
+        padding: 3rem 0;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .section-header h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .section-header p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .why-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .why-card {
+        background: #ffffff;
+        padding: 2rem 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        box-shadow: 0 2px 10px rgba(71, 24, 32, 0.04);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .why-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(71, 24, 32, 0.1);
+    }
+
+    .why-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 2px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .why-card h4 {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .why-card p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .cta-section {
+        background: linear-gradient(135deg, #471820 0%, #6b2530 100%);
+        padding: 4rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .cta-section .container { position: relative; z-index: 1; }
+
+    .cta-section h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.85);
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        line-height: 1.7;
+    }
+
+    .btn-white {
+        background: #ffffff;
+        color: var(--brand-700);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-white:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline-white {
+        background: transparent;
+        color: #ffffff;
+        border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    .btn-outline-white:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.6);
+    }
+
+    .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+    .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    .stagger-6 { transition-delay: 0.6s; }
+
+    @media (max-width: 768px) {
+        .workshops-grid { grid-template-columns: 1fr; }
+        .why-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+<section class="workshops-hero">
+    <div class="container">
+        <div class="free-badge">100% Free Workshops</div>
+        <h1>Free Workshops & Events</h1>
+        <div class="flourish-divider">
+            <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="60" cy="10" r="3" fill="#471820"/>
+            </svg>
+        </div>
+        <p>Join our free workshops designed to inspire, educate, and empower Muslim women and children on their spiritual journey.</p>
+    </div>
+</section>
+
 <section class="section">
     <div class="container">
-        <h1 class="section-title">Upcoming <span class="highlight">Workshops</span></h1>
-        <p class="section-subtitle">Learn beyond the classroom with our specialized workshops designed for meaningful growth.</p>
-        
-        <div class="cards-grid" style="margin-top: 2rem;">
+        <div class="workshops-grid">
             {% for workshop in workshops %}
-            <article class="course-card">
-                <div class="content">
+            <article class="workshop-card animate-on-scroll stagger-{{ forloop.counter }}">
+                <div class="workshop-card-header">
+                    <span class="workshop-free-tag">Free</span>
                     <h3>{{ workshop.title }}</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: var(--space-sm);">
-                        {{ workshop.date }} · {{ workshop.time }}
-                    </p>
-                    <p>{{ workshop.description }}</p>
-                    {% if workshop.instructor %}
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--space-md);">
-                        <strong>Instructor:</strong> {{ workshop.instructor.get_full_name|default:workshop.instructor.username }}
-                    </p>
-                    {% endif %}
-                    <div class="meta" style="border-top: none; padding-top: 0; margin-top: auto;">
-                        <a class="btn btn-link" href="{% url 'workshops:workshop_detail' workshop.slug %}">View Details</a>
+                </div>
+                <div class="workshop-card-body">
+                    <div class="workshop-meta">
+                        <span>📅 {{ workshop.date|date:"F j, Y" }}</span>
+                        <span>🕐 {{ workshop.time|time:"g:i A" }}</span>
+                        <span>⏱️ {{ workshop.duration }}</span>
+                    </div>
+                    <p>{{ workshop.description|truncatewords:25 }}</p>
+                    <div class="workshop-card-footer">
+                        {% if workshop.instructor %}
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">
+                            👩‍🏫 {{ workshop.instructor.get_full_name|default:workshop.instructor.username }}
+                        </span>
+                        {% else %}
+                        <span></span>
+                        {% endif %}
+                        <a class="btn btn-primary" href="{% url 'workshops:workshop_detail' workshop.slug %}">View Details</a>
                     </div>
                 </div>
             </article>
             {% empty %}
-            <p style="text-align: center; padding: 2rem;">New workshops are coming soon. Check back later!</p>
+            <div class="empty-state">
+                <div class="icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5" stroke-linecap="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18"/>
+                        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+                    </svg>
+                </div>
+                <h3>Workshops Coming Soon</h3>
+                <p>We're preparing exciting free workshops for you. Stay tuned and follow us on social media for updates!</p>
+                <a class="btn btn-primary" href="https://chat.whatsapp.com/By6RP0uCP3L9t8ybOPfT2N" target="_blank">Join WhatsApp Community</a>
+            </div>
             {% endfor %}
         </div>
     </div>
 </section>
+
+<section class="why-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Attend Our Workshops?</h2>
+            <div class="flourish-divider">
+                <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 10C20 4 30 16 40 10C50 4 60 16 70 10C80 4 90 16 100 10C110 4 115 10 110 10" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="60" cy="10" r="3" fill="#471820"/>
+                </svg>
+            </div>
+            <p>Learn, connect, and grow — all completely free</p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card animate-on-scroll stagger-1">
+                <div class="why-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <h4>100% Free</h4>
+                <p>All our workshops are completely free — no hidden costs, no catches.</p>
+            </div>
+            <div class="why-card animate-on-scroll stagger-2">
+                <div class="why-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                </div>
+                <h4>Expert Speakers</h4>
+                <p>Learn from qualified scholars and experienced practitioners.</p>
+            </div>
+            <div class="why-card animate-on-scroll stagger-3">
+                <div class="why-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                </div>
+                <h4>Interactive Sessions</h4>
+                <p>Ask questions, participate in discussions, and engage directly.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2>Don't Miss Our Next Workshop</h2>
+        <p>Join our community to get notified about upcoming free workshops and events.</p>
+        <div class="cta-buttons">
+            <a class="btn btn-white" href="{% url 'accounts:register' %}">Join Muslimaa Academy</a>
+            <a class="btn btn-outline-white" href="https://chat.whatsapp.com/By6RP0uCP3L9t8ybOPfT2N" target="_blank">WhatsApp Community</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) { entry.target.classList.add('is-visible'); }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.animate-on-scroll').forEach(function(el) { observer.observe(el); });
+});
+</script>
 {% endblock %}
