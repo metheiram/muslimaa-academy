@@ -46,7 +46,33 @@ def admin_dashboard(request):
 
 @admin_required
 def admin_students(request):
-    """Manage students."""
+    """Manage students - list and add."""
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        if not all([first_name, email, username, password]):
+            messages.error(request, 'All fields are required.')
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+        elif User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists.')
+        else:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                is_staff=False,
+                is_superuser=False,
+            )
+            messages.success(request, f'Student "{user.get_full_name()}" added successfully!')
+            return redirect('dashboard:admin_students')
+
     students = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
     context = {'students': students, 'active_tab': 'students'}
     return render(request, 'dashboard/students.html', context)
@@ -54,7 +80,34 @@ def admin_students(request):
 
 @admin_required
 def admin_teachers(request):
-    """Manage teachers."""
+    """Manage teachers - list and add."""
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+        subject = request.POST.get('subject', '').strip()
+
+        if not all([first_name, email, username, password]):
+            messages.error(request, 'All fields are required.')
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+        elif User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists.')
+        else:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                is_staff=True,
+                is_superuser=False,
+            )
+            messages.success(request, f'Teacher "{user.get_full_name()}" added successfully!')
+            return redirect('dashboard:admin_teachers')
+
     teachers = User.objects.filter(is_staff=True, is_superuser=False).order_by('-date_joined')
     context = {'teachers': teachers, 'active_tab': 'teachers'}
     return render(request, 'dashboard/teachers.html', context)
