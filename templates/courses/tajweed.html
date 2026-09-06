@@ -358,6 +358,15 @@
         .features-grid { grid-template-columns: 1fr; }
         .course-hero-meta { gap: 1rem; }
     }
+
+    .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+    .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    .stagger-6 { transition-delay: 0.6s; }
 </style>
 {% endblock %}
 
@@ -382,7 +391,7 @@
 
 <section class="section">
     <div class="container">
-        <div class="about-grid">
+        <div class="about-grid animate-on-scroll">
             <div class="about-content">
                 <h3>Recite the Quran as It Was Meant to Be Recited</h3>
                 <p>Tajweed is the art of giving every letter its rights and dues. This course will transform your recitation from basic reading to beautiful, precise recitation that honors the words of Allah.</p>
@@ -411,42 +420,42 @@
             <p>Comprehensive Tajweed training from fundamentals to advanced rules</p>
         </div>
         <div class="features-grid">
-            <div class="feature-card">
+            <div class="feature-card animate-on-scroll stagger-1">
                 <div class="feature-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
                 </div>
                 <h4>Makharij (Articulation Points)</h4>
                 <p>Learn exactly where each letter originates in the mouth, throat, and chest</p>
             </div>
-            <div class="feature-card">
+            <div class="feature-card animate-on-scroll stagger-2">
                 <div class="feature-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
                 </div>
                 <h4>Sifat (Characteristics)</h4>
                 <p>Understand the unique qualities of each letter for perfect pronunciation</p>
             </div>
-            <div class="feature-card">
+            <div class="feature-card animate-on-scroll stagger-3">
                 <div class="feature-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </div>
                 <h4>Nooun Sakin & Tanween</h4>
                 <p>Master the rules of Nooun Sakin and the three types of Tanween</p>
             </div>
-            <div class="feature-card">
+            <div class="feature-card animate-on-scroll stagger-4">
                 <div class="feature-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M4 19V5a2 2 0 012-2h8l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M14 3v6h6"/></svg>
                 </div>
                 <h4>Idghaam & Ikhfaa</h4>
                 <p>Learn when to merge, hide, or pronounce letters clearly</p>
             </div>
-            <div class="feature-card">
+            <div class="feature-card animate-on-scroll stagger-5">
                 <div class="feature-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </div>
                 <h4>Madd (Elongation)</h4>
                 <p>Perfect timing for natural, extended, and required elongations</p>
             </div>
-            <div class="feature-card">
+            <div class="feature-card animate-on-scroll stagger-6">
                 <div class="feature-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
                 </div>
@@ -464,28 +473,28 @@
             <p>A progressive 3-month journey to Tajweed mastery</p>
         </div>
         <div class="curriculum-list">
-            <div class="curriculum-item">
+            <div class="curriculum-item animate-on-scroll stagger-1">
                 <div class="curriculum-num">01</div>
                 <div>
                     <h4>Month 1: Foundations</h4>
                     <p>Arabic alphabet review, Makharij basics, and introduction to Tajweed</p>
                 </div>
             </div>
-            <div class="curriculum-item">
+            <div class="curriculum-item animate-on-scroll stagger-2">
                 <div class="curriculum-num">02</div>
                 <div>
                     <h4>Month 2: Core Rules</h4>
                     <p>Nooun Sakin, Tanween, Madd, Idghaam, and Ikhfaa rules</p>
                 </div>
             </div>
-            <div class="curriculum-item">
+            <div class="curriculum-item animate-on-scroll stagger-3">
                 <div class="curriculum-num">03</div>
                 <div>
                     <h4>Month 3: Advanced & Application</h4>
                     <p>Advanced rules, Waqf & Ibtidaa, and comprehensive Surah practice</p>
                 </div>
             </div>
-            <div class="curriculum-item">
+            <div class="curriculum-item animate-on-scroll stagger-4">
                 <div class="curriculum-num">04</div>
                 <div>
                     <h4>Ongoing: Practice & Refinement</h4>
@@ -506,4 +515,17 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) { entry.target.classList.add('is-visible'); }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.animate-on-scroll').forEach(function(el) { observer.observe(el); });
+});
+</script>
 {% endblock %}
