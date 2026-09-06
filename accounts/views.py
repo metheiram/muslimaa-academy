@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 from django import forms
 
 
@@ -39,6 +40,16 @@ def register(request):
     
     context = {'form': form}
     return render(request, 'accounts/register.html', context)
+
+
+class CustomLoginView(LoginView):
+    """Custom login view - admins go to dashboard, others to profile."""
+    template_name = 'accounts/login.html'
+    
+    def get_success_url(self):
+        if self.request.user.is_superuser:
+            return '/dashboard/'
+        return '/accounts/profile/'
 
 
 @login_required

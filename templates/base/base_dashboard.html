@@ -1,0 +1,16 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}Dashboard | Muslimaa Academy{% endblock %}</title>
+    <meta name="description" content="Muslimaa Academy Admin Dashboard">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
