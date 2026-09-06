@@ -510,7 +510,11 @@
         <h2>Perfect Your Recitation Today</h2>
         <p>Join hundreds of sisters who have transformed their Quran recitation with proper Tajweed.</p>
         <div class="cta-buttons">
-            <a class="btn btn-white" href="{% url 'accounts:register' %}">Enroll in Tajweed Course</a>
+            {% if user.is_authenticated %}
+            <a class="btn btn-white" href="{% url 'courses:enroll_course' slug='tajweed' %}">Enroll in Tajweed Course</a>
+            {% else %}
+            <a class="btn btn-white" href="{% url 'accounts:register' %}">Join to Enroll</a>
+            {% endif %}
             <a class="btn btn-outline-white" href="{% url 'content:contact' %}">Ask a Question</a>
         </div>
     </div>

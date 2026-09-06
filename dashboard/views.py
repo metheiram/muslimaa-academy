@@ -23,6 +23,7 @@ def admin_required(view_func):
 def admin_dashboard(request):
     """Admin dashboard overview."""
     from courses.models import Course
+    from courses.enrollment_models import Enrollment
     from workshops.models import Workshop
     from content.models import ContactMessage
 
@@ -32,6 +33,7 @@ def admin_dashboard(request):
     total_courses = Course.objects.filter(is_active=True).count()
     total_workshops = Workshop.objects.filter(is_active=True).count()
     pending_messages = ContactMessage.objects.filter(is_read=False).count()
+    pending_enrollments = Enrollment.objects.filter(status='pending').count()
     recent_messages = ContactMessage.objects.all().order_by('-created_at')[:5]
 
     context = {
@@ -39,6 +41,7 @@ def admin_dashboard(request):
         'total_courses': total_courses,
         'total_workshops': total_workshops,
         'pending_messages': pending_messages,
+        'pending_enrollments': pending_enrollments,
         'recent_messages': recent_messages,
     }
     return render(request, 'dashboard/admin.html', context)
@@ -115,8 +118,37 @@ def admin_teachers(request):
 
 @admin_required
 def admin_enrollments(request):
-    """Manage enrollments."""
-    context = {'active_tab': 'enrollments'}
+    """Manage enrollments - approve/reject."""
+    from courses.enrollment_models import Enrollment
+    from django.utils import timezone
+
+    if request.method == 'POST':
+        enrollment_id = request.POST.get('enrollment_id')
+        action = request.POST.get('action')
+        enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+        
+        if action == 'approve':
+            enrollment.status = 'approved'
+            enrollment.approved_at = timezone.now()
+            enrollment.approved_by = request.user
+            enrollment.save()
+            messages.success(request, f'Enrollment for {enrollment.student.get_full_name()} in {enrollment.course.title} approved!')
+        elif action == 'reject':
+            enrollment.status = 'rejected'
+            enrollment.save()
+            messages.warning(request, f'Enrollment for {enrollment.student.get_full_name()} in {enrollment.course.title} rejected.')
+        return redirect('dashboard:admin_enrollments')
+
+    pending = Enrollment.objects.filter(status='pending').select_related('student', 'course')
+    approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
+    rejected = Enrollment.objects.filter(status='rejected').select_related('student', 'course')
+    
+    context = {
+        'active_tab': 'enrollments',
+        'pending_enrollments': pending,
+        'approved_enrollments': approved,
+        'rejected_enrollments': rejected,
+    }
     return render(request, 'dashboard/enrollments.html', context)
 
 

@@ -528,7 +528,11 @@
         <h2>Begin Your Hifz Journey Today</h2>
         <p>Take the first step toward memorizing the Quran. Our expert Qariyas will guide you every step of the way.</p>
         <div class="cta-buttons">
-            <a class="btn btn-white" href="{% url 'accounts:register' %}">Start Memorizing Now</a>
+            {% if user.is_authenticated %}
+            <a class="btn btn-white" href="{% url 'courses:enroll_course' slug='hifz' %}">Start Memorizing Now</a>
+            {% else %}
+            <a class="btn btn-white" href="{% url 'accounts:register' %}">Join to Enroll</a>
+            {% endif %}
             <a class="btn btn-outline-white" href="{% url 'content:contact' %}">Ask a Question</a>
         </div>
     </div>

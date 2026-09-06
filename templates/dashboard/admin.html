@@ -148,7 +148,7 @@
     /* STAT CARDS */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 1.25rem;
         margin-bottom: 2rem;
     }
@@ -182,6 +182,7 @@
     .stat-card .stat-icon.courses { background: rgba(212, 165, 116, 0.15); color: #8b5e3c; }
     .stat-card .stat-icon.workshops { background: rgba(34, 139, 34, 0.08); color: #228b22; }
     .stat-card .stat-icon.messages { background: rgba(255, 165, 0, 0.1); color: #e67e00; }
+    .stat-card .stat-icon.enrollments { background: rgba(138, 43, 226, 0.1); color: #8a2be2; }
 
     .stat-card h3 {
         font-size: 1.8rem;
@@ -419,6 +420,11 @@
                 <div class="stat-icon messages">✉️</div>
                 <h3>{{ pending_messages }}</h3>
                 <p>Pending Messages</p>
+            </div>
+            <div class="stat-card animate-on-scroll">
+                <div class="stat-icon enrollments">📝</div>
+                <h3>{{ pending_enrollments }}</h3>
+                <p>Pending Enrollments</p>
             </div>
         </div>
 

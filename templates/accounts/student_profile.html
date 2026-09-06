@@ -235,6 +235,39 @@
         color: var(--text-secondary);
     }
 
+    .status-badge {
+        padding: 0.25rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+
+    .status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .status-approved { background: rgba(34,139,34,0.1); color: #228b22; }
+    .status-rejected { background: rgba(220,53,69,0.1); color: #dc3545; }
+
+    .enroll-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(71, 24, 32, 0.04);
+    }
+
+    .enroll-item:last-child { border-bottom: none; }
+
+    .enroll-item h4 {
+        font-size: 0.9rem;
+        color: var(--brand-700);
+        margin-bottom: 0.2rem;
+    }
+
+    .enroll-item p {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
     .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
     .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
 
@@ -309,12 +342,12 @@
                 </div>
                 <div class="card-body">
                     <div class="stat-card">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number">{{ approved_count }}</div>
                         <div class="stat-label">Courses Enrolled</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">0</div>
-                        <div class="stat-label">Classes Attended</div>
+                        <div class="stat-number">{{ pending_count }}</div>
+                        <div class="stat-label">Pending Approvals</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">0</div>
@@ -327,13 +360,25 @@
             <div class="card card-full">
                 <div class="card-header">
                     <span class="icon">📚</span>
-                    <h3>My Courses</h3>
+                    <h3>My Enrollments</h3>
                 </div>
                 <div class="card-body">
+                    {% if enrollments %}
+                    {% for enrollment in enrollments %}
+                    <div class="enroll-item">
+                        <div>
+                            <h4>{{ enrollment.course.title }}</h4>
+                            <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+                        </div>
+                        <span class="status-badge status-{{ enrollment.status }}">{{ enrollment.status }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
                     <div class="empty-state">
                         <p>You haven't enrolled in any courses yet.</p>
                         <a class="btn btn-primary" href="{% url 'courses:course_list' %}" style="margin-top: 1rem;">Browse Courses</a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
 

@@ -526,7 +526,11 @@
         <h2>Give Your Child the Gift of Quran</h2>
         <p>Start your child's beautiful journey of Quran reading today with our patient and qualified female instructors.</p>
         <div class="cta-buttons">
-            <a class="btn btn-white" href="{% url 'accounts:register' %}">Enroll Your Child Now</a>
+            {% if user.is_authenticated %}
+            <a class="btn btn-white" href="{% url 'courses:enroll_course' slug='nazra' %}">Enroll Your Child Now</a>
+            {% else %}
+            <a class="btn btn-white" href="{% url 'accounts:register' %}">Join to Enroll</a>
+            {% endif %}
             <a class="btn btn-outline-white" href="{% url 'content:contact' %}">Ask a Question</a>
         </div>
     </div>

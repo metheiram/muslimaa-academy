@@ -1,0 +1,201 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Enroll - {{ course.title }} | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --brand-700: #471820;
+        --brand-800: #3d1319;
+        --accent-gold: #d4a574;
+        --text-secondary: #5a4a55;
+        --text-muted: #8a7a85;
+    }
+
+    .enroll-section {
+        padding: 4rem 0;
+        background: #faf6f1;
+    }
+
+    .container { max-width: 700px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .enroll-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(71, 24, 32, 0.06);
+        overflow: hidden;
+    }
+
+    .enroll-header {
+        background: linear-gradient(135deg, #471820 0%, #6b2530 100%);
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .enroll-header h1 {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+    }
+
+    .enroll-header p {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.9rem;
+    }
+
+    .enroll-body { padding: 2rem; }
+
+    .course-info {
+        background: rgba(71, 24, 32, 0.04);
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .course-info h3 {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .course-info p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .course-info .meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .course-info .meta span {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border: 1.5px solid rgba(71, 24, 32, 0.12);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-family: var(--font-sans);
+        transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent-gold);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--brand-700);
+        color: #ffffff;
+    }
+
+    .btn-primary:hover {
+        background: var(--brand-800);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--brand-700);
+        border: 1.5px solid var(--brand-700);
+        margin-top: 0.75rem;
+    }
+
+    .btn-outline:hover {
+        background: var(--brand-700);
+        color: #ffffff;
+    }
+
+    .note {
+        background: rgba(212, 165, 116, 0.1);
+        border-left: 3px solid var(--accent-gold);
+        padding: 0.75rem 1rem;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .note p {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="enroll-section">
+    <div class="container">
+        <div class="enroll-card">
+            <div class="enroll-header">
+                <h1>📝 Enroll in Course</h1>
+                <p>Submit your enrollment request</p>
+            </div>
+            <div class="enroll-body">
+                <div class="course-info">
+                    <h3>{{ course.title }}</h3>
+                    <p>{{ course.description|truncatewords:20 }}</p>
+                    <div class="meta">
+                        <span>📚 {{ course.level|title }}</span>
+                        <span>⏱️ {{ course.duration }}</span>
+                        {% if course.price %}
+                        <span>💰 Rs. {{ course.price }}</span>
+                        {% else %}
+                        <span>🆓 Free</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="note">
+                    <p>📧 After admin approval, you will receive a confirmation email with class details.</p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Submit Enrollment Request</button>
+                </form>
+                <a class="btn btn-outline" href="{% url 'courses:course_detail' slug=course.slug %}">← Back to Course</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

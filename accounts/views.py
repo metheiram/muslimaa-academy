@@ -60,9 +60,19 @@ def profile(request):
         return redirect('dashboard:admin_dashboard')
     elif user.is_staff:
         template = 'accounts/teacher_profile.html'
+        context = {'user': user}
     else:
+        from courses.enrollment_models import Enrollment
+        enrollments = Enrollment.objects.filter(student=user).select_related('course')
+        approved_count = enrollments.filter(status='approved').count()
+        pending_count = enrollments.filter(status='pending').count()
+        context = {
+            'user': user,
+            'enrollments': enrollments,
+            'approved_count': approved_count,
+            'pending_count': pending_count,
+        }
         template = 'accounts/student_profile.html'
-    context = {'user': user}
     return render(request, template, context)
 
 
