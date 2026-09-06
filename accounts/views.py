@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
@@ -57,3 +57,9 @@ def profile(request):
     """Display user profile."""
     context = {'user': request.user}
     return render(request, 'accounts/profile.html', context)
+
+
+def custom_logout(request):
+    """Custom logout view that works with GET request."""
+    logout(request)
+    return redirect('home')
