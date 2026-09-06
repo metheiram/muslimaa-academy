@@ -1,0 +1,509 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Tajweed Mastery Course | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --brand-700: #471820;
+        --brand-800: #3d1319;
+        --accent-gold: #d4a574;
+        --text-secondary: #5a4a55;
+        --text-muted: #8a7a85;
+        --font-serif: 'Playfair Display', Georgia, serif;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #faf6f1; color: #2d0d0f; }
+
+    .course-hero {
+        background: linear-gradient(135deg, #471820 0%, #2d0d0f 50%, #d4a574 100%);
+        padding: 5rem 0 4rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .course-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .course-hero .container { position: relative; z-index: 1; }
+
+    .course-hero .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        transition: color 0.3s ease;
+    }
+
+    .course-hero .back-link:hover { color: #fff; }
+
+    .course-hero-badge {
+        display: inline-block;
+        background: rgba(212, 165, 116, 0.2);
+        border: 1px solid rgba(212, 165, 116, 0.4);
+        color: var(--accent-gold);
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 1.5rem;
+    }
+
+    .course-hero h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+    }
+
+    .course-hero p {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.85);
+        max-width: 650px;
+        margin: 0 auto 2rem;
+        line-height: 1.7;
+    }
+
+    .course-hero-meta {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .course-hero-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .section { padding: 4rem 0; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .section-header h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .section-header p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        max-width: 550px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+
+    .about-content h3 {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 1rem;
+    }
+
+    .about-content p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 1rem;
+    }
+
+    .about-visual {
+        background: linear-gradient(135deg, rgba(71, 24, 32, 0.06) 0%, rgba(212, 165, 116, 0.1) 100%);
+        border-radius: 16px;
+        padding: 3rem;
+        text-align: center;
+        border: 2px solid rgba(212, 165, 116, 0.2);
+    }
+
+    .about-visual .icon-large {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 3px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .about-visual h4 {
+        font-family: var(--font-serif);
+        font-size: 1.2rem;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .about-visual p {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .feature-card {
+        background: #ffffff;
+        padding: 2rem 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        box-shadow: 0 2px 10px rgba(71, 24, 32, 0.04);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(71, 24, 32, 0.1);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 2px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .feature-card h4 {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .curriculum-list {
+        max-width: 700px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .curriculum-item {
+        background: #ffffff;
+        padding: 1.25rem 1.5rem;
+        border-radius: 10px;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .curriculum-item:hover {
+        border-color: var(--accent-gold);
+        box-shadow: 0 4px 15px rgba(71, 24, 32, 0.06);
+    }
+
+    .curriculum-num {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        background: var(--brand-700);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .curriculum-item h4 {
+        font-family: var(--font-serif);
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--brand-700);
+        margin-bottom: 0.15rem;
+    }
+
+    .curriculum-item p {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    .cta-section {
+        background: linear-gradient(135deg, #471820 0%, #6b2530 100%);
+        padding: 4rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .cta-section .container { position: relative; z-index: 1; }
+
+    .cta-section h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.85);
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        line-height: 1.7;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 2rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        text-decoration: none;
+        line-height: 1.4;
+    }
+
+    .btn-white {
+        background: #ffffff;
+        color: var(--brand-700);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-white:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline-white {
+        background: transparent;
+        color: #ffffff;
+        border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    .btn-outline-white:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.6);
+    }
+
+    .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .about-grid { grid-template-columns: 1fr; }
+        .features-grid { grid-template-columns: 1fr; }
+        .course-hero-meta { gap: 1rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="course-hero">
+    <div class="container">
+        <a href="{% url 'courses:course_list' %}" class="back-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Courses
+        </a>
+        <div class="course-hero-badge">For Sisters</div>
+        <h1>Tajweed Mastery Course</h1>
+        <p>Learn precise articulation rules (Makharij) and recitation with clarity under the guidance of expert female scholars.</p>
+        <div class="course-hero-meta">
+            <span>⏱️ 3 Months</span>
+            <span>👩‍🎓 For Sisters</span>
+            <span>👩‍🏫 1-on-1 Sessions</span>
+            <span>📹 Online Classes</span>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-content">
+                <h3>Recite the Quran as It Was Meant to Be Recited</h3>
+                <p>Tajweed is the art of giving every letter its rights and dues. This course will transform your recitation from basic reading to beautiful, precise recitation that honors the words of Allah.</p>
+                <p>Our expert Qariyas will guide you through every rule with patience, ensuring you not only understand but internalize the principles of proper recitation.</p>
+            </div>
+            <div class="about-visual">
+                <div class="icon-large">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 38V22L24 16L36 22V38L24 32L12 38Z" stroke="#471820" stroke-width="1.8" stroke-linejoin="round"/>
+                        <path d="M24 16V32" stroke="#471820" stroke-width="1.5"/>
+                        <path d="M16 24L24 20L32 24" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        <path d="M16 28L24 24L32 28" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h4>Master Every Rule</h4>
+                <p>From Makharij to Ghunnah, master every aspect of Tajweed</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" style="background: #f5ede4;">
+    <div class="container">
+        <div class="section-header">
+            <h2>What You'll Master</h2>
+            <p>Comprehensive Tajweed training from fundamentals to advanced rules</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                </div>
+                <h4>Makharij (Articulation Points)</h4>
+                <p>Learn exactly where each letter originates in the mouth, throat, and chest</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                </div>
+                <h4>Sifat (Characteristics)</h4>
+                <p>Understand the unique qualities of each letter for perfect pronunciation</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <h4>Nooun Sakin & Tanween</h4>
+                <p>Master the rules of Nooun Sakin and the three types of Tanween</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M4 19V5a2 2 0 012-2h8l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M14 3v6h6"/></svg>
+                </div>
+                <h4>Idghaam & Ikhfaa</h4>
+                <p>Learn when to merge, hide, or pronounce letters clearly</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <h4>Madd (Elongation)</h4>
+                <p>Perfect timing for natural, extended, and required elongations</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                </div>
+                <h4>Practical Application</h4>
+                <p>Apply rules directly to Surahs from the Quran in every session</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Course Structure</h2>
+            <p>A progressive 3-month journey to Tajweed mastery</p>
+        </div>
+        <div class="curriculum-list">
+            <div class="curriculum-item">
+                <div class="curriculum-num">01</div>
+                <div>
+                    <h4>Month 1: Foundations</h4>
+                    <p>Arabic alphabet review, Makharij basics, and introduction to Tajweed</p>
+                </div>
+            </div>
+            <div class="curriculum-item">
+                <div class="curriculum-num">02</div>
+                <div>
+                    <h4>Month 2: Core Rules</h4>
+                    <p>Nooun Sakin, Tanween, Madd, Idghaam, and Ikhfaa rules</p>
+                </div>
+            </div>
+            <div class="curriculum-item">
+                <div class="curriculum-num">03</div>
+                <div>
+                    <h4>Month 3: Advanced & Application</h4>
+                    <p>Advanced rules, Waqf & Ibtidaa, and comprehensive Surah practice</p>
+                </div>
+            </div>
+            <div class="curriculum-item">
+                <div class="curriculum-num">04</div>
+                <div>
+                    <h4>Ongoing: Practice & Refinement</h4>
+                    <p>Continue perfecting your recitation with guided practice sessions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2>Perfect Your Recitation Today</h2>
+        <p>Join hundreds of sisters who have transformed their Quran recitation with proper Tajweed.</p>
+        <div class="cta-buttons">
+            <a class="btn btn-white" href="{% url 'accounts:register' %}">Enroll in Tajweed Course</a>
+            <a class="btn btn-outline-white" href="https://chat.whatsapp.com/By6RP0uCP3L9t8ybOPfT2N" target="_blank">Ask a Question</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
