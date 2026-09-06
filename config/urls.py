@@ -31,4 +31,5 @@ urlpatterns = [
     path('workshops/', include('workshops.urls')),
     path('accounts/', include('accounts.urls')),
     path('content/', include('content.urls')),
+    path('dashboard/', include('dashboard.urls')),
 ]

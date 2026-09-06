@@ -1,4 +1,512 @@
 {% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --brand-700: #471820;
+        --brand-800: #3d1319;
+        --accent-gold: #d4a574;
+        --text-secondary: #5a4a55;
+        --text-muted: #8a7a85;
+        --font-serif: 'Playfair Display', Georgia, serif;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
+
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 260px;
+        background: var(--brand-700);
+        color: #ffffff;
+        padding: 1.5rem 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        overflow-y: auto;
+        z-index: 100;
+    }
+
+    .sidebar-brand {
+        padding: 0 1.5rem 1.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 1rem;
+    }
+
+    .sidebar-brand h2 {
+        font-family: var(--font-serif);
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .sidebar-brand p {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.6);
+        margin-top: 0.25rem;
+    }
+
+    .sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1.5rem;
+        color: rgba(255,255,255,0.7);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .sidebar-nav li a:hover,
+    .sidebar-nav li a.active {
+        background: rgba(255,255,255,0.08);
+        color: #ffffff;
+        border-left-color: var(--accent-gold);
+    }
+
+    .sidebar-nav li a .icon {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .sidebar-nav .section-label {
+        padding: 1rem 1.5rem 0.5rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(255,255,255,0.4);
+    }
+
+    .sidebar-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-footer a {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255,255,255,0.6);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: color 0.3s ease;
+    }
+
+    .sidebar-footer a:hover { color: #ffffff; }
+
+    /* MAIN CONTENT */
+    .main-content {
+        margin-left: 260px;
+        flex: 1;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-family: var(--font-serif);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--brand-700);
+    }
+
+    .page-header .welcome {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    /* STAT CARDS */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        box-shadow: 0 2px 8px rgba(71, 24, 32, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(71, 24, 32, 0.08);
+    }
+
+    .stat-card .stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .stat-card .stat-icon.students { background: rgba(71, 24, 32, 0.08); color: var(--brand-700); }
+    .stat-card .stat-icon.courses { background: rgba(212, 165, 116, 0.15); color: #8b5e3c; }
+    .stat-card .stat-icon.workshops { background: rgba(34, 139, 34, 0.08); color: #228b22; }
+    .stat-card .stat-icon.messages { background: rgba(255, 165, 0, 0.1); color: #e67e00; }
+
+    .stat-card h3 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--brand-700);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-card p {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* CONTENT GRID */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        box-shadow: 0 2px 8px rgba(71, 24, 32, 0.04);
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(71, 24, 32, 0.06);
+    }
+
+    .card-header h3 {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+    }
+
+    .card-header .badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.25rem 0.6rem;
+        border-radius: 50px;
+        background: rgba(71, 24, 32, 0.08);
+        color: var(--brand-700);
+    }
+
+    .card-body {
+        padding: 1.25rem 1.5rem;
+    }
+
+    /* TABLE */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        text-align: left;
+        padding: 0.75rem 0;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        border-bottom: 1px solid rgba(71, 24, 32, 0.06);
+    }
+
+    .data-table td {
+        padding: 0.85rem 0;
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        border-bottom: 1px solid rgba(71, 24, 32, 0.04);
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .data-table .status-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 50px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+    .status-badge.pending { background: rgba(255, 165, 0, 0.1); color: #e67e00; }
+    .status-badge.approved { background: rgba(34, 139, 34, 0.1); color: #228b22; }
+    .status-badge.read { background: rgba(34, 139, 34, 0.1); color: #228b22; }
+    .status-badge.unread { background: rgba(255, 165, 0, 0.1); color: #e67e00; }
+
+    /* QUICK ACTIONS */
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        background: rgba(71, 24, 32, 0.04);
+        border: 1px solid rgba(71, 24, 32, 0.08);
+        border-radius: 10px;
+        color: var(--brand-700);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        background: var(--brand-700);
+        color: #ffffff;
+        border-color: var(--brand-700);
+    }
+
+    .action-btn .action-icon {
+        width: 35px;
+        height: 35px;
+        background: rgba(71, 24, 32, 0.08);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .action-btn:hover .action-icon { background: rgba(255,255,255,0.2); }
+
+    .empty-msg {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .content-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar { display: none; }
+        .main-content { margin-left: 0; }
+        .stats-grid { grid-template-columns: 1fr; }
+    }
+
+    .animate-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Admin Dashboard</h1>
+<div class="dashboard-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>Muslimaa Academy</h2>
+            <p>Admin Dashboard</p>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li><a href="{% url 'dashboard:admin_dashboard' %}" class="active">
+                <span class="icon">📊</span> Dashboard
+            </a></li>
+
+            <div class="section-label">Management</div>
+            <li><a href="{% url 'dashboard:admin_students' %}">
+                <span class="icon">👩‍🎓</span> Students
+            </a></li>
+            <li><a href="{% url 'dashboard:admin_teachers' %}">
+                <span class="icon">👩‍🏫</span> Teachers
+            </a></li>
+            <li><a href="{% url 'dashboard:admin_enrollments' %}">
+                <span class="icon">📋</span> Enrollments
+            </a></li>
+            <li><a href="{% url 'dashboard:admin_fees' %}">
+                <span class="icon">💰</span> Fee Tracking
+            </a></li>
+
+            <div class="section-label">Content</div>
+            <li><a href="{% url 'courses:course_list' %}">
+                <span class="icon">📚</span> Courses
+            </a></li>
+            <li><a href="{% url 'workshops:workshop_list' %}">
+                <span class="icon">🎓</span> Workshops
+            </a></li>
+            <li><a href="{% url 'admin:index' %}">
+                <span class="icon">⚙️</span> Django Admin
+            </a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p class="welcome">Welcome back, {{ user.get_full_name|default:user.username }}</p>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card animate-on-scroll">
+                <div class="stat-icon students">👩‍🎓</div>
+                <h3>{{ total_students }}</h3>
+                <p>Total Students</p>
+            </div>
+            <div class="stat-card animate-on-scroll">
+                <div class="stat-icon courses">📚</div>
+                <h3>{{ total_courses }}</h3>
+                <p>Active Courses</p>
+            </div>
+            <div class="stat-card animate-on-scroll">
+                <div class="stat-icon workshops">🎓</div>
+                <h3>{{ total_workshops }}</h3>
+                <p>Workshops</p>
+            </div>
+            <div class="stat-card animate-on-scroll">
+                <div class="stat-icon messages">✉️</div>
+                <h3>{{ pending_messages }}</h3>
+                <p>Pending Messages</p>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content-grid">
+            <!-- Recent Messages -->
+            <div class="card animate-on-scroll">
+                <div class="card-header">
+                    <h3>Recent Messages</h3>
+                    <span class="badge">{{ pending_messages }} new</span>
+                </div>
+                <div class="card-body">
+                    {% if recent_messages %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in recent_messages %}
+                            <tr>
+                                <td><strong>{{ msg.name }}</strong></td>
+                                <td>{{ msg.get_subject_display }}</td>
+                                <td>{{ msg.created_at|date:"M d" }}</td>
+                                <td>
+                                    {% if msg.is_read %}
+                                    <span class="status-badge read">Read</span>
+                                    {% else %}
+                                    <span class="status-badge unread">New</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="empty-msg">No messages yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card animate-on-scroll">
+                <div class="card-header">
+                    <h3>Quick Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="{% url 'dashboard:admin_students' %}" class="action-btn">
+                            <span class="action-icon">👩‍🎓</span>
+                            Manage Students
+                        </a>
+                        <a href="{% url 'dashboard:admin_teachers' %}" class="action-btn">
+                            <span class="action-icon">👩‍🏫</span>
+                            Manage Teachers
+                        </a>
+                        <a href="{% url 'dashboard:admin_enrollments' %}" class="action-btn">
+                            <span class="action-icon">📋</span>
+                            View Enrollments
+                        </a>
+                        <a href="{% url 'dashboard:admin_fees' %}" class="action-btn">
+                            <span class="action-icon">💰</span>
+                            Track Fees
+                        </a>
+                        <a href="{% url 'admin:index' %}" class="action-btn">
+                            <span class="action-icon">⚙️</span>
+                            Django Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) { entry.target.classList.add('is-visible'); }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.animate-on-scroll').forEach(function(el) { observer.observe(el); });
+});
+</script>
 {% endblock %}
