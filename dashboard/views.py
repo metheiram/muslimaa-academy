@@ -83,35 +83,67 @@ def admin_students(request):
 
 @admin_required
 def admin_teachers(request):
-    """Manage teachers - list and add."""
+    """Manage teachers - list, add, edit, delete."""
     if request.method == 'POST':
-        first_name = request.POST.get('first_name', '').strip()
-        last_name = request.POST.get('last_name', '').strip()
-        email = request.POST.get('email', '').strip()
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '').strip()
-        subject = request.POST.get('subject', '').strip()
+        action = request.POST.get('action')
 
-        if not all([first_name, email, username, password]):
-            messages.error(request, 'All fields are required.')
-        elif User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists.')
-        elif User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already exists.')
-        else:
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-                is_staff=True,
-                is_superuser=False,
-            )
-            messages.success(request, f'Teacher "{user.get_full_name()}" added successfully!')
+        if action == 'add':
+            first_name = request.POST.get('first_name', '').strip()
+            last_name = request.POST.get('last_name', '').strip()
+            email = request.POST.get('email', '').strip()
+            username = request.POST.get('username', '').strip()
+            password = request.POST.get('password', '').strip()
+            subject = request.POST.get('subject', '').strip()
+
+            if not all([first_name, email, username, password]):
+                messages.error(request, 'All fields are required.')
+            elif User.objects.filter(username=username).exists():
+                messages.error(request, 'Username already exists.')
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, 'Email already exists.')
+            else:
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    is_staff=True,
+                    is_superuser=False,
+                )
+                if subject:
+                    user.profile.subject = subject
+                    user.profile.save()
+                messages.success(request, f'Teacher "{user.get_full_name()}" added successfully!')
+                return redirect('dashboard:admin_teachers')
+
+        elif action == 'edit':
+            user_id = request.POST.get('user_id')
+            user = get_object_or_404(User, id=user_id)
+            user.first_name = request.POST.get('first_name', user.first_name).strip()
+            user.last_name = request.POST.get('last_name', user.last_name).strip()
+            user.email = request.POST.get('email', user.email).strip()
+            subject = request.POST.get('subject', '').strip()
+            
+            new_password = request.POST.get('password', '').strip()
+            if new_password:
+                user.set_password(new_password)
+            
+            user.save()
+            user.profile.subject = subject
+            user.profile.save()
+            messages.success(request, f'Teacher "{user.get_full_name()}" updated successfully!')
             return redirect('dashboard:admin_teachers')
 
-    teachers = User.objects.filter(is_staff=True, is_superuser=False).order_by('-date_joined')
+        elif action == 'delete':
+            user_id = request.POST.get('user_id')
+            user = get_object_or_404(User, id=user_id)
+            name = user.get_full_name()
+            user.delete()
+            messages.success(request, f'Teacher "{name}" deleted successfully!')
+            return redirect('dashboard:admin_teachers')
+
+    teachers = User.objects.filter(is_staff=True, is_superuser=False).select_related('profile').order_by('-date_joined')
     context = {'teachers': teachers, 'active_tab': 'teachers'}
     return render(request, 'dashboard/teachers.html', context)
 

@@ -54,6 +54,12 @@
     .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
     .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .alert-error { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-edit { background: rgba(71,24,32,0.08); color: var(--brand-700); border: 1px solid rgba(71,24,32,0.15); }
+    .btn-edit:hover { background: var(--brand-700); color: #fff; }
+    .btn-delete { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-delete:hover { background: #dc3545; color: #fff; }
+    .action-btns { display: flex; gap: 0.4rem; }
     @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } .form-row { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
@@ -100,7 +106,7 @@
             <div class="card-body">
                 {% if teachers %}
                 <table class="data-table">
-                    <thead><tr><th>Name</th><th>Email</th><th>Username</th><th>Subject</th><th>Joined</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Email</th><th>Username</th><th>Subject</th><th>Joined</th><th>Actions</th></tr></thead>
                     <tbody>
                         {% for teacher in teachers %}
                         <tr>
@@ -109,6 +115,17 @@
                             <td>{{ teacher.username }}</td>
                             <td>{{ teacher.profile.subject|default:"-" }}</td>
                             <td>{{ teacher.date_joined|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-sm btn-edit" onclick="openEditModal('{{ teacher.id }}', '{{ teacher.first_name|escapejs }}', '{{ teacher.last_name|escapejs }}', '{{ teacher.email|escapejs }}', '{{ teacher.username|escapejs }}', '{{ teacher.profile.subject|escapejs }}')">Edit</button>
+                                    <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this teacher?')">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="user_id" value="{{ teacher.id }}">
+                                        <button type="submit" class="btn-sm btn-delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -130,6 +147,7 @@
         </div>
         <form method="POST" action="{% url 'dashboard:admin_teachers' %}">
             {% csrf_token %}
+            <input type="hidden" name="action" value="add">
             <div class="modal-body">
                 <div class="form-row">
                     <div class="form-group">
@@ -153,6 +171,10 @@
                     <label>Password *</label>
                     <input type="password" name="password" required placeholder="Set a password">
                 </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="subject" placeholder="e.g. Tajweed, Hifz, Nazra">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn" style="background: #f0f0f0;" onclick="document.getElementById('addTeacherModal').classList.remove('active')">Cancel</button>
@@ -161,4 +183,63 @@
         </form>
     </div>
 </div>
+
+<!-- EDIT TEACHER MODAL -->
+<div class="modal-overlay" id="editTeacherModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Teacher</h3>
+            <button class="modal-close" onclick="document.getElementById('editTeacherModal').classList.remove('active')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'dashboard:admin_teachers' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="user_id" id="edit_user_id">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name *</label>
+                        <input type="text" name="first_name" id="edit_first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name *</label>
+                        <input type="text" name="last_name" id="edit_last_name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" name="email" id="edit_email" required>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="edit_username" disabled style="background:#f5f0eb; color: var(--text-muted);">
+                </div>
+                <div class="form-group">
+                    <label>New Password (leave blank to keep current)</label>
+                    <input type="password" name="password" placeholder="Leave blank to keep current">
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="subject" id="edit_subject" placeholder="e.g. Tajweed, Hifz, Nazra">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background: #f0f0f0;" onclick="document.getElementById('editTeacherModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditModal(id, firstName, lastName, email, username, subject) {
+    document.getElementById('edit_user_id').value = id;
+    document.getElementById('edit_first_name').value = firstName;
+    document.getElementById('edit_last_name').value = lastName;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_username').value = username;
+    document.getElementById('edit_subject').value = subject;
+    document.getElementById('editTeacherModal').classList.add('active');
+}
+</script>
 {% endblock %}
