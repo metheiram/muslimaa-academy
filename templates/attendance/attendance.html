@@ -1,27 +1,10 @@
-{% extends 'base/base_dashboard.html' %}
+{% extends 'base/base_teacher.html' %}
 {% load static %}
 
 {% block title %}Attendance | Muslimaa Academy{% endblock %}
 
-{% block extra_head %}
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+{% block teacher_extra_head %}
 <style>
-    :root { --brand-700: #471820; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
-    .dashboard-wrapper { display: flex; min-height: 100vh; }
-    .sidebar { width: 260px; background: var(--brand-700); color: #fff; padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; }
-    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
-    .sidebar-brand h2 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; }
-    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
-    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
-    .sidebar-nav li a { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
-    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #fff; border-left-color: var(--accent-gold); }
-    .sidebar-nav .section-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
-    .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
-    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; }
-    .sidebar-footer a:hover { color: #fff; }
-    .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
     .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
@@ -41,125 +24,95 @@
     .attendance-table td { padding: 0.85rem 0; font-size: 0.88rem; color: var(--text-secondary); border-bottom: 1px solid rgba(71,24,32,0.04); }
     .status-select { padding: 0.4rem 0.8rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); }
     .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
-    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } .filter-row { flex-direction: column; } }
+    .alert-box { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="dashboard-wrapper">
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <h2>Muslimaa Academy</h2>
-            <p>{% if user.is_superuser %}Admin{% else %}Teacher{% endif %} Dashboard</p>
-        </div>
-        <ul class="sidebar-nav">
-            <li><a href="{% if user.is_superuser %}{% url 'dashboard:admin_dashboard' %}{% else %}{% url 'teacher_dashboard' %}{% endif %}"><span>📊</span> Dashboard</a></li>
-            <div class="section-label">Academics</div>
-            <li><a href="{% url 'attendance:attendance' %}" class="active"><span>✅</span> Attendance</a></li>
-            <li><a href="{% url 'classes:schedule' %}"><span>📅</span> Schedule</a></li>
-            <div class="section-label">Management</div>
-            {% if user.is_superuser %}
-            <li><a href="{% url 'dashboard:admin_students' %}"><span>👩‍🎓</span> Students</a></li>
-            <li><a href="{% url 'dashboard:admin_teachers' %}"><span>👩‍🏫</span> Teachers</a></li>
-            <li><a href="{% url 'dashboard:admin_enrollments' %}"><span>📋</span> Enrollments</a></li>
-            <li><a href="{% url 'dashboard:admin_fees' %}"><span>💰</span> Fees</a></li>
-            <li><a href="{% url 'dashboard:admin_courses' %}"><span>📚</span> Courses</a></li>
-            {% endif %}
-        </ul>
-        <div class="sidebar-footer">
-            <a href="{% url 'home' %}">🏠 Back to Site</a>
-            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <div class="page-header">
-            <h1>📝 Mark Attendance</h1>
-        </div>
-
-        {% if messages %}
-        {% for message in messages %}
-        <div style="padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; {% if message.tags == 'success' %}background: rgba(34,139,34,0.1); color: #228b22;{% elif message.tags == 'error' %}background: rgba(220,20,60,0.1); color: #dc143c;{% else %}background: rgba(255,165,0,0.1); color: #e67e00;{% endif %}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
-
-        <div class="card">
-            <div class="card-body">
-                <form method="GET" action="{% url 'attendance:attendance' %}">
-                    <div class="filter-row">
-                        <div>
-                            <label>Course</label>
-                            <select name="course" required>
-                                <option value="">Select Course</option>
-                                {% for course in courses %}
-                                <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.title }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label>Date</label>
-                            <input type="date" name="date" value="{{ selected_date }}">
-                        </div>
-                        <div>
-                            <button type="submit" class="btn btn-primary">🔍 Load Students</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        {% if students %}
-        <div class="card">
-            <div class="card-header">
-                <h3>Students — {{ selected_date }}</h3>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="course_id" value="{{ selected_course }}">
-                    <input type="hidden" name="date" value="{{ selected_date }}">
-                    <table class="attendance-table">
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for student in students %}
-                            <tr>
-                                <td><strong>{{ student.get_full_name }}</strong></td>
-                                <td>{{ student.email }}</td>
-                                <td>
-                                    <select name="student_ids" style="display:none;" multiple></select>
-                                    <select name="status_{{ student.id }}" class="status-select">
-                                        <option value="present" {% if existing_attendance.0 == 'present' %}selected{% endif %}>✅ Present</option>
-                                        <option value="absent" {% if existing_attendance.0 == 'absent' %}selected{% endif %}>❌ Absent</option>
-                                        <option value="late" {% if existing_attendance.0 == 'late' %}selected{% endif %}>⏰ Late</option>
-                                        <option value="excused" {% if existing_attendance.0 == 'excused' %}selected{% endif %}>📋 Excused</option>
-                                    </select>
-                                    <input type="hidden" name="student_ids" value="{{ student.id }}">
-                                </td>
-                                <td><input type="text" name="notes_{{ student.id }}" placeholder="Optional note" style="padding:0.4rem 0.8rem; border:1px solid rgba(71,24,32,0.15); border-radius:6px; font-size:0.82rem; width:150px;"></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <div style="margin-top: 1.5rem;">
-                        <button type="submit" class="btn btn-success">✅ Save Attendance</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        {% elif selected_course %}
-        <div class="card">
-            <div class="card-body">
-                <p class="empty-msg">No approved students found for this course.</p>
-            </div>
-        </div>
-        {% endif %}
-    </main>
+{% block teacher_content %}
+<div class="page-header">
+    <h1>📝 Mark Attendance</h1>
 </div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert-box" style="{% if message.tags == 'success' %}background:rgba(34,139,34,0.1); color:#228b22;{% elif message.tags == 'error' %}background:rgba(220,20,60,0.1); color:#dc143c;{% else %}background:rgba(255,165,0,0.1); color:#e67e00;{% endif %}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        <form method="GET" action="{% url 'attendance:attendance' %}">
+            <div class="filter-row">
+                <div>
+                    <label>Course</label>
+                    <select name="course" required>
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Date</label>
+                    <input type="date" name="date" value="{{ selected_date }}">
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary">🔍 Load Students</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if students %}
+<div class="card">
+    <div class="card-header">
+        <h3>Students — {{ selected_date }}</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="course_id" value="{{ selected_course }}">
+            <input type="hidden" name="date" value="{{ selected_date }}">
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td><strong>{{ student.get_full_name }}</strong></td>
+                        <td>{{ student.email }}</td>
+                        <td>
+                            <select name="status_{{ student.id }}" class="status-select">
+                                <option value="present" {% if existing_attendance.0 == 'present' %}selected{% endif %}>✅ Present</option>
+                                <option value="absent" {% if existing_attendance.0 == 'absent' %}selected{% endif %}>❌ Absent</option>
+                                <option value="late" {% if existing_attendance.0 == 'late' %}selected{% endif %}>⏰ Late</option>
+                                <option value="excused" {% if existing_attendance.0 == 'excused' %}selected{% endif %}>📋 Excused</option>
+                            </select>
+                            <input type="hidden" name="student_ids" value="{{ student.id }}">
+                        </td>
+                        <td><input type="text" name="notes_{{ student.id }}" placeholder="Optional note" style="padding:0.4rem 0.8rem; border:1px solid rgba(71,24,32,0.15); border-radius:6px; font-size:0.82rem; width:150px;"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-success">✅ Save Attendance</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% elif selected_course %}
+<div class="card">
+    <div class="card-body">
+        <p class="empty-msg">No approved students found for this course.</p>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
