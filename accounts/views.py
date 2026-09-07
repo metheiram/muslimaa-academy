@@ -63,14 +63,20 @@ def profile(request):
         context = {'user': user}
     else:
         from courses.enrollment_models import Enrollment
+        from payments.models import Payment
+        from django.db.models import Sum
         enrollments = Enrollment.objects.filter(student=user).select_related('course')
         approved_count = enrollments.filter(status='approved').count()
         pending_count = enrollments.filter(status='pending').count()
+        payments = Payment.objects.filter(student=user).select_related('course')
+        total_paid = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
         context = {
             'user': user,
             'enrollments': enrollments,
             'approved_count': approved_count,
             'pending_count': pending_count,
+            'payments': payments,
+            'total_paid': total_paid,
         }
         template = 'accounts/student_profile.html'
     return render(request, template, context)

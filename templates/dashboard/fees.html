@@ -24,11 +24,57 @@
     .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
-    .empty-state { text-align: center; padding: 4rem; background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); }
-    .empty-state .icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: rgba(71,24,32,0.06); border-radius: 50%; border: 2px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-    .empty-state h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--brand-700); margin-bottom: 0.5rem; }
-    .empty-state p { font-size: 0.95rem; color: var(--text-secondary); max-width: 400px; margin: 0 auto; line-height: 1.6; }
-    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
+
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #ffffff; border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); }
+    .stat-card h3 { font-size: 1.8rem; font-weight: 800; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .stat-card p { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { text-align: left; padding: 0.75rem 0; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .data-table td { padding: 0.85rem 0; font-size: 0.88rem; color: var(--text-secondary); border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 600; }
+    .status-paid { background: rgba(34,139,34,0.1); color: #228b22; }
+    .status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .status-free { background: rgba(138,43,226,0.1); color: #8a2be2; }
+    .status-waived { background: rgba(100,149,237,0.1); color: #6495ed; }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #ffffff; }
+    .btn-primary:hover { background: var(--brand-800); transform: translateY(-1px); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; }
+    .btn-mark { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-mark:hover { background: #228b22; color: #fff; }
+    .btn-record { background: rgba(71,24,32,0.08); color: var(--brand-700); border: 1px solid rgba(71,24,32,0.15); }
+    .btn-record:hover { background: var(--brand-700); color: #fff; }
+
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #ffffff; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .modal-header h3 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; color: var(--brand-700); }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; transition: border-color 0.3s ease; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--brand-700); }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } .stats-row { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
@@ -55,12 +101,169 @@
     </aside>
 
     <main class="main-content">
-        <div class="page-header"><h1>Fee Tracking</h1></div>
-        <div class="empty-state">
-            <div class="icon">💰</div>
-            <h3>Fee Tracking Coming Soon</h3>
-            <p>Track student payments, pending fees, and payment history all in one place. Payment reminders and receipts will be available here.</p>
+        <div class="page-header">
+            <h1>Fee Tracking</h1>
         </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <h3>Rs. {{ total_collected|floatformat:0 }}</h3>
+                <p>Total Collected</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ total_pending }}</h3>
+                <p>Pending Payments</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ total_free }}</h3>
+                <p>Free Enrollments</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Enrolled Students — Fee Status</h3>
+            </div>
+            <div class="card-body">
+                {% if approved_enrollments %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in approved_enrollments %}
+                        <tr>
+                            <td><strong>{{ enrollment.student.get_full_name }}</strong></td>
+                            <td>{{ enrollment.course.title }}</td>
+                            <td>{% for payment in payments %}{% if payment.enrollment.id == enrollment.id %}Rs. {{ payment.amount }}{% endif %}{% empty %}-{% endfor %}</td>
+                            <td>
+                                {% for payment in payments %}{% if payment.enrollment.id == enrollment.id %}
+                                <span class="status-badge status-{{ payment.status }}">{{ payment.get_status_display }}</span>
+                                {% endif %}{% empty %}
+                                <span class="status-badge status-pending">Unpaid</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <button class="btn-sm btn-record" onclick="openPaymentModal('{{ enrollment.id }}', '{{ enrollment.student.get_full_name }}', '{{ enrollment.course.title }}')">Record Payment</button>
+                                <form method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
+                                    <button type="submit" name="action" value="mark_free" class="btn-sm btn-mark">Mark Free</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-msg">No approved enrollments yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if payments %}
+        <div class="card">
+            <div class="card-header">
+                <h3>Payment History</h3>
+            </div>
+            <div class="card-body">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td><strong>{{ payment.student.get_full_name }}</strong></td>
+                            <td>{{ payment.course.title }}</td>
+                            <td>Rs. {{ payment.amount }}</td>
+                            <td>{{ payment.get_method_display }}</td>
+                            <td><span class="status-badge status-{{ payment.status }}">{{ payment.get_status_display }}</span></td>
+                            <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </main>
 </div>
+
+<!-- RECORD PAYMENT MODAL -->
+<div class="modal-overlay" id="paymentModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Record Payment</h3>
+            <button class="modal-close" onclick="document.getElementById('paymentModal').classList.remove('active')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'dashboard:admin_fees' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_payment">
+            <input type="hidden" name="enrollment_id" id="modal_enrollment_id">
+            <div class="modal-body">
+                <p style="font-size:0.85rem; color: var(--text-muted); margin-bottom:1rem;" id="modal_student_info"></p>
+                <div class="form-group">
+                    <label>Amount (Rs.) *</label>
+                    <input type="number" name="amount" required placeholder="0" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Payment Method *</label>
+                    <select name="method" required>
+                        <option value="free">Free</option>
+                        <option value="cash">Cash</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="jazzcash">JazzCash</option>
+                        <option value="easypaisa">EasyPaisa</option>
+                        <option value="online">Online</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status *</label>
+                    <select name="payment_status" required>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="free">Free</option>
+                        <option value="waived">Waived</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2" placeholder="Optional notes..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background: #f0f0f0;" onclick="document.getElementById('paymentModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Payment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openPaymentModal(enrollmentId, studentName, courseTitle) {
+    document.getElementById('modal_enrollment_id').value = enrollmentId;
+    document.getElementById('modal_student_info').textContent = studentName + ' — ' + courseTitle;
+    document.getElementById('paymentModal').classList.add('active');
+}
+</script>
 {% endblock %}

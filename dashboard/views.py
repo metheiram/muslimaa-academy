@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q, F
 from django.utils import timezone
 from datetime import timedelta
 
@@ -154,6 +154,60 @@ def admin_enrollments(request):
 
 @admin_required
 def admin_fees(request):
-    """Fee tracking."""
-    context = {'active_tab': 'fees'}
+    """Fee tracking - manage payments."""
+    from payments.models import Payment
+    from courses.enrollment_models import Enrollment
+    from django.db.models import Sum
+
+    if request.method == 'POST':
+        enrollment_id = request.POST.get('enrollment_id')
+        action = request.POST.get('action')
+        enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+
+        if action == 'add_payment':
+            amount = request.POST.get('amount', '0')
+            method = request.POST.get('method', 'free')
+            notes = request.POST.get('notes', '')
+            status = request.POST.get('payment_status', 'paid')
+
+            payment = Payment.objects.create(
+                enrollment=enrollment,
+                student=enrollment.student,
+                course=enrollment.course,
+                amount=float(amount),
+                status=status,
+                method=method,
+                notes=notes,
+                recorded_by=request.user,
+            )
+            messages.success(request, f'Payment recorded for {enrollment.student.get_full_name()} — Rs. {amount}')
+        elif action == 'mark_free':
+            payment = Payment.objects.create(
+                enrollment=enrollment,
+                student=enrollment.student,
+                course=enrollment.course,
+                amount=0,
+                status='free',
+                method='free',
+                notes='Course marked as free',
+                recorded_by=request.user,
+            )
+            messages.success(request, f'{enrollment.course.title} marked as free for {enrollment.student.get_full_name()}.')
+        return redirect('dashboard:admin_fees')
+
+    approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
+    payments = Payment.objects.select_related('student', 'course', 'enrollment')
+    
+    total_collected = payments.filter(status='paid').aggregate(total=models.Sum('amount'))['total'] or 0
+    total_pending = approved.count() - payments.count()
+    total_free = payments.filter(status='free').count()
+
+    context = {
+        'active_tab': 'fees',
+        'approved_enrollments': approved,
+        'payments': payments,
+        'total_collected': total_collected,
+        'total_pending': total_pending,
+        'total_free': total_free,
+    }
     return render(request, 'dashboard/fees.html', context)
