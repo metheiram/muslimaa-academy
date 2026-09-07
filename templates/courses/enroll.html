@@ -186,24 +186,8 @@
                 </div>
 
                 <div class="note">
-                    <p>📧 After admin approval, you will receive a confirmation email with class details.</p>
+                    <p>📧 After admin approval, you will receive payment details via email. Please check your inbox.</p>
                 </div>
-
-                {% if payment_methods %}
-                <div style="margin-bottom: 1.5rem;">
-                    <h3 style="font-family: var(--font-serif); font-size: 1rem; color: var(--brand-700); margin-bottom: 0.75rem;">💰 Send Fee To:</h3>
-                    {% for pm in payment_methods %}
-                    <div style="background: rgba(71,24,32,0.04); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <strong style="font-size: 0.9rem; color: var(--brand-700);">{{ pm.get_method_display }}</strong>
-                        </div>
-                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-gold); margin: 0.3rem 0;">{{ pm.account_number }}</div>
-                        {% if pm.account_title %}<div style="font-size: 0.8rem; color: var(--text-muted);">{{ pm.account_title }}</div>{% endif %}
-                        {% if pm.instructions %}<div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.3rem;">{{ pm.instructions }}</div>{% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
 
                 <form method="POST">
                     {% csrf_token %}

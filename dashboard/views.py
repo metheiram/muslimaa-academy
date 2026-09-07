@@ -164,7 +164,46 @@ def admin_enrollments(request):
             enrollment.approved_at = timezone.now()
             enrollment.approved_by = request.user
             enrollment.save()
-            messages.success(request, f'Enrollment for {enrollment.student.get_full_name()} in {enrollment.course.title} approved!')
+            
+            from payments.models import PaymentMethod
+            payment_methods = PaymentMethod.objects.filter(is_active=True)
+            if payment_methods.exists():
+                method_lines = []
+                for pm in payment_methods:
+                    method_lines.append(f"{pm.get_method_display()}: {pm.account_number}")
+                    if pm.account_title:
+                        method_lines.append(f"  Account Title: {pm.account_title}")
+                    if pm.instructions:
+                        method_lines.append(f"  Note: {pm.instructions}")
+                    method_lines.append("")
+                payment_info = "\n".join(method_lines)
+            else:
+                payment_info = "No payment methods configured yet. Contact admin for details."
+
+            try:
+                from django.core.mail import send_mail
+                from django.conf import settings
+                subject = f'Enrollment Approved - {enrollment.course.title}'
+                message = (
+                    f'Assalam-o-Alaikum {enrollment.student.first_name},\n\n'
+                    f'Congratulations! Your enrollment in "{enrollment.course.title}" has been approved.\n\n'
+                    f'Please send the course fee to:\n\n'
+                    f'{payment_info}\n'
+                    f'After sending the fee, please reply to this email with the screenshot of your payment.\n\n'
+                    f'JazakAllah Khair,\n'
+                    f'Muslimaa Academy'
+                )
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [enrollment.student.email],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
+            
+            messages.success(request, f'Enrollment for {enrollment.student.get_full_name()} in {enrollment.course.title} approved! Payment details sent via email.')
         elif action == 'reject':
             enrollment.status = 'rejected'
             enrollment.save()
