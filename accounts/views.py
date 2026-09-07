@@ -116,6 +116,37 @@ def student_dashboard(request):
 
 
 @login_required
+def teacher_dashboard(request):
+    """Teacher dashboard with assigned students, courses, schedule."""
+    from courses.enrollment_models import Enrollment
+    from courses.models import Course
+    from payments.models import Payment
+
+    user = request.user
+    courses_taught = Course.objects.filter(instructor=user, is_active=True)
+    enrolled_students = Enrollment.objects.filter(
+        course__in=courses_taught,
+        status='approved'
+    ).select_related('student', 'course')
+
+    total_students = enrolled_students.values('student').distinct().count()
+    total_courses = courses_taught.count()
+    total_pending = Enrollment.objects.filter(
+        course__in=courses_taught,
+        status='pending'
+    ).count()
+
+    context = {
+        'courses_taught': courses_taught,
+        'enrolled_students': enrolled_students,
+        'total_students': total_students,
+        'total_courses': total_courses,
+        'total_pending': total_pending,
+    }
+    return render(request, 'accounts/teacher_dashboard.html', context)
+
+
+@login_required
 def profile(request):
     """Display user profile based on role."""
     user = request.user
