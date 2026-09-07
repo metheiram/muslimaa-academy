@@ -4,6 +4,31 @@ from courses.models import Course
 from courses.enrollment_models import Enrollment
 
 
+class PaymentMethod(models.Model):
+    """Admin payment account details for students."""
+
+    METHOD_CHOICES = [
+        ('jazzcash', 'JazzCash'),
+        ('sadapay', 'SadaPay'),
+        ('easypaisa', 'EasyPaisa'),
+        ('bank', 'Bank Transfer'),
+    ]
+
+    name = models.CharField(max_length=100)
+    method = models.CharField(max_length=20, choices=METHOD_CHOICES)
+    account_number = models.CharField(max_length=30)
+    account_title = models.CharField(max_length=200, blank=True)
+    instructions = models.TextField(blank=True, help_text='Extra instructions for students')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['method', 'name']
+
+    def __str__(self):
+        return f"{self.get_method_display()} - {self.account_number}"
+
+
 class Payment(models.Model):
     """Payment record for course enrollments."""
     

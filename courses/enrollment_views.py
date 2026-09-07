@@ -9,7 +9,10 @@ from courses.enrollment_models import Enrollment
 @login_required
 def enroll_course(request, slug):
     """Student enrolls in a course."""
+    from payments.models import PaymentMethod
+    
     course = get_object_or_404(Course, slug=slug)
+    payment_methods = PaymentMethod.objects.filter(is_active=True)
     
     existing = Enrollment.objects.filter(student=request.user, course=course).first()
     if existing:
@@ -30,7 +33,7 @@ def enroll_course(request, slug):
         messages.success(request, f'Enrollment request for {course.title} submitted! Waiting for admin approval.')
         return redirect('accounts:profile')
     
-    return render(request, 'courses/enroll.html', {'course': course})
+    return render(request, 'courses/enroll.html', {'course': course, 'payment_methods': payment_methods})
 
 
 @login_required

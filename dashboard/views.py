@@ -154,35 +154,65 @@ def admin_enrollments(request):
 
 @admin_required
 def admin_fees(request):
-    """Fee tracking - manage payments."""
-    from payments.models import Payment
+    """Fee tracking - manage payments and payment methods."""
+    from payments.models import Payment, PaymentMethod
     from courses.enrollment_models import Enrollment
     from django.db.models import Sum
 
     if request.method == 'POST':
-        enrollment_id = request.POST.get('enrollment_id')
         action = request.POST.get('action')
-        enrollment = get_object_or_404(Enrollment, id=enrollment_id)
 
-        if action == 'add_payment':
+        if action == 'add_payment_method':
+            name = request.POST.get('name', '').strip()
+            method = request.POST.get('pay_method', '').strip()
+            account_number = request.POST.get('account_number', '').strip()
+            account_title = request.POST.get('account_title', '').strip()
+            instructions = request.POST.get('instructions', '').strip()
+
+            if name and method and account_number:
+                PaymentMethod.objects.create(
+                    name=name,
+                    method=method,
+                    account_number=account_number,
+                    account_title=account_title,
+                    instructions=instructions,
+                )
+                messages.success(request, f'Payment method "{name}" added successfully!')
+            else:
+                messages.error(request, 'Name, method, and account number are required.')
+            return redirect('dashboard:admin_fees')
+
+        elif action == 'delete_payment_method':
+            method_id = request.POST.get('method_id')
+            PaymentMethod.objects.filter(id=method_id).delete()
+            messages.success(request, 'Payment method deleted.')
+            return redirect('dashboard:admin_fees')
+
+        elif action == 'add_payment':
+            enrollment_id = request.POST.get('enrollment_id')
+            enrollment = get_object_or_404(Enrollment, id=enrollment_id)
             amount = request.POST.get('amount', '0')
             method = request.POST.get('method', 'free')
             notes = request.POST.get('notes', '')
-            status = request.POST.get('payment_status', 'paid')
+            payment_status = request.POST.get('payment_status', 'paid')
 
-            payment = Payment.objects.create(
+            Payment.objects.create(
                 enrollment=enrollment,
                 student=enrollment.student,
                 course=enrollment.course,
                 amount=float(amount),
-                status=status,
+                status=payment_status,
                 method=method,
                 notes=notes,
                 recorded_by=request.user,
             )
             messages.success(request, f'Payment recorded for {enrollment.student.get_full_name()} — Rs. {amount}')
+            return redirect('dashboard:admin_fees')
+
         elif action == 'mark_free':
-            payment = Payment.objects.create(
+            enrollment_id = request.POST.get('enrollment_id')
+            enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+            Payment.objects.create(
                 enrollment=enrollment,
                 student=enrollment.student,
                 course=enrollment.course,
@@ -193,12 +223,13 @@ def admin_fees(request):
                 recorded_by=request.user,
             )
             messages.success(request, f'{enrollment.course.title} marked as free for {enrollment.student.get_full_name()}.')
-        return redirect('dashboard:admin_fees')
+            return redirect('dashboard:admin_fees')
 
     approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
     payments = Payment.objects.select_related('student', 'course', 'enrollment')
-    
-    total_collected = payments.filter(status='paid').aggregate(total=models.Sum('amount'))['total'] or 0
+    payment_methods = PaymentMethod.objects.filter(is_active=True)
+
+    total_collected = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
     total_pending = approved.count() - payments.count()
     total_free = payments.filter(status='free').count()
 
@@ -206,6 +237,7 @@ def admin_fees(request):
         'active_tab': 'fees',
         'approved_enrollments': approved,
         'payments': payments,
+        'payment_methods': payment_methods,
         'total_collected': total_collected,
         'total_pending': total_pending,
         'total_free': total_free,

@@ -57,6 +57,16 @@
 
     .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
 
+    .methods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .method-card { background: #ffffff; border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); position: relative; }
+    .method-card h4 { font-family: var(--font-serif); font-size: 0.95rem; color: var(--brand-700); margin-bottom: 0.5rem; }
+    .method-card .account { font-size: 1.1rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.25rem; }
+    .method-card .title { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .method-card .note { font-size: 0.75rem; color: var(--text-secondary); }
+    .method-card .delete-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; cursor: pointer; font-size: 0.9rem; color: #dc3545; }
+    .add-method-card { border: 2px dashed rgba(71,24,32,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; min-height: 120px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; transition: all 0.3s; }
+    .add-method-card:hover { border-color: var(--brand-700); color: var(--brand-700); }
+
     .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
     .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
@@ -123,6 +133,36 @@
             <div class="stat-card">
                 <h3>{{ total_free }}</h3>
                 <p>Free Enrollments</p>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+                <h3>Payment Methods (Your Account Details)</h3>
+                <button class="btn btn-primary btn-sm" onclick="document.getElementById('addMethodModal').classList.add('active')">+ Add Method</button>
+            </div>
+            <div class="card-body">
+                {% if payment_methods %}
+                <div class="methods-grid">
+                    {% for pm in payment_methods %}
+                    <div class="method-card">
+                        <form method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_payment_method">
+                            <input type="hidden" name="method_id" value="{{ pm.id }}">
+                            <button type="submit" class="delete-btn" onclick="return confirm('Delete this payment method?')">&times;</button>
+                        </form>
+                        <h4>{{ pm.get_method_display }}</h4>
+                        <div class="account">{{ pm.account_number }}</div>
+                        {% if pm.account_title %}<div class="title">{{ pm.account_title }}</div>{% endif %}
+                        {% if pm.instructions %}<div class="note">{{ pm.instructions }}</div>{% endif %}
+                    </div>
+                    {% endfor %}
+                    <div class="method-card add-method-card" onclick="document.getElementById('addMethodModal').classList.add('active')">+ Add New</div>
+                </div>
+                {% else %}
+                <p class="empty-msg">No payment methods added yet. Add your JazzCash, SadaPay, etc. account details so students know where to send fees.</p>
+                {% endif %}
             </div>
         </div>
 
@@ -255,6 +295,47 @@
             <div class="modal-footer">
                 <button type="button" class="btn" style="background: #f0f0f0;" onclick="document.getElementById('paymentModal').classList.remove('active')">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Payment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ADD PAYMENT METHOD MODAL -->
+<div class="modal-overlay" id="addMethodModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Add Payment Method</h3>
+            <button class="modal-close" onclick="document.getElementById('addMethodModal').classList.remove('active')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'dashboard:admin_fees' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_payment_method">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Method Name *</label>
+                    <select name="pay_method" required>
+                        <option value="jazzcash">JazzCash</option>
+                        <option value="sadapay">SadaPay</option>
+                        <option value="easypaisa">EasyPaisa</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Account Number *</label>
+                    <input type="text" name="account_number" required placeholder="e.g. 0300-1234567">
+                </div>
+                <div class="form-group">
+                    <label>Account Title</label>
+                    <input type="text" name="account_title" placeholder="e.g. Iram Mukhtar">
+                </div>
+                <div class="form-group">
+                    <label>Extra Instructions</label>
+                    <textarea name="instructions" rows="2" placeholder="e.g. Send fee within 7 days of enrollment..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background: #f0f0f0;" onclick="document.getElementById('addMethodModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Method</button>
             </div>
         </form>
     </div>
