@@ -18,6 +18,7 @@ class Payment(models.Model):
         ('cash', 'Cash'),
         ('bank', 'Bank Transfer'),
         ('jazzcash', 'JazzCash'),
+        ('sadapay', 'SadaPay'),
         ('easypaisa', 'EasyPaisa'),
         ('online', 'Online'),
         ('free', 'Free'),
