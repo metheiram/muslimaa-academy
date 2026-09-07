@@ -1,239 +1,189 @@
 {% extends 'base/base_dashboard.html' %}
 {% load static %}
 
-{% block title %}Enrollments | Muslimaa Academy Dashboard{% endblock %}
+{% block title %}Enrollments | Muslimaa Academy Admin{% endblock %}
 
 {% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .page-header h1 {
-        font-family: var(--font-serif);
-        font-size: 1.5rem;
-        color: var(--brand-700);
-    }
-
-    .tabs {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .tab {
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        background: rgba(71, 24, 32, 0.06);
-        color: var(--text-muted);
-        transition: all 0.3s;
-    }
-
-    .tab.active {
-        background: var(--brand-700);
-        color: #ffffff;
-    }
-
-    .tab:hover:not(.active) {
-        background: rgba(71, 24, 32, 0.1);
-    }
-
+    :root { --brand-700: #471820; --brand-800: #3d1319; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: var(--brand-700); color: #ffffff; padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; }
+    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .sidebar-brand h2 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; }
+    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
+    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #ffffff; border-left-color: var(--accent-gold); }
+    .sidebar-nav .section-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
+    .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; }
+    .sidebar-footer a:hover { color: #ffffff; }
+    .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .tab { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; background: rgba(71,24,32,0.06); color: var(--text-muted); transition: all 0.3s; }
+    .tab.active { background: var(--brand-700); color: #ffffff; }
+    .tab:hover:not(.active) { background: rgba(71,24,32,0.1); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
-    .card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid rgba(71, 24, 32, 0.06);
-        overflow: hidden;
-    }
-
-    .card-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid rgba(71, 24, 32, 0.06);
-    }
-
-    .card-header h3 {
-        font-family: var(--font-serif);
-        font-size: 1rem;
-        color: var(--brand-700);
-    }
-
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
     .enroll-list { padding: 0.5rem 0; }
-
-    .enroll-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid rgba(71, 24, 32, 0.04);
-    }
-
+    .enroll-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
     .enroll-item:last-child { border-bottom: none; }
-
-    .enroll-info h4 {
-        font-size: 0.9rem;
-        color: var(--brand-700);
-        margin-bottom: 0.25rem;
-    }
-
-    .enroll-info p {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-    }
-
-    .enroll-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .btn-sm {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.3s;
-    }
-
-    .btn-approve {
-        background: rgba(34, 139, 34, 0.1);
-        color: #228b22;
-        border: 1px solid rgba(34, 139, 34, 0.2);
-    }
-
+    .enroll-info h4 { font-size: 0.9rem; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .enroll-info p { font-size: 0.8rem; color: var(--text-muted); }
+    .enroll-actions { display: flex; gap: 0.5rem; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: all 0.3s; }
+    .btn-approve { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .btn-approve:hover { background: #228b22; color: #fff; }
-
-    .btn-reject {
-        background: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-        border: 1px solid rgba(220, 53, 69, 0.2);
-    }
-
+    .btn-reject { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
     .btn-reject:hover { background: #dc3545; color: #fff; }
-
-    .status-badge {
-        padding: 0.3rem 0.6rem;
-        border-radius: 12px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: capitalize;
-    }
-
-    .status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
-    .status-approved { background: rgba(34,139,34,0.1); color: #228b22; }
-    .status-rejected { background: rgba(220,53,69,0.1); color: #dc3545; }
-
-    .empty-state {
-        text-align: center;
-        padding: 2rem;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-
+    .status-badge { display: inline-block; padding: 0.3rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 600; }
+    .status-badge.status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .status-badge.status-approved { background: rgba(34,139,34,0.1); color: #228b22; }
+    .status-badge.status-rejected { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
     .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
     .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
-    .alert-error { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
 </style>
 {% endblock %}
 
-<div class="page-header">
-    <h1>📚 Manage Enrollments</h1>
-</div>
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <div class="sidebar-brand"><h2>Muslimaa Academy</h2><p>Admin Dashboard</p></div>
+        <ul class="sidebar-nav">
+            <li><a href="{% url 'dashboard:admin_dashboard' %}"><span class="icon">📊</span> Dashboard</a></li>
+            <div class="section-label">Management</div>
+            <li><a href="{% url 'dashboard:admin_students' %}"><span class="icon">👩‍🎓</span> Students</a></li>
+            <li><a href="{% url 'dashboard:admin_teachers' %}"><span class="icon">👩‍🏫</span> Teachers</a></li>
+            <li><a href="{% url 'dashboard:admin_enrollments' %}" class="active"><span class="icon">📋</span> Enrollments</a></li>
+            <li><a href="{% url 'dashboard:admin_fees' %}"><span class="icon">💰</span> Fee Tracking</a></li>
+            <div class="section-label">Content</div>
+            <li><a href="{% url 'courses:course_list' %}"><span class="icon">📚</span> Courses</a></li>
+            <li><a href="{% url 'workshops:workshop_list' %}"><span class="icon">🎓</span> Workshops</a></li>
+            <li><a href="{% url 'admin:index' %}"><span class="icon">⚙️</span> Django Admin</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+        </div>
+    </aside>
 
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{{ message.tags }}">{{ message }}</div>
-{% endfor %}
-{% endif %}
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Enrollments</h1>
+        </div>
 
-<div class="tabs">
-    <button class="tab active" onclick="showTab('pending')">Pending ({{ pending_enrollments.count }})</button>
-    <button class="tab" onclick="showTab('approved')">Approved ({{ approved_enrollments.count }})</button>
-    <button class="tab" onclick="showTab('rejected')">Rejected ({{ rejected_enrollments.count }})</button>
-</div>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
 
-<div id="pending" class="tab-content active">
-    <div class="card">
-        {% if pending_enrollments %}
-        <div class="enroll-list">
-            {% for enrollment in pending_enrollments %}
-            <div class="enroll-item">
-                <div class="enroll-info">
-                    <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
-                    <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('pending')">Pending ({{ pending_enrollments.count }})</button>
+            <button class="tab" onclick="showTab('approved')">Approved ({{ approved_enrollments.count }})</button>
+            <button class="tab" onclick="showTab('rejected')">Rejected ({{ rejected_enrollments.count }})</button>
+        </div>
+
+        <div id="pending" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Pending Enrollments</h3>
+                    <span class="status-badge status-pending">{{ pending_enrollments.count }} pending</span>
                 </div>
-                <div class="enroll-actions">
-                    <form method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
-                        <button type="submit" name="action" value="approve" class="btn-sm btn-approve">✓ Approve</button>
-                    </form>
-                    <form method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
-                        <button type="submit" name="action" value="reject" class="btn-sm btn-reject">✕ Reject</button>
-                    </form>
+                <div class="card-body">
+                    {% if pending_enrollments %}
+                    <div class="enroll-list">
+                        {% for enrollment in pending_enrollments %}
+                        <div class="enroll-item">
+                            <div class="enroll-info">
+                                <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
+                                <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+                            </div>
+                            <div class="enroll-actions">
+                                <form method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
+                                    <button type="submit" name="action" value="approve" class="btn-sm btn-approve">✓ Approve</button>
+                                </form>
+                                <form method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
+                                    <button type="submit" name="action" value="reject" class="btn-sm btn-reject">✕ Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="empty-msg">No pending enrollments.</p>
+                    {% endif %}
                 </div>
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <div class="empty-state">No pending enrollments.</div>
-        {% endif %}
-    </div>
-</div>
 
-<div id="approved" class="tab-content">
-    <div class="card">
-        {% if approved_enrollments %}
-        <div class="enroll-list">
-            {% for enrollment in approved_enrollments %}
-            <div class="enroll-item">
-                <div class="enroll-info">
-                    <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
-                    <p>Approved {{ enrollment.approved_at|date:"M d, Y" }}</p>
+        <div id="approved" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Approved Enrollments</h3>
                 </div>
-                <span class="status-badge status-approved">Approved</span>
+                <div class="card-body">
+                    {% if approved_enrollments %}
+                    <div class="enroll-list">
+                        {% for enrollment in approved_enrollments %}
+                        <div class="enroll-item">
+                            <div class="enroll-info">
+                                <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
+                                <p>Approved {{ enrollment.approved_at|date:"M d, Y" }}</p>
+                            </div>
+                            <span class="status-badge status-approved">Approved</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="empty-msg">No approved enrollments yet.</p>
+                    {% endif %}
+                </div>
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <div class="empty-state">No approved enrollments yet.</div>
-        {% endif %}
-    </div>
-</div>
 
-<div id="rejected" class="tab-content">
-    <div class="card">
-        {% if rejected_enrollments %}
-        <div class="enroll-list">
-            {% for enrollment in rejected_enrollments %}
-            <div class="enroll-item">
-                <div class="enroll-info">
-                    <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
-                    <p>Rejected</p>
+        <div id="rejected" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Rejected Enrollments</h3>
                 </div>
-                <span class="status-badge status-rejected">Rejected</span>
+                <div class="card-body">
+                    {% if rejected_enrollments %}
+                    <div class="enroll-list">
+                        {% for enrollment in rejected_enrollments %}
+                        <div class="enroll-item">
+                            <div class="enroll-info">
+                                <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
+                                <p>Rejected</p>
+                            </div>
+                            <span class="status-badge status-rejected">Rejected</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="empty-msg">No rejected enrollments.</p>
+                    {% endif %}
+                </div>
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <div class="empty-state">No rejected enrollments.</div>
-        {% endif %}
-    </div>
+    </main>
 </div>
 
 <script>
