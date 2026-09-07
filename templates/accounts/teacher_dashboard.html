@@ -116,11 +116,6 @@
                 <div class="stat-number">{{ total_students }}</div>
                 <div class="stat-label">Active Students</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">⏳</div>
-                <div class="stat-number">{{ total_pending }}</div>
-                <div class="stat-label">Pending Enrollments</div>
-            </div>
         </div>
 
         <div class="content-grid">
@@ -178,44 +173,6 @@
                 </div>
             </div>
         </div>
-
-        {% if enrolled_students %}
-        <div class="card">
-            <div class="card-header">
-                <h3>All Enrolled Students</h3>
-            </div>
-            <div class="card-body">
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th style="text-align:left; padding:0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid rgba(71,24,32,0.06);">Student</th>
-                            <th style="text-align:left; padding:0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid rgba(71,24,32,0.06);">Course</th>
-                            <th style="text-align:left; padding:0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid rgba(71,24,32,0.06);">Email</th>
-                            <th style="text-align:left; padding:0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid rgba(71,24,32,0.06);">Phone</th>
-                            <th style="text-align:left; padding:0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid rgba(71,24,32,0.06);">Enrolled</th>
-                            <th style="text-align:left; padding:0.75rem 0; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid rgba(71,24,32,0.06);">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for enrollment in enrolled_students %}
-                        <tr>
-                            <td style="padding:0.85rem 0; font-size:0.88rem; color:var(--text-secondary); border-bottom:1px solid rgba(71,24,32,0.04);"><strong>{{ enrollment.student.get_full_name }}</strong></td>
-                            <td style="padding:0.85rem 0; font-size:0.88rem; color:var(--text-secondary); border-bottom:1px solid rgba(71,24,32,0.04);">{{ enrollment.course.title }}</td>
-                            <td style="padding:0.85rem 0; font-size:0.88rem; color:var(--text-secondary); border-bottom:1px solid rgba(71,24,32,0.04);">{{ enrollment.student.email }}</td>
-                            <td style="padding:0.85rem 0; font-size:0.88rem; color:var(--text-secondary); border-bottom:1px solid rgba(71,24,32,0.04);">{{ enrollment.student.profile.phone|default:"-" }}</td>
-                            <td style="padding:0.85rem 0; font-size:0.88rem; color:var(--text-secondary); border-bottom:1px solid rgba(71,24,32,0.04);">{{ enrollment.enrolled_at|date:"M d, Y" }}</td>
-                            <td style="padding:0.85rem 0; font-size:0.88rem; color:var(--text-secondary); border-bottom:1px solid rgba(71,24,32,0.04);">
-                                {% if enrollment.student.profile.phone %}
-                                <a href="https://wa.me/92{{ enrollment.student.profile.phone|cut:'-'|cut:' '|cut:'+'|cut:'0' }}" target="_blank" class="btn btn-whatsapp" style="padding:0.35rem 0.7rem; font-size:0.75rem;">📱 WhatsApp</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endif %}
     </main>
 </div>
 {% endblock %}
