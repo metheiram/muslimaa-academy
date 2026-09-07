@@ -185,22 +185,28 @@ def admin_enrollments(request):
             import urllib.parse
             phone = getattr(enrollment.student.profile, 'phone', '') or ''
 
-            email_msg = (
-                f'Assalam-o-Alaikum {enrollment.student.first_name},\n\n'
-                f'Congratulations! Your enrollment in "{enrollment.course.title}" has been approved.\n\n'
-                f'Please send the course fee to:\n\n'
-                f'{payment_info}\n'
-                f'After sending the fee, please reply to this email with the screenshot of your payment.\n\n'
-                f'JazakAllah Khair,\n'
-                f'Muslimaa Academy'
+            welcome_msg = (
+                f"Assalam-o-Alaikum {enrollment.student.first_name}! 🌙\n\n"
+                f"Welcome to Muslimaa Academy! 🎉\n\n"
+                f"Alhamdulillah! Your enrollment in \"{enrollment.course.title}\" has been approved.\n\n"
+                f"We are excited to have you on board. Please complete your payment by sending the fee to the following account:\n\n"
+                f"💳 *Payment Details:*\n"
+                f"{payment_info}\n"
+                f"After sending the payment, please share the screenshot of your payment on:\n"
+                f"📧 Email: {settings.DEFAULT_FROM_EMAIL}\n"
+                f"📱 WhatsApp: Reply to this message\n\n"
+                f"Once we verify your payment, your course access will be activated immediately.\n\n"
+                f"If you have any questions, feel free to reach out.\n\n"
+                f"JazakAllah Khair! 🤲\n"
+                f"Muslimaa Academy Team"
             )
 
             try:
                 from django.core.mail import send_mail
                 from django.conf import settings
                 send_mail(
-                    f'Enrollment Approved - {enrollment.course.title}',
-                    email_msg,
+                    f'Welcome to Muslimaa Academy - {enrollment.course.title}',
+                    welcome_msg,
                     settings.DEFAULT_FROM_EMAIL,
                     [enrollment.student.email],
                     fail_silently=True,
@@ -212,7 +218,7 @@ def admin_enrollments(request):
                 clean_phone = phone.replace('+', '').replace('-', '').replace(' ', '')
                 if not clean_phone.startswith('92'):
                     clean_phone = '92' + clean_phone.lstrip('0')
-                whatsapp_msg = email_msg
+                whatsapp_msg = welcome_msg
                 encoded_msg = urllib.parse.quote(whatsapp_msg)
                 whatsapp_url = f"https://wa.me/{clean_phone}?text={encoded_msg}"
 
@@ -250,13 +256,13 @@ def admin_fees(request):
         action = request.POST.get('action')
 
         if action == 'add_payment_method':
-            name = request.POST.get('name', '').strip()
+            name = request.POST.get('name', '').strip() or request.POST.get('pay_method', '').strip()
             method = request.POST.get('pay_method', '').strip()
             account_number = request.POST.get('account_number', '').strip()
             account_title = request.POST.get('account_title', '').strip()
             instructions = request.POST.get('instructions', '').strip()
 
-            if name and method and account_number:
+            if method and account_number:
                 PaymentMethod.objects.create(
                     name=name,
                     method=method,
