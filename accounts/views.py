@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django import forms
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 class RegisterForm(forms.ModelForm):
@@ -156,6 +157,134 @@ def profile(request):
         return redirect('teacher_dashboard')
     else:
         return redirect('student_dashboard')
+
+
+@login_required
+def edit_profile(request):
+    """Edit user profile - name, email, phone, subject."""
+    user = request.user
+
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        subject = request.POST.get('subject', '').strip()
+
+        if not first_name or not email:
+            messages.error(request, 'First name and email are required.')
+        elif User.objects.filter(email=email).exclude(id=user.id).exists():
+            messages.error(request, 'This email is already in use.')
+        else:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            user.save()
+
+            user.profile.phone = phone
+            if user.is_staff:
+                user.profile.subject = subject
+            user.profile.save()
+
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('accounts:edit_profile')
+
+    context = {'profile_user': user}
+    return render(request, 'accounts/edit_profile.html', context)
+
+
+@login_required
+def change_password(request):
+    """Change password for any logged-in user."""
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Password changed successfully!')
+            return redirect('accounts:edit_profile')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error.as_text())
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    context = {'form': form}
+    return render(request, 'accounts/change_password.html', context)
+
+
+def forgot_password(request):
+    """Password reset via email."""
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        if User.objects.filter(email=email).exists():
+            from django.contrib.auth.tokens import default_token_generator
+            from django.utils.http import urlsafe_base64_encode
+            from django.utils.encoding import force_bytes
+            from django.core.mail import send_mail
+            from django.conf import settings
+
+            user = User.objects.get(email=email)
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            reset_url = f"{request.scheme}://{request.get_host()}/accounts/reset/{uid}/{token}/"
+
+            try:
+                send_mail(
+                    'Password Reset - Muslimaa Academy',
+                    f'Salam {user.first_name},\n\n'
+                    f'You requested a password reset. Click the link below to reset your password:\n\n'
+                    f'{reset_url}\n\n'
+                    f'If you did not request this, please ignore this email.\n\n'
+                    f'JazakAllah Khair!\n'
+                    f'Muslimaa Academy Team',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=True,
+                )
+                messages.success(request, 'Password reset link sent to your email! Check your inbox.')
+            except Exception:
+                messages.error(request, 'Failed to send email. Please try again.')
+
+            return redirect('accounts:login')
+        else:
+            messages.error(request, 'No account found with this email.')
+
+    return render(request, 'accounts/forgot_password.html')
+
+
+def reset_password(request, uidb64, token):
+    """Reset password with token."""
+    from django.utils.http import urlsafe_base64_decode
+    from django.utils.encoding import force_str
+    from django.contrib.auth.tokens import default_token_generator
+
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            password = request.POST.get('password', '')
+            password2 = request.POST.get('password2', '')
+
+            if not password:
+                messages.error(request, 'Password is required.')
+            elif password != password2:
+                messages.error(request, 'Passwords do not match.')
+            else:
+                user.set_password(password)
+                user.save()
+                messages.success(request, 'Password reset successful! You can now login.')
+                return redirect('accounts:login')
+
+        return render(request, 'accounts/reset_password.html', {'valid': True})
+    else:
+        messages.error(request, 'Invalid or expired reset link.')
+        return redirect('accounts:login')
 
 
 def custom_logout(request):

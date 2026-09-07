@@ -3,41 +3,96 @@
 
 {% block title %}{{ course.title }} | Muslimaa Academy{% endblock %}
 
+{% block extra_head %}
+<style>
+    :root { --brand-700: #471820; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { font-family: var(--font-sans); background: #faf6f1; }
+    .course-detail { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+    .back-link { color: var(--brand-700); text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-block; margin-bottom: 1.5rem; }
+    .back-link:hover { text-decoration: underline; }
+    .course-hero { width: 100%; max-height: 400px; object-fit: cover; border-radius: 16px; margin-bottom: 2rem; }
+    .course-title { font-family: var(--font-serif); font-size: 2rem; color: var(--brand-700); margin-bottom: 1rem; }
+    .course-meta { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .meta-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; background: rgba(71,24,32,0.06); border-radius: 50px; font-size: 0.82rem; color: var(--text-secondary); font-weight: 500; }
+    .course-body { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+    .course-desc { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; }
+    .course-sidebar { background: #fff; border-radius: 16px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 4px 20px rgba(71,24,32,0.06); padding: 1.5rem; position: sticky; top: 2rem; height: fit-content; }
+    .sidebar-item { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.06); font-size: 0.9rem; }
+    .sidebar-item:last-child { border-bottom: none; }
+    .sidebar-item strong { color: var(--brand-700); }
+    .sidebar-item span { color: var(--text-secondary); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem 2rem; font-size: 0.95rem; font-weight: 700; border-radius: 50px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; width: 100%; margin-top: 1.5rem; }
+    .btn-primary { background: var(--brand-700); color: #fff; box-shadow: 0 4px 20px rgba(71,24,32,0.3); }
+    .btn-primary:hover { background: var(--brand-800); transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 2px solid var(--brand-700); }
+    .btn-outline:hover { background: var(--brand-700); color: #fff; }
+    .features-list { list-style: none; padding: 0; margin: 1rem 0; }
+    .features-list li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; font-size: 0.9rem; color: var(--text-secondary); }
+    .features-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent-gold); font-weight: 700; }
+    @media (max-width: 768px) { .course-body { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="section">
-    <div class="container">
-        <div style="margin-bottom: 2rem;">
-            <a href="{% url 'courses:course_list' %}">← Back to Courses</a>
-        </div>
-        
-        {% if course.image_url or course.image %}
-        <img src="{% if course.image_url %}{{ course.image_url }}{% elif course.image %}{{ course.image.url }}{% endif %}" 
-             alt="{{ course.title }}" 
-             style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 2rem;">
+<div class="course-detail">
+    <a href="{% url 'courses:course_list' %}" class="back-link">← Back to Courses</a>
+
+    {% if course.image_url or course.image %}
+    <img src="{% if course.image_url %}{{ course.image_url }}{% elif course.image %}{{ course.image.url }}{% endif %}" 
+         alt="{{ course.title }}" class="course-hero">
+    {% endif %}
+
+    <h1 class="course-title">{{ course.title }}</h1>
+
+    <div class="course-meta">
+        <span class="meta-badge">📚 {{ course.get_category_display }}</span>
+        <span class="meta-badge">📊 {{ course.get_level_display }}</span>
+        <span class="meta-badge">⏱️ {{ course.duration }}</span>
+        {% if course.instructor %}
+        <span class="meta-badge">👩‍🏫 {{ course.instructor.get_full_name|default:course.instructor.username }}</span>
         {% endif %}
-        
-        <h1 class="section-title">{{ course.title }}</h1>
-        
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-            <div>
-                <p class="section-subtitle" style="margin-top: 1rem;">{{ course.description }}</p>
-            </div>
-            
-            <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 12px;">
-                <h3>Course Details</h3>
-                <p><strong>Category:</strong> {{ course.category }}</p>
-                <p><strong>Level:</strong> {{ course.level }}</p>
-                <p><strong>Duration:</strong> {{ course.duration }}</p>
-                {% if course.price %}
-                <p><strong>Price:</strong> ${{ course.price }}</p>
+    </div>
+
+    <div class="course-body">
+        <div>
+            <div class="course-desc">{{ course.description|linebreaks }}</div>
+
+            {% if course.features %}
+            <h3 style="font-family: var(--font-serif); color: var(--brand-700); margin-top: 2rem; margin-bottom: 0.5rem;">What You'll Learn</h3>
+            <ul class="features-list">
+                {% for feature in course.features.splitlines %}
+                {% if feature.strip %}
+                <li>{{ feature.strip }}</li>
                 {% endif %}
-                {% if course.instructor %}
-                <p><strong>Instructor:</strong> {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
-                {% endif %}
-                
-                <a class="btn btn-primary" href="{% url 'accounts:register' %}" style="width: 100%; margin-top: 1rem;">Enroll Now</a>
-            </div>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if course.curriculum %}
+            <h3 style="font-family: var(--font-serif); color: var(--brand-700); margin-top: 2rem; margin-bottom: 0.5rem;">Curriculum</h3>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.8;">{{ course.curriculum|linebreaks }}</div>
+            {% endif %}
+
+            {% if course.faq %}
+            <h3 style="font-family: var(--font-serif); color: var(--brand-700); margin-top: 2rem; margin-bottom: 0.5rem;">FAQ</h3>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.8;">{{ course.faq|linebreaks }}</div>
+            {% endif %}
+        </div>
+
+        <div class="course-sidebar">
+            <div class="sidebar-item"><strong>Category</strong><span>{{ course.get_category_display }}</span></div>
+            <div class="sidebar-item"><strong>Level</strong><span>{{ course.get_level_display }}</span></div>
+            <div class="sidebar-item"><strong>Duration</strong><span>{{ course.duration }}</span></div>
+            {% if course.price %}
+            <div class="sidebar-item"><strong>Price</strong><span>${{ course.price }}</span></div>
+            {% endif %}
+            {% if course.instructor %}
+            <div class="sidebar-item"><strong>Instructor</strong><span>{{ course.instructor.get_full_name }}</span></div>
+            {% endif %}
+
+            <a class="btn btn-primary" href="{% url 'courses:enroll_course' slug=course.slug %}">Enroll in This Course</a>
+            <a class="btn btn-outline" href="{% url 'accounts:register' %}">Create Account First</a>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

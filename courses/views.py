@@ -1,11 +1,37 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 from .models import Course
 
 
 def course_list(request):
-    """Display all courses."""
+    """Display all courses with search and filter."""
     courses = Course.objects.filter(is_active=True)
-    context = {'courses': courses}
+
+    query = request.GET.get('q', '').strip()
+    category = request.GET.get('category', '')
+    level = request.GET.get('level', '')
+
+    if query:
+        courses = courses.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(short_description__icontains=query)
+        )
+
+    if category:
+        courses = courses.filter(category=category)
+
+    if level:
+        courses = courses.filter(level=level)
+
+    context = {
+        'courses': courses,
+        'query': query,
+        'selected_category': category,
+        'selected_level': level,
+        'categories': Course.CATEGORY_CHOICES,
+        'levels': Course.LEVEL_CHOICES,
+    }
     return render(request, 'courses/course_list.html', context)
 
 

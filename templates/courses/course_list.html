@@ -789,22 +789,27 @@
         </div>
 
         <!-- SEARCH BAR -->
+        <form method="GET" action="{% url 'courses:course_list' %}">
         <div class="search-container">
             <div class="search-bar">
                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="2" stroke-linecap="round">
                     <circle cx="11" cy="11" r="8"/>
                     <path d="M21 21L16.65 16.65"/>
                 </svg>
-                <input type="text" placeholder="Search Courses (e.g., Tajweed, Hifz)...">
-                <button class="search-btn">Go</button>
+                <input type="text" name="q" placeholder="Search Courses (e.g., Tajweed, Hifz)..." value="{{ query|default:'' }}">
+                <button type="submit" class="search-btn">Go</button>
             </div>
         </div>
 
         <!-- FILTER BUTTONS -->
         <div class="filter-buttons">
-            <button class="filter-btn active">For Sisters</button>
-            <button class="filter-btn">For Kids</button>
+            <a href="{% url 'courses:course_list' %}" class="filter-btn {% if not selected_category and not selected_level %}active{% endif %}">All</a>
+            <a href="?category=quranic" class="filter-btn {% if selected_category == 'quranic' %}active{% endif %}">Quranic</a>
+            <a href="?category=islamic" class="filter-btn {% if selected_category == 'islamic' %}active{% endif %}">Islamic</a>
+            <a href="?category=arabic" class="filter-btn {% if selected_category == 'arabic' %}active{% endif %}">Arabic</a>
+            <a href="?category=kids" class="filter-btn {% if selected_category == 'kids' %}active{% endif %}">For Kids</a>
         </div>
+        </form>
     </div>
 </section>
 

@@ -1,0 +1,87 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}My Attendance | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root { --brand-700: #471820; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { font-family: var(--font-sans); background: #faf6f1; }
+    .att-container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+    .att-header { text-align: center; margin-bottom: 2rem; }
+    .att-header h1 { font-family: var(--font-serif); font-size: 1.8rem; color: var(--brand-700); }
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #fff; border-radius: 12px; padding: 1.25rem; text-align: center; border: 1px solid rgba(71,24,32,0.06); }
+    .stat-card .num { font-size: 1.8rem; font-weight: 800; color: var(--brand-700); }
+    .stat-card .label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .stat-card.present .num { color: #228b22; }
+    .stat-card.absent .num { color: #dc143c; }
+    .stat-card.late .num { color: #e67e00; }
+    .filter-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .filter-bar select { padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem; }
+    .att-card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); overflow: hidden; margin-bottom: 1rem; }
+    .att-card table { width: 100%; border-collapse: collapse; }
+    .att-card th { text-align: left; padding: 0.75rem 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); background: rgba(71,24,32,0.02); }
+    .att-card td { padding: 0.85rem 1rem; font-size: 0.88rem; color: var(--text-secondary); border-top: 1px solid rgba(71,24,32,0.04); }
+    .badge { padding: 0.2rem 0.7rem; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+    .badge-present { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-absent { background: rgba(220,20,60,0.1); color: #dc143c; }
+    .badge-late { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .badge-excused { background: rgba(100,100,200,0.1); color: #6464c8; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="att-container">
+    <div class="att-header">
+        <h1>📋 My Attendance</h1>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="num">{{ total }}</div><div class="label">Total Classes</div></div>
+        <div class="stat-card present"><div class="num">{{ present }}</div><div class="label">Present</div></div>
+        <div class="stat-card absent"><div class="num">{{ absent }}</div><div class="label">Absent</div></div>
+        <div class="stat-card late"><div class="num">{{ late }}</div><div class="label">Late</div></div>
+        <div class="stat-card"><div class="num">{{ excused }}</div><div class="label">Excused</div></div>
+    </div>
+
+    <div class="filter-bar">
+        <form method="GET">
+            <select name="course" onchange="this.form.submit()">
+                <option value="">All Courses</option>
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.title }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <div class="att-card">
+        {% if attendances %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Course</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendances %}
+                <tr>
+                    <td>{{ att.date|date:"M d, Y" }}</td>
+                    <td>{{ att.course.title }}</td>
+                    <td><span class="badge badge-{{ att.status }}">{{ att.get_status_display }}</span></td>
+                    <td>{{ att.notes|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-msg">No attendance records yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
