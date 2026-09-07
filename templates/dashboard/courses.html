@@ -1,0 +1,402 @@
+{% extends 'base/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Manage Courses | Muslimaa Academy Admin{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root { --brand-700: #471820; --brand-800: #3d1319; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: var(--brand-700); color: #ffffff; padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; }
+    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .sidebar-brand h2 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; }
+    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
+    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #ffffff; border-left-color: var(--accent-gold); }
+    .sidebar-nav .section-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
+    .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; }
+    .sidebar-footer a:hover { color: #ffffff; }
+    .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #ffffff; }
+    .btn-primary:hover { background: var(--brand-800); transform: translateY(-1px); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-edit { background: rgba(71,24,32,0.08); color: var(--brand-700); border: 1px solid rgba(71,24,32,0.15); }
+    .btn-edit:hover { background: var(--brand-700); color: #fff; }
+    .btn-delete { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-delete:hover { background: #dc3545; color: #fff; }
+    .btn-view { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-view:hover { background: #228b22; color: #fff; }
+    .action-btns { display: flex; gap: 0.4rem; }
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { text-align: left; padding: 0.75rem 0; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .data-table td { padding: 0.85rem 0; font-size: 0.88rem; color: var(--text-secondary); border-bottom: 1px solid rgba(71,24,32,0.04); vertical-align: top; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 600; }
+    .status-badge.active { background: rgba(34,139,34,0.1); color: #228b22; }
+    .status-badge.inactive { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #ffffff; border-radius: 16px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .modal-header h3 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; color: var(--brand-700); }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; transition: border-color 0.3s ease; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--brand-700); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-check { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .form-check input[type="checkbox"] { width: auto; }
+    .form-check label { margin-bottom: 0; font-size: 0.88rem; }
+    .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: flex-end; gap: 0.75rem; }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .alert-error { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } .form-row { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <div class="sidebar-brand"><h2>Muslimaa Academy</h2><p>Admin Dashboard</p></div>
+        <ul class="sidebar-nav">
+            <li><a href="{% url 'dashboard:admin_dashboard' %}"><span class="icon">📊</span> Dashboard</a></li>
+            <div class="section-label">Management</div>
+            <li><a href="{% url 'dashboard:admin_students' %}"><span class="icon">👩‍🎓</span> Students</a></li>
+            <li><a href="{% url 'dashboard:admin_teachers' %}"><span class="icon">👩‍🏫</span> Teachers</a></li>
+            <li><a href="{% url 'dashboard:admin_enrollments' %}"><span class="icon">📋</span> Enrollments</a></li>
+            <li><a href="{% url 'dashboard:admin_fees' %}"><span class="icon">💰</span> Fee Tracking</a></li>
+            <div class="section-label">Content</div>
+            <li><a href="{% url 'dashboard:admin_courses' %}" class="active"><span class="icon">📚</span> Courses</a></li>
+            <li><a href="{% url 'workshops:workshop_list' %}"><span class="icon">🎓</span> Workshops</a></li>
+            <li><a href="{% url 'admin:index' %}"><span class="icon">⚙️</span> Django Admin</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Courses</h1>
+            <button class="btn btn-primary" onclick="openAddModal()">+ Add Course</button>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h3>All Courses</h3>
+                <span class="badge">{{ courses|length }} total</span>
+            </div>
+            <div class="card-body">
+                {% if courses %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Category</th>
+                            <th>Level</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        <tr>
+                            <td>
+                                <strong>{{ course.title }}</strong>
+                                {% if course.short_description %}<br><span style="font-size:0.78rem; color: var(--text-muted);">{{ course.short_description|truncatewords:10 }}</span>{% endif %}
+                            </td>
+                            <td>{{ course.get_category_display }}</td>
+                            <td>{{ course.get_level_display }}</td>
+                            <td>{{ course.duration }}</td>
+                            <td>{% if course.price %}Rs. {{ course.price }}{% else %}Free{% endif %}</td>
+                            <td>
+                                {% if course.is_active %}
+                                <span class="status-badge active">Active</span>
+                                {% else %}
+                                <span class="status-badge inactive">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="{% url 'courses:course_detail' slug=course.slug %}" target="_blank" class="btn-sm btn-view">View</a>
+                                    <button class="btn-sm btn-edit" onclick="openEditModal('{{ course.id }}', '{{ course.title|escapejs }}', '{{ course.description|escapejs }}', '{{ course.short_description|escapejs }}', '{{ course.category }}', '{{ course.level }}', '{{ course.duration|escapejs }}', '{{ course.price|default:'' }}', '{{ course.features|escapejs }}', '{{ course.curriculum|escapejs }}', '{{ course.faq|escapejs }}', '{{ course.image_url|escapejs }}', '{{ course.meta_title|escapejs }}', '{{ course.meta_description|escapejs }}', '{{ course.instructor_id|default:'' }}', '{% if course.is_active %}true{% else %}false{% endif %}')">Edit</button>
+                                    <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this course?')">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="course_id" value="{{ course.id }}">
+                                        <button type="submit" class="btn-sm btn-delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-msg">No courses yet. Click "Add Course" to create one.</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ADD COURSE MODAL -->
+<div class="modal-overlay" id="addCourseModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Add New Course</h3>
+            <button class="modal-close" onclick="document.getElementById('addCourseModal').classList.remove('active')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'dashboard:admin_courses' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Course Title *</label>
+                    <input type="text" name="title" required placeholder="e.g. Tajweed Mastery">
+                </div>
+                <div class="form-group">
+                    <label>Short Description</label>
+                    <input type="text" name="short_description" placeholder="Brief description for cards (max 300 chars)">
+                </div>
+                <div class="form-group">
+                    <label>Full Description *</label>
+                    <textarea name="description" required rows="3" placeholder="Detailed course description..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category">
+                            <option value="quranic">Quranic Studies</option>
+                            <option value="islamic">Islamic Studies</option>
+                            <option value="arabic">Arabic Language</option>
+                            <option value="personal">Personal Development</option>
+                            <option value="kids">Kids Programs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Level</label>
+                        <select name="level">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Duration</label>
+                        <input type="text" name="duration" placeholder="e.g. 8 weeks">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (Rs.)</label>
+                        <input type="number" name="price" placeholder="0 for free" min="0" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Instructor</label>
+                    <select name="instructor">
+                        <option value="">-- Select Teacher --</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Course Image</label>
+                    <input type="file" name="image" accept="image/*">
+                    <p class="form-hint">Or paste image URL below</p>
+                    <input type="text" name="image_url" placeholder="https://example.com/image.jpg" style="margin-top:0.5rem;">
+                </div>
+                <div class="form-group">
+                    <label>Features</label>
+                    <textarea name="features" rows="3" placeholder="One feature per line&#10;e.g. Live one-on-one sessions&#10;Flexible scheduling&#10;Certificate of completion"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Curriculum</label>
+                    <textarea name="curriculum" rows="3" placeholder="One module per line&#10;e.g. Module 1: Introduction to Tajweed&#10;Module 2: Letter Rules"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>FAQ</label>
+                    <textarea name="faq" rows="3" placeholder="One per line&#10;Q: Do I need prior knowledge? | A: No, this course is beginner-friendly."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SEO Title</label>
+                        <input type="text" name="meta_title" placeholder="Page title for search engines">
+                    </div>
+                    <div class="form-group">
+                        <label>SEO Description</label>
+                        <input type="text" name="meta_description" placeholder="Page description for search engines">
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="is_active" id="add_active" checked>
+                    <label for="add_active">Active (visible on website)</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background: #f0f0f0;" onclick="document.getElementById('addCourseModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Course</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT COURSE MODAL -->
+<div class="modal-overlay" id="editCourseModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Course</h3>
+            <button class="modal-close" onclick="document.getElementById('editCourseModal').classList.remove('active')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'dashboard:admin_courses' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="course_id" id="edit_course_id">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Course Title *</label>
+                    <input type="text" name="title" id="edit_title" required>
+                </div>
+                <div class="form-group">
+                    <label>Short Description</label>
+                    <input type="text" name="short_description" id="edit_short_description">
+                </div>
+                <div class="form-group">
+                    <label>Full Description *</label>
+                    <textarea name="description" id="edit_description" required rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category" id="edit_category">
+                            <option value="quranic">Quranic Studies</option>
+                            <option value="islamic">Islamic Studies</option>
+                            <option value="arabic">Arabic Language</option>
+                            <option value="personal">Personal Development</option>
+                            <option value="kids">Kids Programs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Level</label>
+                        <select name="level" id="edit_level">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Duration</label>
+                        <input type="text" name="duration" id="edit_duration">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (Rs.)</label>
+                        <input type="number" name="price" id="edit_price" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Instructor</label>
+                    <select name="instructor" id="edit_instructor">
+                        <option value="">-- Select Teacher --</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Course Image</label>
+                    <input type="file" name="image" accept="image/*">
+                    <p class="form-hint">Leave empty to keep current image. Or paste URL below:</p>
+                    <input type="text" name="image_url" id="edit_image_url" style="margin-top:0.5rem;">
+                </div>
+                <div class="form-group">
+                    <label>Features</label>
+                    <textarea name="features" id="edit_features" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Curriculum</label>
+                    <textarea name="curriculum" id="edit_curriculum" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>FAQ</label>
+                    <textarea name="faq" id="edit_faq" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SEO Title</label>
+                        <input type="text" name="meta_title" id="edit_meta_title">
+                    </div>
+                    <div class="form-group">
+                        <label>SEO Description</label>
+                        <input type="text" name="meta_description" id="edit_meta_description">
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="is_active" id="edit_active">
+                    <label for="edit_active">Active (visible on website)</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background: #f0f0f0;" onclick="document.getElementById('editCourseModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAddModal() {
+    document.getElementById('addCourseModal').classList.add('active');
+}
+
+function openEditModal(id, title, description, shortDesc, category, level, duration, price, features, curriculum, faq, imageUrl, metaTitle, metaDesc, instructorId, isActive) {
+    document.getElementById('edit_course_id').value = id;
+    document.getElementById('edit_title').value = title;
+    document.getElementById('edit_description').value = description;
+    document.getElementById('edit_short_description').value = shortDesc;
+    document.getElementById('edit_category').value = category;
+    document.getElementById('edit_level').value = level;
+    document.getElementById('edit_duration').value = duration;
+    document.getElementById('edit_price').value = price;
+    document.getElementById('edit_features').value = features;
+    document.getElementById('edit_curriculum').value = curriculum;
+    document.getElementById('edit_faq').value = faq;
+    document.getElementById('edit_image_url').value = imageUrl;
+    document.getElementById('edit_meta_title').value = metaTitle;
+    document.getElementById('edit_meta_description').value = metaDesc;
+    document.getElementById('edit_instructor').value = instructorId;
+    document.getElementById('edit_active').checked = isActive === 'true';
+    document.getElementById('editCourseModal').classList.add('active');
+}
+</script>
+{% endblock %}

@@ -275,3 +275,105 @@ def admin_fees(request):
         'total_free': total_free,
     }
     return render(request, 'dashboard/fees.html', context)
+
+
+@admin_required
+def admin_courses(request):
+    """Manage courses - list, add, edit, delete."""
+    from courses.models import Course
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'add':
+            title = request.POST.get('title', '').strip()
+            description = request.POST.get('description', '').strip()
+            short_description = request.POST.get('short_description', '').strip()
+            category = request.POST.get('category', 'quranic')
+            level = request.POST.get('level', 'beginner')
+            duration = request.POST.get('duration', '').strip()
+            price = request.POST.get('price', '0')
+            features = request.POST.get('features', '').strip()
+            curriculum = request.POST.get('curriculum', '').strip()
+            faq = request.POST.get('faq', '').strip()
+            image_url = request.POST.get('image_url', '').strip()
+            meta_title = request.POST.get('meta_title', '').strip()
+            meta_description = request.POST.get('meta_description', '').strip()
+            instructor_id = request.POST.get('instructor')
+            is_active = request.POST.get('is_active') == 'on'
+            image = request.FILES.get('image')
+
+            if not title or not description:
+                messages.error(request, 'Title and description are required.')
+            else:
+                course = Course(
+                    title=title,
+                    description=description,
+                    short_description=short_description,
+                    category=category,
+                    level=level,
+                    duration=duration,
+                    price=float(price) if price else 0,
+                    features=features,
+                    curriculum=curriculum,
+                    faq=faq,
+                    image_url=image_url,
+                    meta_title=meta_title,
+                    meta_description=meta_description,
+                    is_active=is_active,
+                )
+                if image:
+                    course.image = image
+                if instructor_id:
+                    course.instructor_id = instructor_id
+                course.save()
+                messages.success(request, f'Course "{title}" created successfully!')
+                return redirect('dashboard:admin_courses')
+
+        elif action == 'edit':
+            course_id = request.POST.get('course_id')
+            course = get_object_or_404(Course, id=course_id)
+            course.title = request.POST.get('title', course.title).strip()
+            course.description = request.POST.get('description', course.description).strip()
+            course.short_description = request.POST.get('short_description', '').strip()
+            course.category = request.POST.get('category', course.category)
+            course.level = request.POST.get('level', course.level)
+            course.duration = request.POST.get('duration', '').strip()
+            course.price = float(request.POST.get('price', '0') or '0')
+            course.features = request.POST.get('features', '').strip()
+            course.curriculum = request.POST.get('curriculum', '').strip()
+            course.faq = request.POST.get('faq', '').strip()
+            course.image_url = request.POST.get('image_url', '').strip()
+            course.meta_title = request.POST.get('meta_title', '').strip()
+            course.meta_description = request.POST.get('meta_description', '').strip()
+            course.is_active = request.POST.get('is_active') == 'on'
+
+            instructor_id = request.POST.get('instructor')
+            if instructor_id:
+                course.instructor_id = instructor_id
+            else:
+                course.instructor = None
+
+            image = request.FILES.get('image')
+            if image:
+                course.image = image
+            course.save()
+            messages.success(request, f'Course "{course.title}" updated successfully!')
+            return redirect('dashboard:admin_courses')
+
+        elif action == 'delete':
+            course_id = request.POST.get('course_id')
+            course = get_object_or_404(Course, id=course_id)
+            name = course.title
+            course.delete()
+            messages.success(request, f'Course "{name}" deleted successfully!')
+            return redirect('dashboard:admin_courses')
+
+    courses = Course.objects.select_related('instructor').order_by('-created_at')
+    teachers = User.objects.filter(is_staff=True, is_superuser=False)
+    context = {
+        'courses': courses,
+        'teachers': teachers,
+        'active_tab': 'courses',
+    }
+    return render(request, 'dashboard/courses.html', context)
