@@ -143,6 +143,7 @@ def teacher_dashboard(request):
         'total_students': total_students,
         'total_courses': total_courses,
         'total_pending': total_pending,
+        'active_page': 'dashboard',
     }
     return render(request, 'accounts/teacher_dashboard.html', context)
 
@@ -189,7 +190,9 @@ def edit_profile(request):
             messages.success(request, 'Profile updated successfully!')
             return redirect('accounts:edit_profile')
 
-    context = {'profile_user': user}
+    context = {'profile_user': user, 'active_page': 'profile'}
+    if user.is_staff and not user.is_superuser:
+        return render(request, 'accounts/edit_profile_teacher.html', context)
     return render(request, 'accounts/edit_profile.html', context)
 
 

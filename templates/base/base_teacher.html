@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'base/base_dashboard.html' %}
 {% load static %}
 
 {% block extra_head %}
@@ -18,7 +18,7 @@
     .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #fff; border-left-color: var(--accent-gold); }
     .sidebar-nav .section-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
     .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
-    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; }
+    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: color 0.3s ease; }
     .sidebar-footer a:hover { color: #fff; }
     .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
     @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
@@ -56,3 +56,4 @@
     </main>
 </div>
 {% endblock %}
+

@@ -70,6 +70,7 @@ def attendance_view(request):
         'existing_attendance': existing_attendance,
         'selected_course': selected_course,
         'selected_date': selected_date,
+        'active_page': 'attendance',
     }
     return render(request, 'attendance/attendance.html', context)
 

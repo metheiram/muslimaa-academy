@@ -28,6 +28,7 @@ def schedule_view(request):
     context = {
         'schedule_by_day': schedule_by_day,
         'days': day_order,
+        'active_page': 'schedule',
     }
     if user.is_staff or user.is_superuser:
         return render(request, 'classes/schedule_teacher.html', context)
