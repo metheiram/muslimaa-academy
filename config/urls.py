@@ -5,6 +5,7 @@ from courses.views import course_list
 from workshops.models import Workshop
 from content.models import Testimonial
 from courses.models import Course
+from accounts.views import student_dashboard
 
 
 def home_view(request):
@@ -27,6 +28,7 @@ def home_view(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
+    path('student/dashboard/', student_dashboard, name='student_dashboard'),
     path('courses/', include('courses.urls')),
     path('workshops/', include('workshops.urls')),
     path('accounts/', include('accounts.urls')),

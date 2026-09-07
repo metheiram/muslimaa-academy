@@ -1,0 +1,240 @@
+{% extends 'base/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}My Dashboard | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root { --brand-700: #471820; --brand-800: #3d1319; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+
+    .sidebar { width: 260px; background: var(--brand-700); color: #ffffff; padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; }
+    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .sidebar-brand h2 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; }
+    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
+    .sidebar-avatar { width: 50px; height: 50px; background: rgba(212,165,116,0.2); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 1rem; }
+    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #ffffff; border-left-color: var(--accent-gold); }
+    .sidebar-nav .section-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
+    .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; }
+    .sidebar-footer a:hover { color: #ffffff; }
+
+    .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
+
+    .welcome-banner { background: linear-gradient(135deg, #471820 0%, #6b2530 100%); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; color: #fff; position: relative; overflow: hidden; }
+    .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212,165,116,0.15) 0%, transparent 70%); border-radius: 50%; }
+    .welcome-banner h1 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; position: relative; }
+    .welcome-banner p { font-size: 0.9rem; color: rgba(255,255,255,0.8); position: relative; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #ffffff; border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); text-align: center; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card .stat-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .stat-card .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--brand-700); }
+    .stat-card .stat-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; margin-top: 0.25rem; }
+
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
+
+    .course-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .course-item:last-child { border-bottom: none; }
+    .course-info h4 { font-size: 0.95rem; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .course-info p { font-size: 0.8rem; color: var(--text-muted); }
+    .course-meta { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+    .course-meta span { font-size: 0.75rem; color: var(--text-muted); background: rgba(71,24,32,0.04); padding: 0.2rem 0.6rem; border-radius: 20px; }
+
+    .status-badge { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 50px; font-size: 0.72rem; font-weight: 700; text-transform: capitalize; }
+    .status-approved { background: rgba(34,139,34,0.1); color: #228b22; }
+    .status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .status-rejected { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .status-paid { background: rgba(34,139,34,0.1); color: #228b22; }
+    .status-free { background: rgba(138,43,226,0.1); color: #8a2be2; }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #ffffff; }
+    .btn-primary:hover { background: var(--brand-800); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1.5px solid var(--brand-700); }
+    .btn-outline:hover { background: var(--brand-700); color: #ffffff; }
+    .btn-whatsapp { background: #25d366; color: #fff; }
+    .btn-whatsapp:hover { background: #1da851; }
+    .btn-danger { background: transparent; color: #dc3545; border: 1.5px solid #dc3545; }
+    .btn-danger:hover { background: #dc3545; color: #ffffff; }
+
+    .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
+    .empty-msg a { color: var(--brand-700); font-weight: 700; text-decoration: none; }
+    .empty-msg a:hover { text-decoration: underline; }
+
+    .actions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; }
+    .action-btn { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: rgba(71,24,32,0.03); border-radius: 10px; text-decoration: none; color: var(--text-secondary); font-size: 0.88rem; font-weight: 600; transition: all 0.3s; border: 1px solid rgba(71,24,32,0.06); }
+    .action-btn:hover { background: var(--brand-700); color: #fff; transform: translateY(-2px); }
+    .action-icon { font-size: 1.3rem; }
+
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
+
+    .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } .stats-row { grid-template-columns: repeat(2, 1fr); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-avatar">👤</div>
+            <h2>{{ user.get_full_name|default:user.username }}</h2>
+            <p>Student</p>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="{% url 'student_dashboard' %}" class="active"><span class="icon">📊</span> Dashboard</a></li>
+            <div class="section-label">Learning</div>
+            <li><a href="{% url 'courses:my_enrollments' %}"><span class="icon">📚</span> My Courses</a></li>
+            <li><a href="{% url 'courses:course_list' %}"><span class="icon">🔍</span> Browse Courses</a></li>
+            <li><a href="{% url 'workshops:workshop_list' %}"><span class="icon">🎓</span> Workshops</a></li>
+            <div class="section-label">Account</div>
+            <li><a href="{% url 'accounts:profile' %}"><span class="icon">👤</span> My Profile</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="welcome-banner">
+            <h1>Assalam-o-Alaikum, {{ user.first_name|default:user.username }} 🌙</h1>
+            <p>Welcome to your learning dashboard. Keep growing in knowledge!</p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-number">{{ approved_count }}</div>
+                <div class="stat-label">Enrolled Courses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-number">{{ pending_count }}</div>
+                <div class="stat-label">Pending Approvals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-number">Rs. {{ total_paid|floatformat:0 }}</div>
+                <div class="stat-label">Total Paid</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3>My Enrolled Courses</h3>
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.75rem;">Browse More</a>
+                </div>
+                <div class="card-body">
+                    {% if approved_enrollments %}
+                    {% for enrollment in approved_enrollments %}
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>{{ enrollment.course.title }}</h4>
+                            <p>{{ enrollment.course.get_level_display }} · {{ enrollment.course.duration }}</p>
+                            <div class="course-meta">
+                                <span>📚 {{ enrollment.course.get_category_display }}</span>
+                                {% if enrollment.course.instructor %}
+                                <span>👩‍🏫 {{ enrollment.course.instructor.get_full_name }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="status-badge status-approved">Active</span>
+                    </div>
+                    {% endfor %}
+                    {% elif pending_enrollments %}
+                    {% for enrollment in pending_enrollments %}
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>{{ enrollment.course.title }}</h4>
+                            <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-msg">
+                        <p>You haven't enrolled in any courses yet.</p>
+                        <a href="{% url 'courses:course_list' %}">Browse Courses →</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Pending Enrollments</h3>
+                </div>
+                <div class="card-body">
+                    {% if pending_enrollments %}
+                    {% for enrollment in pending_enrollments %}
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>{{ enrollment.course.title }}</h4>
+                            <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+                        </div>
+                        <span class="status-badge status-pending">Waiting</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-msg">
+                        <p>No pending enrollments. All clear!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Quick Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="actions-grid">
+                    <a href="{% url 'courses:course_list' %}" class="action-btn">
+                        <span class="action-icon">📚</span>
+                        Browse Courses
+                    </a>
+                    <a href="{% url 'courses:my_enrollments' %}" class="action-btn">
+                        <span class="action-icon">📋</span>
+                        My Enrollments
+                    </a>
+                    <a href="{% url 'workshops:workshop_list' %}" class="action-btn">
+                        <span class="action-icon">🎓</span>
+                        View Workshops
+                    </a>
+                    <a href="{% url 'content:contact' %}" class="action-btn">
+                        <span class="action-icon">💬</span>
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

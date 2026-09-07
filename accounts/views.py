@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.contrib import messages
 from django import forms
 
 
@@ -73,13 +74,45 @@ def register(request):
 
 
 class CustomLoginView(LoginView):
-    """Custom login view - admins go to dashboard, others to profile."""
+    """Custom login view - admins go to dashboard, teachers to teacher dashboard, students to student dashboard."""
     template_name = 'accounts/login.html'
     
     def get_success_url(self):
         if self.request.user.is_superuser:
             return '/dashboard/'
-        return '/accounts/profile/'
+        elif self.request.user.is_staff:
+            return '/teacher/dashboard/'
+        return '/student/dashboard/'
+
+
+@login_required
+def student_dashboard(request):
+    """Student dashboard with courses, payments, schedule."""
+    from courses.enrollment_models import Enrollment
+    from payments.models import Payment
+    from courses.models import Course
+    from django.db.models import Sum
+
+    user = request.user
+    enrollments = Enrollment.objects.filter(student=user).select_related('course', 'course__instructor')
+    payments = Payment.objects.filter(student=user).select_related('course')
+
+    approved_enrollments = enrollments.filter(status='approved')
+    pending_enrollments = enrollments.filter(status='pending')
+    total_paid = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
+    total_pending_payment = payments.filter(status='pending').aggregate(total=Sum('amount'))['total'] or 0
+
+    context = {
+        'enrollments': enrollments,
+        'approved_enrollments': approved_enrollments,
+        'pending_enrollments': pending_enrollments,
+        'payments': payments,
+        'total_paid': total_paid,
+        'total_pending_payment': total_pending_payment,
+        'approved_count': approved_enrollments.count(),
+        'pending_count': pending_enrollments.count(),
+    }
+    return render(request, 'accounts/student_dashboard.html', context)
 
 
 @login_required
@@ -89,27 +122,9 @@ def profile(request):
     if user.is_superuser:
         return redirect('dashboard:admin_dashboard')
     elif user.is_staff:
-        template = 'accounts/teacher_profile.html'
-        context = {'user': user}
+        return redirect('teacher_dashboard')
     else:
-        from courses.enrollment_models import Enrollment
-        from payments.models import Payment
-        from django.db.models import Sum
-        enrollments = Enrollment.objects.filter(student=user).select_related('course')
-        approved_count = enrollments.filter(status='approved').count()
-        pending_count = enrollments.filter(status='pending').count()
-        payments = Payment.objects.filter(student=user).select_related('course')
-        total_paid = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
-        context = {
-            'user': user,
-            'enrollments': enrollments,
-            'approved_count': approved_count,
-            'pending_count': pending_count,
-            'payments': payments,
-            'total_paid': total_paid,
-        }
-        template = 'accounts/student_profile.html'
-    return render(request, template, context)
+        return redirect('student_dashboard')
 
 
 def custom_logout(request):
