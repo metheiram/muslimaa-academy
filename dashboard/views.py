@@ -154,6 +154,8 @@ def admin_enrollments(request):
     from courses.enrollment_models import Enrollment
     from django.utils import timezone
 
+    whatsapp_url = ''
+
     if request.method == 'POST':
         enrollment_id = request.POST.get('enrollment_id')
         action = request.POST.get('action')
@@ -180,35 +182,48 @@ def admin_enrollments(request):
             else:
                 payment_info = "No payment methods configured yet. Contact admin for details."
 
+            import urllib.parse
+            phone = getattr(enrollment.student.profile, 'phone', '') or ''
+
+            email_msg = (
+                f'Assalam-o-Alaikum {enrollment.student.first_name},\n\n'
+                f'Congratulations! Your enrollment in "{enrollment.course.title}" has been approved.\n\n'
+                f'Please send the course fee to:\n\n'
+                f'{payment_info}\n'
+                f'After sending the fee, please reply to this email with the screenshot of your payment.\n\n'
+                f'JazakAllah Khair,\n'
+                f'Muslimaa Academy'
+            )
+
             try:
                 from django.core.mail import send_mail
                 from django.conf import settings
-                subject = f'Enrollment Approved - {enrollment.course.title}'
-                message = (
-                    f'Assalam-o-Alaikum {enrollment.student.first_name},\n\n'
-                    f'Congratulations! Your enrollment in "{enrollment.course.title}" has been approved.\n\n'
-                    f'Please send the course fee to:\n\n'
-                    f'{payment_info}\n'
-                    f'After sending the fee, please reply to this email with the screenshot of your payment.\n\n'
-                    f'JazakAllah Khair,\n'
-                    f'Muslimaa Academy'
-                )
                 send_mail(
-                    subject,
-                    message,
+                    f'Enrollment Approved - {enrollment.course.title}',
+                    email_msg,
                     settings.DEFAULT_FROM_EMAIL,
                     [enrollment.student.email],
                     fail_silently=True,
                 )
             except Exception:
                 pass
-            
-            messages.success(request, f'Enrollment for {enrollment.student.get_full_name()} in {enrollment.course.title} approved! Payment details sent via email.')
+
+            if phone:
+                clean_phone = phone.replace('+', '').replace('-', '').replace(' ', '')
+                if not clean_phone.startswith('92'):
+                    clean_phone = '92' + clean_phone.lstrip('0')
+                whatsapp_msg = email_msg
+                encoded_msg = urllib.parse.quote(whatsapp_msg)
+                whatsapp_url = f"https://wa.me/{clean_phone}?text={encoded_msg}"
+
+            messages.success(request, f'Enrollment for {enrollment.student.get_full_name()} approved! Email sent automatically.')
+            return redirect('dashboard:admin_enrollments')
+
         elif action == 'reject':
             enrollment.status = 'rejected'
             enrollment.save()
-            messages.warning(request, f'Enrollment for {enrollment.student.get_full_name()} in {enrollment.course.title} rejected.')
-        return redirect('dashboard:admin_enrollments')
+            messages.warning(request, f'Enrollment for {enrollment.student.get_full_name()} rejected.')
+            return redirect('dashboard:admin_enrollments')
 
     pending = Enrollment.objects.filter(status='pending').select_related('student', 'course')
     approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
@@ -219,6 +234,7 @@ def admin_enrollments(request):
         'pending_enrollments': pending,
         'approved_enrollments': approved,
         'rejected_enrollments': rejected,
+        'whatsapp_url': whatsapp_url,
     }
     return render(request, 'dashboard/enrollments.html', context)
 

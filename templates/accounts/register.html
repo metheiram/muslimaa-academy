@@ -232,75 +232,51 @@
                 <form method="post">
                     {% csrf_token %}
 
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="form-error" style="{% if message.tags == 'success' %}background: #f0fdf4; color: #166534; border-color: rgba(22,101,52,0.15);{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="{{ form.first_name.id_for_label }}">First Name</label>
-                            <input type="text" id="{{ form.first_name.id_for_label }}" 
-                                   name="{{ form.first_name.html_name }}" 
-                                   placeholder="First name"
-                                   {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}
-                                   required>
-                            {% if form.first_name.errors %}
-                            <div class="field-error">{% for e in form.first_name.errors %}{{ e }}{% endfor %}</div>
-                            {% endif %}
+                            <label for="first_name">First Name *</label>
+                            <input type="text" id="first_name" name="first_name" placeholder="First name"
+                                   value="{{ form_data.first_name|default:'' }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="{{ form.last_name.id_for_label }}">Last Name</label>
-                            <input type="text" id="{{ form.last_name.id_for_label }}" 
-                                   name="{{ form.last_name.html_name }}" 
-                                   placeholder="Last name"
-                                   {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}
-                                   required>
-                            {% if form.last_name.errors %}
-                            <div class="field-error">{% for e in form.last_name.errors %}{{ e }}{% endfor %}</div>
-                            {% endif %}
+                            <label for="last_name">Last Name *</label>
+                            <input type="text" id="last_name" name="last_name" placeholder="Last name"
+                                   value="{{ form_data.last_name|default:'' }}" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="{{ form.email.id_for_label }}">Email Address</label>
-                        <input type="email" id="{{ form.email.id_for_label }}" 
-                               name="{{ form.email.html_name }}" 
-                               placeholder="Enter your email"
-                               {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
-                               required>
-                        {% if form.email.errors %}
-                        <div class="field-error">{% for e in form.email.errors %}{{ e }}{% endfor %}</div>
-                        {% endif %}
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email"
+                               value="{{ form_data.email|default:'' }}" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="{{ form.username.id_for_label }}">Username</label>
-                        <input type="text" id="{{ form.username.id_for_label }}" 
-                               name="{{ form.username.html_name }}" 
-                               placeholder="Choose a username"
-                               {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
-                               required>
-                        {% if form.username.errors %}
-                        <div class="field-error">{% for e in form.username.errors %}{{ e }}{% endfor %}</div>
-                        {% endif %}
+                        <label for="phone">Phone / WhatsApp Number *</label>
+                        <input type="tel" id="phone" name="phone" placeholder="e.g. 0300-1234567"
+                               value="{{ form_data.phone|default:'' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username *</label>
+                        <input type="text" id="username" name="username" placeholder="Choose a username"
+                               value="{{ form_data.username|default:'' }}" required>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="{{ form.password.id_for_label }}">Password</label>
-                            <input type="password" id="{{ form.password.id_for_label }}" 
-                                   name="{{ form.password.html_name }}" 
-                                   placeholder="Create password"
-                                   required>
-                            {% if form.password.errors %}
-                            <div class="field-error">{% for e in form.password.errors %}{{ e }}{% endfor %}</div>
-                            {% endif %}
+                            <label for="password">Password *</label>
+                            <input type="password" id="password" name="password" placeholder="Create password" required>
                         </div>
                         <div class="form-group">
-                            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
-                            <input type="password" id="{{ form.password2.id_for_label }}" 
-                                   name="{{ form.password2.html_name }}" 
-                                   placeholder="Confirm password"
-                                   required>
-                            {% if form.password2.errors %}
-                            <div class="field-error">{% for e in form.password2.errors %}{{ e }}{% endfor %}</div>
-                            {% endif %}
+                            <label for="password2">Confirm Password *</label>
+                            <input type="password" id="password2" name="password2" placeholder="Confirm password" required>
                         </div>
                     </div>
 

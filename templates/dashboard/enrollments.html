@@ -91,6 +91,16 @@
         {% endfor %}
         {% endif %}
 
+        {% if whatsapp_url %}
+        <div style="background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.3); border-radius: 10px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <strong style="color: #25d366; font-size: 0.9rem;">📱 WhatsApp Payment Details Ready!</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Click the button to send payment details to student via WhatsApp</p>
+            </div>
+            <a href="{{ whatsapp_url }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #25d366; color: #fff; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">Send on WhatsApp</a>
+        </div>
+        {% endif %}
+
         <div class="tabs">
             <button class="tab active" onclick="showTab('pending')">Pending ({{ pending_enrollments.count }})</button>
             <button class="tab" onclick="showTab('approved')">Approved ({{ approved_enrollments.count }})</button>
