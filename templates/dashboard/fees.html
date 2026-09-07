@@ -57,15 +57,26 @@
 
     .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
 
-    .methods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .method-card { background: #ffffff; border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); position: relative; }
-    .method-card h4 { font-family: var(--font-serif); font-size: 0.95rem; color: var(--brand-700); margin-bottom: 0.5rem; }
-    .method-card .account { font-size: 1.1rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.25rem; }
-    .method-card .title { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-    .method-card .note { font-size: 0.75rem; color: var(--text-secondary); }
-    .method-card .delete-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; cursor: pointer; font-size: 0.9rem; color: #dc3545; }
-    .add-method-card { border: 2px dashed rgba(71,24,32,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; min-height: 120px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; transition: all 0.3s; }
-    .add-method-card:hover { border-color: var(--brand-700); color: var(--brand-700); }
+    .methods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.25rem; }
+    .method-card { background: linear-gradient(135deg, #ffffff 0%, #fdf8f5 100%); border-radius: 16px; padding: 1.5rem; border: 1.5px solid rgba(71,24,32,0.08); box-shadow: 0 4px 15px rgba(71,24,32,0.06); position: relative; transition: all 0.3s ease; }
+    .method-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(71,24,32,0.1); }
+    .method-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+    .method-icon.jazzcash { background: rgba(220,53,69,0.1); }
+    .method-icon.sadapay { background: rgba(138,43,226,0.1); }
+    .method-icon.easypaisa { background: rgba(34,139,34,0.1); }
+    .method-icon.bank { background: rgba(71,24,32,0.08); }
+    .method-card h4 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.75rem; }
+    .method-account { background: rgba(71,24,32,0.04); border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 0.75rem; }
+    .method-account .label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .method-account .number { font-size: 1.15rem; font-weight: 800; color: var(--brand-700); font-family: monospace; letter-spacing: 0.5px; }
+    .method-title { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+    .method-title strong { color: var(--brand-700); }
+    .method-note { font-size: 0.78rem; color: var(--text-muted); font-style: italic; border-top: 1px solid rgba(71,24,32,0.06); padding-top: 0.5rem; margin-top: 0.5rem; }
+    .method-delete { position: absolute; top: 1rem; right: 1rem; background: rgba(220,53,69,0.08); border: none; cursor: pointer; font-size: 0.85rem; color: #dc3545; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+    .method-delete:hover { background: #dc3545; color: #fff; }
+    .add-method-card { border: 2px dashed rgba(71,24,32,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; min-height: 200px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; transition: all 0.3s; border-radius: 16px; background: transparent; }
+    .add-method-card:hover { border-color: var(--accent-gold); color: var(--brand-700); background: rgba(212,165,116,0.04); }
+    .add-method-card .plus { font-size: 2rem; margin-bottom: 0.5rem; color: var(--text-muted); }
 
     .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
     .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
@@ -150,15 +161,24 @@
                             {% csrf_token %}
                             <input type="hidden" name="action" value="delete_payment_method">
                             <input type="hidden" name="method_id" value="{{ pm.id }}">
-                            <button type="submit" class="delete-btn" onclick="return confirm('Delete this payment method?')">&times;</button>
+                            <button type="submit" class="method-delete" onclick="return confirm('Delete this payment method?')">✕</button>
                         </form>
+                        <div class="method-icon {{ pm.method }}">
+                            {% if pm.method == 'jazzcash' %}💳{% elif pm.method == 'sadapay' %}💜{% elif pm.method == 'easypaisa' %}💚{% else %}🏦{% endif %}
+                        </div>
                         <h4>{{ pm.get_method_display }}</h4>
-                        <div class="account">{{ pm.account_number }}</div>
-                        {% if pm.account_title %}<div class="title">{{ pm.account_title }}</div>{% endif %}
-                        {% if pm.instructions %}<div class="note">{{ pm.instructions }}</div>{% endif %}
+                        <div class="method-account">
+                            <div class="label">Account Number</div>
+                            <div class="number">{{ pm.account_number }}</div>
+                        </div>
+                        {% if pm.account_title %}<div class="method-title"><strong>Title:</strong> {{ pm.account_title }}</div>{% endif %}
+                        {% if pm.instructions %}<div class="method-note">{{ pm.instructions }}</div>{% endif %}
                     </div>
                     {% endfor %}
-                    <div class="method-card add-method-card" onclick="document.getElementById('addMethodModal').classList.add('active')">+ Add New</div>
+                    <div class="method-card add-method-card" onclick="document.getElementById('addMethodModal').classList.add('active')">
+                        <div class="plus">+</div>
+                        Add New Method
+                    </div>
                 </div>
                 {% else %}
                 <p class="empty-msg">No payment methods added yet. Add your JazzCash, SadaPay, etc. account details so students know where to send fees.</p>
