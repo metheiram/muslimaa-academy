@@ -129,34 +129,65 @@ def admin_dashboard(request):
 
 @admin_required
 def admin_students(request):
-    """Manage students - list and add."""
+    """Manage students - list, add, edit, delete."""
     if request.method == 'POST':
-        first_name = request.POST.get('first_name', '').strip()
-        last_name = request.POST.get('last_name', '').strip()
-        email = request.POST.get('email', '').strip()
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '').strip()
+        action = request.POST.get('action')
 
-        if not all([first_name, email, username, password]):
-            messages.error(request, 'All fields are required.')
-        elif User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists.')
-        elif User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already exists.')
-        else:
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-                is_staff=False,
-                is_superuser=False,
-            )
-            messages.success(request, f'Student "{user.get_full_name()}" added successfully!')
+        if action == 'add':
+            first_name = request.POST.get('first_name', '').strip()
+            last_name = request.POST.get('last_name', '').strip()
+            email = request.POST.get('email', '').strip()
+            username = request.POST.get('username', '').strip()
+            password = request.POST.get('password', '').strip()
+
+            if not all([first_name, email, username, password]):
+                messages.error(request, 'All fields are required.')
+            elif User.objects.filter(username=username).exists():
+                messages.error(request, 'Username already exists.')
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, 'Email already exists.')
+            else:
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    is_staff=False,
+                    is_superuser=False,
+                )
+                messages.success(request, f'Student "{user.get_full_name()}" added successfully!')
             return redirect('dashboard:admin_students')
 
-    students = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
+        elif action == 'edit':
+            user_id = request.POST.get('user_id')
+            user = get_object_or_404(User, id=user_id)
+            user.first_name = request.POST.get('first_name', user.first_name).strip()
+            user.last_name = request.POST.get('last_name', user.last_name).strip()
+            user.email = request.POST.get('email', user.email).strip()
+
+            new_password = request.POST.get('password', '').strip()
+            if new_password:
+                user.set_password(new_password)
+
+            user.save()
+
+            phone = request.POST.get('phone', '').strip()
+            user.profile.phone = phone
+            user.profile.save()
+
+            messages.success(request, f'Student "{user.get_full_name()}" updated successfully!')
+            return redirect('dashboard:admin_students')
+
+        elif action == 'delete':
+            user_id = request.POST.get('user_id')
+            user = get_object_or_404(User, id=user_id)
+            name = user.get_full_name()
+            user.delete()
+            messages.success(request, f'Student "{name}" deleted successfully!')
+            return redirect('dashboard:admin_students')
+
+    students = User.objects.filter(is_superuser=False, is_staff=False).select_related('profile').order_by('-date_joined')
     context = {'students': students, 'active_tab': 'students'}
     return render(request, 'dashboard/students.html', context)
 
