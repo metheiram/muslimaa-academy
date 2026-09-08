@@ -44,9 +44,13 @@ def compose(request, recipient_id=None):
     if request.user.is_superuser:
         available_users = User.objects.filter(is_active=True).exclude(id=request.user.id)
     elif request.user.is_staff:
-        students = User.objects.filter(is_superuser=False, is_staff=False, is_active=True)
+        from courses.enrollment_models import Enrollment
+        assigned_student_ids = Enrollment.objects.filter(
+            teacher=request.user, status='approved'
+        ).values_list('student_id', flat=True).distinct()
+        assigned_students = User.objects.filter(id__in=assigned_student_ids, is_active=True)
         admins = User.objects.filter(is_superuser=True)
-        available_users = (students | admins).exclude(id=request.user.id).distinct()
+        available_users = (assigned_students | admins).exclude(id=request.user.id).distinct()
     else:
         teachers = User.objects.filter(is_staff=True, is_active=True)
         admins = User.objects.filter(is_superuser=True)

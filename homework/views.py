@@ -28,7 +28,9 @@ def teacher_homework(request):
     if user.is_superuser:
         courses = Course.objects.filter(is_active=True)
     else:
-        courses = Course.objects.filter(instructor=user, is_active=True)
+        from courses.enrollment_models import Enrollment
+        assigned_course_ids = Enrollment.objects.filter(teacher=user, status='approved').values_list('course_id', flat=True).distinct()
+        courses = Course.objects.filter(id__in=assigned_course_ids, is_active=True)
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -52,9 +54,12 @@ def teacher_homework(request):
                 )
                 messages.success(request, f'Homework "{title}" created for {course.title}!')
 
-                # Notify enrolled students
+                # Notify only teacher's assigned students
                 from courses.enrollment_models import Enrollment
-                enrolled = Enrollment.objects.filter(course=course, status='approved').select_related('student')
+                if user.is_superuser:
+                    enrolled = Enrollment.objects.filter(course=course, status='approved').select_related('student')
+                else:
+                    enrolled = Enrollment.objects.filter(course=course, status='approved', teacher=user).select_related('student')
                 for enr in enrolled:
                     if enr.student.email:
                         try:
@@ -86,7 +91,13 @@ def teacher_homework(request):
     all_homework = Homework.objects.filter(course__in=courses).select_related('course')
     homework_with_subs = []
     for hw in all_homework:
-        submissions = hw.submissions.select_related('student').all()
+        if user.is_superuser:
+            submissions = hw.submissions.select_related('student').all()
+        else:
+            assigned_student_ids = Enrollment.objects.filter(
+                teacher=user, course=hw.course, status='approved'
+            ).values_list('student_id', flat=True)
+            submissions = hw.submissions.select_related('student').filter(student_id__in=assigned_student_ids)
         homework_with_subs.append({'homework': hw, 'submissions': submissions})
 
     context = {

@@ -153,16 +153,16 @@ def teacher_dashboard(request):
     from django.utils import timezone
 
     user = request.user
-    courses_taught = Course.objects.filter(instructor=user, is_active=True)
     enrolled_students = Enrollment.objects.filter(
-        course__in=courses_taught,
+        teacher=user,
         status='approved'
     ).select_related('student', 'course')
 
     total_students = enrolled_students.values('student').distinct().count()
-    total_courses = courses_taught.count()
+    assigned_course_ids = enrolled_students.values_list('course_id', flat=True).distinct()
+    total_courses = assigned_course_ids.count()
     total_pending = Enrollment.objects.filter(
-        course__in=courses_taught,
+        teacher=user,
         status='pending'
     ).count()
 
@@ -182,7 +182,7 @@ def teacher_dashboard(request):
     ).select_related('student', 'homework')[:5]
 
     context = {
-        'courses_taught': courses_taught,
+        'courses_taught': Course.objects.filter(id__in=assigned_course_ids, is_active=True),
         'enrolled_students': enrolled_students,
         'total_students': total_students,
         'total_courses': total_courses,

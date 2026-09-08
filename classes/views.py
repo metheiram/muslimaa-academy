@@ -108,7 +108,8 @@ def teacher_meetings(request):
     if user.is_superuser:
         courses = Course.objects.filter(is_active=True)
     else:
-        courses = Course.objects.filter(instructor=user, is_active=True)
+        assigned_course_ids = Enrollment.objects.filter(teacher=user, status='approved').values_list('course_id', flat=True).distinct()
+        courses = Course.objects.filter(id__in=assigned_course_ids, is_active=True)
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -134,8 +135,11 @@ def teacher_meetings(request):
                     scheduled_at=scheduled_at,
                     duration_minutes=int(duration),
                 )
-                # Auto-add enrolled students
-                enrolled = Enrollment.objects.filter(course=course, status='approved').values_list('student_id', flat=True)
+                # Auto-add only teacher's assigned students
+                if user.is_superuser:
+                    enrolled = Enrollment.objects.filter(course=course, status='approved').values_list('student_id', flat=True)
+                else:
+                    enrolled = Enrollment.objects.filter(course=course, status='approved', teacher=user).values_list('student_id', flat=True)
                 meeting.students.set(enrolled)
 
                 # Internal message to students

@@ -16,7 +16,12 @@ def attendance_view(request):
         return redirect('student_dashboard')
 
     today = date.today()
-    courses = Course.objects.filter(instructor=user, is_active=True) if not user.is_superuser else Course.objects.filter(is_active=True)
+    if user.is_superuser:
+        courses = Course.objects.filter(is_active=True)
+    else:
+        from courses.enrollment_models import Enrollment
+        assigned_course_ids = Enrollment.objects.filter(teacher=user, status='approved').values_list('course_id', flat=True).distinct()
+        courses = Course.objects.filter(id__in=assigned_course_ids, is_active=True)
 
     selected_course = request.GET.get('course')
     selected_date = request.GET.get('date', str(today))
@@ -27,7 +32,10 @@ def attendance_view(request):
     if selected_course:
         from courses.enrollment_models import Enrollment
         course = get_object_or_404(Course, id=selected_course)
-        enrolled = Enrollment.objects.filter(course=course, status='approved').select_related('student')
+        if user.is_superuser:
+            enrolled = Enrollment.objects.filter(course=course, status='approved').select_related('student')
+        else:
+            enrolled = Enrollment.objects.filter(course=course, status='approved', teacher=user).select_related('student')
         students = [e.student for e in enrolled]
 
         attendances = Attendance.objects.filter(
