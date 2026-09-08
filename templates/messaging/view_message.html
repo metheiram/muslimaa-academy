@@ -1,0 +1,42 @@
+{% extends 'messaging/base_messaging.html' %}
+
+{% block msg_content %}
+<div class="card">
+    <div class="msg-detail">
+        <div class="msg-detail-header">
+            <div class="msg-detail-subject">{{ msg.subject }}</div>
+            <div class="msg-detail-meta">
+                {% if msg.sender == user %}
+                To: <strong>{{ msg.recipient.get_full_name }}</strong>
+                {% else %}
+                From: <strong>{{ msg.sender.get_full_name }}</strong>
+                {% endif %}
+                &middot; {{ msg.created_at|date:"M d, Y g:i A" }}
+            </div>
+        </div>
+
+        <div class="msg-detail-body">{{ msg.body }}</div>
+
+        <div class="msg-detail-actions">
+            {% if msg.recipient == user %}
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('replyBox').style.display='block'">Reply</button>
+            {% endif %}
+            <form method="POST" action="{% url 'messaging:delete_message' msg.id %}" style="margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this message?')">Delete</button>
+            </form>
+            <a href="{% url 'messaging:inbox' %}" class="btn btn-outline btn-sm">Back to Inbox</a>
+        </div>
+
+        {% if msg.recipient == user %}
+        <div class="reply-box" id="replyBox" style="display:none;">
+            <form method="POST" action="{% url 'messaging:reply_message' msg.id %}">
+                {% csrf_token %}
+                <textarea name="body" required placeholder="Write your reply..."></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">Send Reply</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

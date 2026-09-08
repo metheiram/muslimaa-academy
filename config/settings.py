@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'content',
     'dashboard',
     'announcements',
+    'homework',
+    'messaging',
 ]
 
 MIDDLEWARE = [

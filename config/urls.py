@@ -40,6 +40,8 @@ urlpatterns = [
     path('attendance/', include('attendance.urls')),
     path('schedule/', include('classes.urls')),
     path('announcements/', include('announcements.urls')),
+    path('homework/', include('homework.urls')),
+    path('messages/', include('messaging.urls')),
 ]
 
 if settings.DEBUG:

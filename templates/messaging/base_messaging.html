@@ -1,0 +1,85 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Messages | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root { --brand-700: #471820; --brand-800: #3d1319; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { font-family: var(--font-sans); background: #faf6f1; }
+    .msg-container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+    .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .msg-header h1 { font-family: var(--font-serif); font-size: 1.6rem; color: var(--brand-700); }
+    .msg-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .msg-nav a { padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); border: 1px solid rgba(71,24,32,0.1); transition: all 0.3s; }
+    .msg-nav a:hover, .msg-nav a.active { background: var(--brand-700); color: #fff; border-color: var(--brand-700); }
+    .msg-nav .badge { background: #dc143c; color: #fff; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 50px; margin-left: 0.3rem; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+    .btn-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-danger:hover { background: #dc3545; color: #fff; }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1.5px solid rgba(71,24,32,0.2); }
+    .btn-outline:hover { background: rgba(71,24,32,0.05); }
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-body { padding: 1.25rem 1.5rem; }
+
+    .msg-list { list-style: none; padding: 0; margin: 0; }
+    .msg-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.04); cursor: pointer; transition: background 0.2s; text-decoration: none; color: inherit; }
+    .msg-item:hover { background: rgba(71,24,32,0.02); }
+    .msg-item.unread { background: rgba(212,165,116,0.06); }
+    .msg-item.unread .msg-subject { font-weight: 700; color: var(--brand-700); }
+    .msg-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-gold), #c4956a); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .msg-content { flex: 1; min-width: 0; }
+    .msg-top { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+    .msg-subject { font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.15rem; }
+    .msg-preview { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .msg-time { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+    .unread-dot { width: 8px; height: 8px; background: var(--accent-gold); border-radius: 50%; flex-shrink: 0; }
+
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
+    .alert-success { background: rgba(212,165,116,0.15); color: var(--brand-700); border-left: 3px solid var(--accent-gold); }
+
+    .compose-form .form-group { margin-bottom: 1rem; }
+    .compose-form label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .compose-form input, .compose-form select, .compose-form textarea { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; }
+    .compose-form input:focus, .compose-form select:focus, .compose-form textarea:focus { outline: none; border-color: var(--brand-700); }
+    .compose-form textarea { resize: vertical; min-height: 150px; }
+
+    .msg-detail { padding: 1.5rem; }
+    .msg-detail-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .msg-detail-subject { font-family: var(--font-serif); font-size: 1.3rem; color: var(--brand-700); margin-bottom: 0.5rem; }
+    .msg-detail-meta { font-size: 0.82rem; color: var(--text-muted); }
+    .msg-detail-body { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap; }
+    .msg-detail-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(71,24,32,0.06); flex-wrap: wrap; }
+    .reply-box { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(71,24,32,0.06); }
+    .reply-box textarea { width: 100%; padding: 0.75rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; resize: vertical; min-height: 100px; margin-bottom: 0.75rem; }
+    .reply-box textarea:focus { outline: none; border-color: var(--brand-700); }
+
+    @media (max-width: 768px) { .msg-header { flex-direction: column; align-items: flex-start; } .msg-item { padding: 0.75rem 1rem; } .msg-time { display: none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="msg-container">
+    <div class="msg-header">
+        <h1>Messages</h1>
+        <a href="{% url 'messaging:compose' %}" class="btn btn-primary">+ New Message</a>
+    </div>
+
+    <div class="msg-nav">
+        <a href="{% url 'messaging:inbox' %}" class="{% if active_page == 'inbox' %}active{% endif %}">Inbox {% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</a>
+        <a href="{% url 'messaging:sent' %}" class="{% if active_page == 'sent' %}active{% endif %}">Sent</a>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    {% block msg_content %}{% endblock %}
+</div>
+{% endblock %}

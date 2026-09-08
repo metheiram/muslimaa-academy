@@ -1,0 +1,25 @@
+{% extends 'messaging/base_messaging.html' %}
+
+{% block msg_content %}
+<div class="card">
+    {% if messages_list %}
+    <ul class="msg-list">
+        {% for msg in messages_list %}
+        <a href="{% url 'messaging:view_message' msg.id %}" class="msg-item {% if not msg.is_read %}unread{% endif %}">
+            <div class="msg-avatar">{{ msg.sender.first_name|first|upper }}{{ msg.sender.last_name|first|upper }}</div>
+            <div class="msg-content">
+                <div class="msg-top">
+                    <div class="msg-subject">{{ msg.subject }}</div>
+                    <div class="msg-time">{{ msg.created_at|date:"M d" }}</div>
+                </div>
+                <div class="msg-preview">From {{ msg.sender.get_full_name }} — {{ msg.body|truncatewords:15 }}</div>
+            </div>
+            {% if not msg.is_read %}<div class="unread-dot"></div>{% endif %}
+        </a>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty-msg">No messages yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

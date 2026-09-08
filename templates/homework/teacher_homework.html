@@ -1,0 +1,191 @@
+{% extends 'base/base_teacher.html' %}
+{% load static %}
+
+{% block title %}Homework | Muslimaa Academy{% endblock %}
+
+{% block teacher_extra_head %}
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+    .btn-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-success:hover { background: #228b22; color: #fff; }
+    .btn-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-danger:hover { background: #dc3545; color: #fff; }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1.5px solid rgba(71,24,32,0.2); }
+    .btn-outline:hover { background: rgba(71,24,32,0.05); }
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
+    .hw-item { padding: 1.25rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .hw-item:last-child { border-bottom: none; }
+    .hw-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+    .hw-title { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .hw-meta { font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .hw-desc { font-size: 0.88rem; color: var(--text-secondary); margin: 0.5rem 0; line-height: 1.5; }
+    .hw-stats { display: flex; gap: 1rem; margin-top: 0.75rem; }
+    .hw-stat { font-size: 0.78rem; color: var(--text-muted); }
+    .hw-stat strong { color: var(--brand-700); }
+    .subs-list { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(71,24,32,0.06); }
+    .subs-title { font-size: 0.82rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.75rem; }
+    .sub-item { display: flex; align-items: center; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid rgba(71,24,32,0.03); flex-wrap: wrap; }
+    .sub-item:last-child { border-bottom: none; }
+    .sub-info { flex: 1; min-width: 200px; }
+    .sub-name { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
+    .sub-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .sub-text { font-size: 0.82rem; color: var(--text-secondary); background: rgba(71,24,32,0.03); padding: 0.5rem 0.75rem; border-radius: 6px; margin-top: 0.35rem; max-height: 80px; overflow-y: auto; }
+    .sub-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .grade-badge { padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+    .grade-graded { background: rgba(34,139,34,0.1); color: #228b22; }
+    .grade-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); }
+    .form-row { display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap; }
+    .form-row select, .form-row input { padding: 0.4rem 0.7rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .modal-header h3 { font-family: var(--font-serif); font-size: 1.1rem; color: var(--brand-700); }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--brand-700); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+    @media (max-width: 768px) { .page-header { flex-direction: column; align-items: flex-start; } .sub-item { flex-direction: column; align-items: flex-start; } }
+</style>
+{% endblock %}
+
+{% block teacher_content %}
+<div class="page-header">
+    <h1>Homework</h1>
+    <button class="btn btn-primary" onclick="document.getElementById('createModal').classList.add('active')">+ Create Homework</button>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        {% if homework_with_subs %}
+        {% for item in homework_with_subs %}
+        <div class="hw-item">
+            <div class="hw-top">
+                <div>
+                    <div class="hw-title">{{ item.homework.title }}</div>
+                    <div class="hw-meta">
+                        <span>{{ item.homework.course.title }}</span>
+                        <span>Due: {{ item.homework.due_date|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <form method="POST" style="margin:0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="homework_id" value="{{ item.homework.id }}">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this homework?')">Delete</button>
+                </form>
+            </div>
+            <div class="hw-desc">{{ item.homework.description|linebreaksbr }}</div>
+            <div class="hw-stats">
+                <span class="hw-stat">Submissions: <strong>{{ item.homework.submission_count }}</strong></span>
+                <span class="hw-stat">Graded: <strong>{{ item.homework.graded_count }}</strong></span>
+            </div>
+
+            {% if item.submissions %}
+            <div class="subs-list">
+                <div class="subs-title">Submissions</div>
+                {% for sub in item.submissions %}
+                <div class="sub-item">
+                    <div class="sub-info">
+                        <div class="sub-name">{{ sub.student.get_full_name }}</div>
+                        <div class="sub-meta">Submitted {{ sub.submitted_at|date:"M d, Y g:i A" }}</div>
+                        {% if sub.submission_text %}<div class="sub-text">{{ sub.submission_text|linebreaksbr }}</div>{% endif %}
+                        {% if sub.file %}<div class="sub-meta" style="margin-top:0.25rem;"><a href="{{ sub.file.url }}" target="_blank" style="color:var(--brand-700);">View File</a></div>{% endif %}
+                    </div>
+                    <div class="sub-actions">
+                        {% if sub.grade %}
+                        <span class="grade-badge grade-graded">{{ sub.grade }}</span>
+                        {% else %}
+                        <span class="grade-badge grade-pending">Ungraded</span>
+                        {% endif %}
+                        <form method="POST" action="{% url 'homework:grade_submission' sub.id %}" class="form-row" style="margin:0;">
+                            {% csrf_token %}
+                            <select name="grade">
+                                <option value="">Grade</option>
+                                <option value="A+" {% if sub.grade == 'A+' %}selected{% endif %}>A+</option>
+                                <option value="A" {% if sub.grade == 'A' %}selected{% endif %}>A</option>
+                                <option value="B" {% if sub.grade == 'B' %}selected{% endif %}>B</option>
+                                <option value="C" {% if sub.grade == 'C' %}selected{% endif %}>C</option>
+                                <option value="D" {% if sub.grade == 'D' %}selected{% endif %}>D</option>
+                                <option value="F" {% if sub.grade == 'F' %}selected{% endif %}>F</option>
+                            </select>
+                            <input type="text" name="feedback" placeholder="Feedback" value="{{ sub.feedback }}">
+                            <button type="submit" class="btn btn-success btn-sm">Save</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="empty-msg">No homework assigned yet. Create one to get started.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- CREATE HOMEWORK MODAL -->
+<div class="modal-overlay" id="createModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Create Homework</h3>
+            <button class="modal-close" onclick="document.getElementById('createModal').classList.remove('active')">&times;</button>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" name="title" required placeholder="e.g. Surah Al-Fatiha Memorization">
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea name="description" required placeholder="Describe the assignment..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Course *</label>
+                    <select name="course_id" required>
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Due Date *</label>
+                    <input type="date" name="due_date" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('createModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

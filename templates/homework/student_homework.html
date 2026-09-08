@@ -1,0 +1,154 @@
+{% extends 'base/base_student.html' %}
+{% load static %}
+
+{% block title %}Homework | Muslimaa Academy{% endblock %}
+
+{% block student_extra_head %}
+<style>
+    .page-header { text-align: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; color: var(--brand-700); }
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-body { padding: 1.25rem 1.5rem; }
+    .hw-item { padding: 1.25rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .hw-item:last-child { border-bottom: none; }
+    .hw-item:first-child { padding-top: 0; }
+    .hw-title { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .hw-meta { font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .hw-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+    .overdue-badge { background: rgba(220,20,60,0.1); color: #dc143c; padding: 0.15rem 0.5rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+    .status-badge { padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+    .status-submitted { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .status-graded { background: rgba(34,139,34,0.1); color: #228b22; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1.5px solid rgba(71,24,32,0.2); }
+    .btn-outline:hover { background: rgba(71,24,32,0.05); }
+    .grade-display { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+    .grade-big { font-size: 1.5rem; font-weight: 800; color: var(--brand-700); }
+    .feedback-text { font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
+    .submission-info { background: rgba(71,24,32,0.03); border-radius: 8px; padding: 0.75rem; margin-top: 0.5rem; }
+    .submission-info .label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; }
+    .submission-info .text { font-size: 0.85rem; color: var(--text-secondary); }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
+    .alert-success { background: rgba(212,165,116,0.15); color: var(--brand-700); border-left: 3px solid var(--accent-gold); }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .modal-header h3 { font-family: var(--font-serif); font-size: 1.1rem; color: var(--brand-700); }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .form-group input, .form-group textarea { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--brand-700); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+    @media (max-width: 768px) { .hw-meta { flex-direction: column; gap: 0.35rem; } }
+</style>
+{% endblock %}
+
+{% block student_content %}
+<div class="page-header">
+    <h1>Homework</h1>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        {% if homework_list %}
+        {% for item in homework_list %}
+        <div class="hw-item">
+            <div class="hw-title">{{ item.homework.title }}</div>
+            <div class="hw-meta">
+                <span>{{ item.homework.course.title }}</span>
+                <span>Due: {{ item.homework.due_date|date:"M d, Y" }}</span>
+                {% if item.is_overdue %}<span class="overdue-badge">Overdue</span>{% endif %}
+                {% if item.submission %}
+                    {% if item.submission.grade %}
+                    <span class="status-badge status-graded">Graded</span>
+                    {% else %}
+                    <span class="status-badge status-submitted">Submitted</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="hw-desc">{{ item.homework.description|linebreaksbr }}</div>
+
+            {% if item.submission %}
+                {% if item.submission.grade %}
+                <div class="grade-display">
+                    <span class="grade-big">{{ item.submission.grade }}</span>
+                    {% if item.submission.feedback %}
+                    <span class="feedback-text">"{{ item.submission.feedback }}"</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if item.submission.submission_text %}
+                <div class="submission-info">
+                    <div class="label">Your Submission</div>
+                    <div class="text">{{ item.submission.submission_text|linebreaksbr }}</div>
+                </div>
+                {% endif %}
+                {% if item.submission.file %}
+                <div style="margin-top:0.35rem;">
+                    <a href="{{ item.submission.file.url }}" target="_blank" style="font-size:0.82rem; color:var(--brand-700);">View Uploaded File</a>
+                </div>
+                {% endif %}
+            {% else %}
+                {% if not item.is_overdue %}
+                <button class="btn btn-primary" onclick="openSubmitModal('{{ item.homework.id }}', '{{ item.homework.title|escapejs }}')">Submit Homework</button>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="empty-msg">No homework assigned yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- SUBMIT HOMEWORK MODAL -->
+<div class="modal-overlay" id="submitModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Submit Homework</h3>
+            <button class="modal-close" onclick="document.getElementById('submitModal').classList.remove('active')">&times;</button>
+        </div>
+        <form method="POST" enctype="multipart/form-data" id="submitForm">
+            {% csrf_token %}
+            <div class="modal-body">
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;" id="hwTitle"></p>
+                <div class="form-group">
+                    <label>Your Answer</label>
+                    <textarea name="submission_text" placeholder="Write your answer here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload File (optional)</label>
+                    <input type="file" name="file">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('submitModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openSubmitModal(hwId, hwTitle) {
+    document.getElementById('submitForm').action = '/homework/submit/' + hwId + '/';
+    document.getElementById('hwTitle').textContent = hwTitle;
+    document.getElementById('submitModal').classList.add('active');
+}
+</script>
+{% endblock %}
