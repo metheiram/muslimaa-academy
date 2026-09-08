@@ -1,0 +1,110 @@
+{% extends 'base/base_student.html' %}
+{% load static %}
+
+{% block title %}My Meetings | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root { --brand-700: #471820; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; padding: 2rem; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-success:hover { background: #228b22; color: #fff; }
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); margin-bottom: 1.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
+    .meeting-item { padding: 1rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+    .meeting-item:last-child { border-bottom: none; }
+    .meeting-title { font-size: 0.95rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .meeting-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.25rem; }
+    .meeting-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-live { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-doubt { background: rgba(0,123,255,0.1); color: #007bff; }
+    .badge-exam { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .badge-recording { background: rgba(123,44,191,0.1); color: #7b2cbf; }
+    .time-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+    .time-upcoming { background: rgba(212,165,116,0.15); color: #b8894a; }
+    .time-past { background: rgba(150,150,150,0.1); color: #999; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .section-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--brand-700); margin-bottom: 1rem; }
+    @media (max-width: 768px) { .main-content { padding: 72px 1rem 1rem; } .page-header h1 { font-size: 1.4rem; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>My Meetings</h1>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Upcoming Meetings</h3>
+            </div>
+            <div class="card-body">
+                {% if upcoming_meetings %}
+                {% for meeting in upcoming_meetings %}
+                <div class="meeting-item">
+                    <div>
+                        <div class="meeting-title">{{ meeting.title }}</div>
+                        <div class="meeting-meta">
+                            <span>📚 {{ meeting.course.title }}</span>
+                            <span>👩‍🏫 {{ meeting.teacher.get_full_name }}</span>
+                            <span>📅 {{ meeting.scheduled_at|date:"M d, Y — h:i A" }}</span>
+                            <span>⏱ {{ meeting.duration_minutes }}min</span>
+                            <span class="meeting-badge badge-{{ meeting.meeting_type }}">{{ meeting.get_meeting_type_display }}</span>
+                        </div>
+                        {% if meeting.description %}
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">{{ meeting.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span class="time-badge time-upcoming">{{ meeting.time_until }}</span>
+                        <a href="{{ meeting.meet_link }}" target="_blank" class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 0.8rem;">🔗 Join</a>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="empty-msg">No upcoming meetings.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if past_meetings %}
+        <div class="card">
+            <div class="card-header">
+                <h3>Past Meetings</h3>
+            </div>
+            <div class="card-body">
+                {% for meeting in past_meetings %}
+                <div class="meeting-item" style="opacity: 0.7;">
+                    <div>
+                        <div class="meeting-title">{{ meeting.title }}</div>
+                        <div class="meeting-meta">
+                            <span>📚 {{ meeting.course.title }}</span>
+                            <span>👩‍🏫 {{ meeting.teacher.get_full_name }}</span>
+                            <span>📅 {{ meeting.scheduled_at|date:"M d, Y — h:i A" }}</span>
+                        </div>
+                    </div>
+                    <span class="time-badge time-past">Past</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

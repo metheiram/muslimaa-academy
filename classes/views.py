@@ -90,3 +90,114 @@ def manage_schedule(request):
         'all_schedules': all_schedules,
     }
     return render(request, 'classes/manage_schedule.html', context)
+
+
+# ─── Meetings ────────────────────────────────────────────────────────────
+
+@login_required
+def teacher_meetings(request):
+    """Teacher creates/manages meetings."""
+    from classes.models import Meeting
+    from courses.models import Course
+    from courses.enrollment_models import Enrollment
+
+    user = request.user
+    if not user.is_staff and not user.is_superuser:
+        return redirect('classes:student_meetings')
+
+    if user.is_superuser:
+        courses = Course.objects.filter(is_active=True)
+    else:
+        courses = Course.objects.filter(instructor=user, is_active=True)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'create':
+            title = request.POST.get('title', '').strip()
+            description = request.POST.get('description', '').strip()
+            course_id = request.POST.get('course_id')
+            meeting_type = request.POST.get('meeting_type', 'live')
+            meet_link = request.POST.get('meet_link', '').strip()
+            scheduled_at = request.POST.get('scheduled_at')
+            duration = request.POST.get('duration_minutes', 60)
+
+            if title and course_id and meet_link and scheduled_at:
+                course = Course.objects.get(id=course_id)
+                meeting = Meeting.objects.create(
+                    title=title,
+                    description=description,
+                    course=course,
+                    teacher=user,
+                    meeting_type=meeting_type,
+                    meet_link=meet_link,
+                    scheduled_at=scheduled_at,
+                    duration_minutes=int(duration),
+                )
+                # Auto-add enrolled students
+                enrolled = Enrollment.objects.filter(course=course, status='approved').values_list('student_id', flat=True)
+                meeting.students.set(enrolled)
+
+                # Email students
+                from core.utils import send_email_notification
+                for sid in enrolled:
+                    try:
+                        student = User.objects.get(id=sid)
+                        msg = (
+                            f"Assalam-o-Alaikum {student.first_name},\n\n"
+                            f"A new {meeting.get_meeting_type_display()} has been scheduled:\n\n"
+                            f"📚 Course: {course.title}\n"
+                            f"📌 Title: {title}\n"
+                            f"📅 Date: {meeting.scheduled_at.strftime('%B %d, %Y at %I:%M %p')}\n"
+                            f"⏱ Duration: {duration} minutes\n"
+                            f"🔗 Join Link: {meet_link}\n\n"
+                            f"JazakAllah Khair!\n"
+                            f"Muslimaa Academy Team"
+                        )
+                        send_email_notification(
+                            f"New Meeting: {title} | {course.title}",
+                            msg,
+                            student.email,
+                        )
+                    except User.DoesNotExist:
+                        pass
+
+                messages.success(request, f'Meeting "{title}" created and students notified!')
+            else:
+                messages.error(request, 'All fields are required.')
+            return redirect('classes:teacher_meetings')
+
+        elif action == 'delete':
+            meeting_id = request.POST.get('meeting_id')
+            Meeting.objects.filter(id=meeting_id).delete()
+            messages.success(request, 'Meeting deleted.')
+            return redirect('classes:teacher_meetings')
+
+    meetings = Meeting.objects.filter(teacher=user).select_related('course').prefetch_related('students')
+
+    context = {
+        'courses': courses,
+        'meetings': meetings,
+    }
+    return render(request, 'classes/teacher_meetings.html', context)
+
+
+@login_required
+def student_meetings(request):
+    """Student sees upcoming meetings for enrolled courses."""
+    from classes.models import Meeting
+    from courses.enrollment_models import Enrollment
+
+    user = request.user
+    enrolled_courses = Enrollment.objects.filter(student=user, status='approved').values_list('course_id', flat=True)
+    meetings = Meeting.objects.filter(course_id__in=enrolled_courses).select_related('course', 'teacher').order_by('-scheduled_at')
+
+    upcoming = meetings.filter(status='upcoming')
+    past = meetings.exclude(status='upcoming')
+
+    context = {
+        'upcoming_meetings': upcoming,
+        'past_meetings': past,
+        'active_page': 'meetings',
+    }
+    return render(request, 'classes/student_meetings.html', context)

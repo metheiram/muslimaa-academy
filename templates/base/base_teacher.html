@@ -68,6 +68,9 @@
             <div class="section-label">Academics</div>
             <li><a href="{% url 'attendance:attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}"><span class="icon">✅</span> Attendance</a></li>
             <li><a href="{% url 'classes:schedule' %}" class="{% if active_page == 'schedule' %}active{% endif %}"><span class="icon">📅</span> Schedule</a></li>
+            <li><a href="{% url 'classes:teacher_meetings' %}" class="{% if active_page == 'meetings' %}active{% endif %}"><span class="icon">🎥</span> Meetings</a></li>
+            <li><a href="{% url 'homework:teacher_homework' %}" class="{% if active_page == 'homework' %}active{% endif %}"><span class="icon">📝</span> Homework</a></li>
+            <li><a href="{% url 'messaging:inbox' %}" class="{% if active_page == 'messages' %}active{% endif %}"><span class="icon">✉️</span> Messages</a></li>
             <div class="section-label">Account</div>
             <li><a href="{% url 'accounts:edit_profile' %}" class="{% if active_page == 'profile' %}active{% endif %}"><span class="icon">👤</span> My Profile</a></li>
         </ul>

@@ -1,0 +1,167 @@
+{% extends 'base/base_teacher.html' %}
+{% load static %}
+
+{% block title %}Meetings | Muslimaa Academy Teacher{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root { --brand-700: #471820; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; padding: 2rem; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800, #3d1319); }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: all 0.3s; }
+    .btn-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-danger:hover { background: #dc3545; color: #fff; }
+    .btn-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-success:hover { background: #228b22; color: #fff; }
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); margin-bottom: 1.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
+    .meeting-item { padding: 1rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .meeting-item:last-child { border-bottom: none; }
+    .meeting-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+    .meeting-title { font-size: 0.95rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .meeting-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.25rem; }
+    .meeting-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-live { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-doubt { background: rgba(0,123,255,0.1); color: #007bff; }
+    .badge-exam { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .badge-recording { background: rgba(123,44,191,0.1); color: #7b2cbf; }
+    .student-avatars { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .student-tag { background: rgba(71,24,32,0.06); padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; color: var(--text-secondary); }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .alert-error { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { font-family: var(--font-serif); color: var(--brand-700); margin-bottom: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.3rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid rgba(71,24,32,0.2); border-radius: 8px; font-size: 0.85rem; font-family: var(--font-sans); }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    .form-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+    @media (max-width: 768px) { .main-content { padding: 72px 1rem 1rem; } .page-header h1 { font-size: 1.4rem; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Meetings</h1>
+            <button class="btn btn-primary" onclick="document.getElementById('createModal').classList.add('active')">+ New Meeting</button>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h3>My Meetings</h3>
+                <span style="font-size:0.78rem; color: var(--text-muted);">{{ meetings.count }} total</span>
+            </div>
+            <div class="card-body">
+                {% if meetings %}
+                {% for meeting in meetings %}
+                <div class="meeting-item">
+                    <div class="meeting-header">
+                        <div>
+                            <div class="meeting-title">{{ meeting.title }}</div>
+                            <div class="meeting-meta">
+                                <span>📚 {{ meeting.course.title }}</span>
+                                <span>📅 {{ meeting.scheduled_at|date:"M d, Y — h:i A" }}</span>
+                                <span>⏱ {{ meeting.duration_minutes }}min</span>
+                                <span class="meeting-badge badge-{{ meeting.meeting_type }}">{{ meeting.get_meeting_type_display }}</span>
+                            </div>
+                            {% if meeting.description %}
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">{{ meeting.description }}</p>
+                            {% endif %}
+                            <div class="student-avatars">
+                                <span class="student-tag">👥 {{ meeting.students.count }} student{{ meeting.students.count|pluralize }}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="{{ meeting.meet_link }}" target="_blank" class="btn-sm btn-success">🔗 Join</a>
+                            <form method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="meeting_id" value="{{ meeting.id }}">
+                                <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Delete this meeting?')">✕</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="empty-msg">No meetings created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Create Meeting Modal -->
+<div class="modal-overlay" id="createModal">
+    <div class="modal">
+        <h3>Create Meeting</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" name="title" required placeholder="e.g. Tajweed Lesson 5">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" placeholder="What will be covered..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Course *</label>
+                <select name="course_id" required>
+                    <option value="">Select course</option>
+                    {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select name="meeting_type">
+                    <option value="live">Live Class</option>
+                    <option value="doubt">Doubt Session</option>
+                    <option value="exam">Exam</option>
+                    <option value="recording">Recording Shared</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Meeting Link (Google Meet / Zoom) *</label>
+                <input type="url" name="meet_link" required placeholder="https://meet.google.com/... or https://zoom.us/...">
+            </div>
+            <div class="form-group">
+                <label>Date & Time *</label>
+                <input type="datetime-local" name="scheduled_at" required>
+            </div>
+            <div class="form-group">
+                <label>Duration (minutes)</label>
+                <input type="number" name="duration_minutes" value="60" min="15" max="300">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn" style="background: rgba(71,24,32,0.06);" onclick="document.getElementById('createModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Meeting</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

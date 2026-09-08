@@ -363,8 +363,20 @@ def admin_enrollments(request):
             messages.warning(request, f'Enrollment for {enrollment.student.get_full_name()} rejected.')
             return redirect('dashboard:admin_enrollments')
 
+        elif action == 'assign_teacher':
+            teacher_id = request.POST.get('teacher_id')
+            if teacher_id:
+                from django.contrib.auth.models import User
+                teacher = get_object_or_404(User, id=teacher_id)
+                enrollment.teacher = teacher
+                enrollment.save()
+                messages.success(request, f'Teacher {teacher.get_full_name()} assigned to {enrollment.student.get_full_name()} for {enrollment.course.title}.')
+            else:
+                messages.error(request, 'Please select a teacher.')
+            return redirect('dashboard:admin_enrollments')
+
     pending = Enrollment.objects.filter(status='pending').select_related('student', 'course')
-    approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
+    approved = Enrollment.objects.filter(status='approved').select_related('student', 'course', 'teacher')
     rejected = Enrollment.objects.filter(status='rejected').select_related('student', 'course')
 
     # Build WhatsApp URLs for all approved enrollments
@@ -375,6 +387,9 @@ def admin_enrollments(request):
         wurl = build_whatsapp_url(phone, msg)
         approved_with_whatsapp.append({'enrollment': enr, 'whatsapp_url': wurl})
 
+    from django.contrib.auth.models import User
+    teachers = User.objects.filter(is_staff=True, is_superuser=False, is_active=True)
+
     context = {
         'active_tab': 'enrollments',
         'pending_enrollments': pending,
@@ -382,6 +397,7 @@ def admin_enrollments(request):
         'approved_with_whatsapp': approved_with_whatsapp,
         'rejected_enrollments': rejected,
         'whatsapp_url': whatsapp_url,
+        'teachers': teachers,
     }
     return render(request, 'dashboard/enrollments.html', context)
 

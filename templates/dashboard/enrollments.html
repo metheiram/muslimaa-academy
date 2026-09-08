@@ -163,25 +163,46 @@
             <div class="card">
                 <div class="card-header">
                     <h3>Approved Enrollments</h3>
-                    <span style="font-size:0.78rem; color: var(--text-muted);">WhatsApp receipt available for each student</span>
+                    <span style="font-size:0.78rem; color: var(--text-muted);">Assign teacher & send WhatsApp receipt</span>
                 </div>
                 <div class="card-body">
                     {% if approved_with_whatsapp %}
                     <div class="enroll-list">
                         {% for item in approved_with_whatsapp %}
-                        <div class="enroll-item">
-                            <div class="enroll-info">
-                                <h4>{{ item.enrollment.student.get_full_name }} → {{ item.enrollment.course.title }}</h4>
-                                <p>Approved {{ item.enrollment.approved_at|date:"M d, Y" }} · {{ item.enrollment.student.email }}</p>
+                        <div class="enroll-item" style="flex-direction: column; align-items: flex-start; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 0.5rem;">
+                                <div class="enroll-info">
+                                    <h4>{{ item.enrollment.student.get_full_name }} → {{ item.enrollment.course.title }}</h4>
+                                    <p>Approved {{ item.enrollment.approved_at|date:"M d, Y" }} · {{ item.enrollment.student.email }}</p>
+                                    {% if item.enrollment.teacher %}
+                                    <p style="color: #228b22; font-weight: 600;">👩‍🏫 Assigned: {{ item.enrollment.teacher.get_full_name }}</p>
+                                    {% else %}
+                                    <p style="color: #e67e00; font-weight: 600;">⚠ No teacher assigned</p>
+                                    {% endif %}
+                                </div>
+                                <div class="enroll-actions" style="flex-wrap: wrap;">
+                                    <span class="status-badge status-approved">Approved</span>
+                                    {% if item.whatsapp_url %}
+                                    <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp" title="Send receipt on WhatsApp">📱 WhatsApp</a>
+                                    {% else %}
+                                    <span class="btn-sm btn-no-phone" title="No phone number on file">📱 No Phone</span>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="enroll-actions">
-                                <span class="status-badge status-approved">Approved</span>
-                                {% if item.whatsapp_url %}
-                                <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp" title="Send receipt on WhatsApp">📱 WhatsApp</a>
-                                {% else %}
-                                <span class="btn-sm btn-no-phone" title="No phone number on file">📱 No Phone</span>
-                                {% endif %}
-                            </div>
+                            <form method="POST" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                                {% csrf_token %}
+                                <input type="hidden" name="enrollment_id" value="{{ item.enrollment.id }}">
+                                <input type="hidden" name="action" value="assign_teacher">
+                                <select name="teacher_id" required style="padding: 0.4rem 0.6rem; border: 1px solid rgba(71,24,32,0.2); border-radius: 6px; font-size: 0.8rem; background: #fff; color: #2d0d0f; min-width: 180px;">
+                                    <option value="">Select Teacher</option>
+                                    {% for teacher in teachers %}
+                                    <option value="{{ teacher.id }}" {% if item.enrollment.teacher and item.enrollment.teacher.id == teacher.id %}selected{% endif %}>
+                                        {{ teacher.get_full_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn-sm btn-approve">Assign</button>
+                            </form>
                         </div>
                         {% endfor %}
                     </div>
