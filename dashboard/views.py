@@ -109,6 +109,7 @@ def admin_dashboard(request):
     from courses.enrollment_models import Enrollment
     from workshops.models import Workshop
     from content.models import ContactMessage
+    from payments.models import Payment
 
     today = timezone.now().date()
 
@@ -119,6 +120,28 @@ def admin_dashboard(request):
     pending_enrollments = Enrollment.objects.filter(status='pending').count()
     recent_messages = ContactMessage.objects.all().order_by('-created_at')[:5]
 
+    # Chart data — last 6 months
+    chart_labels = []
+    chart_revenue = []
+    chart_enrollments = []
+    for i in range(5, -1, -1):
+        month_date = today - timedelta(days=30 * i)
+        month_label = month_date.strftime('%b %Y')
+        chart_labels.append(month_label)
+        revenue = Payment.objects.filter(
+            status='paid',
+            created_at__month=month_date.month,
+            created_at__year=month_date.year
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        chart_revenue.append(float(revenue))
+        enroll_count = Enrollment.objects.filter(
+            enrolled_at__month=month_date.month,
+            enrolled_at__year=month_date.year
+        ).count()
+        chart_enrollments.append(enroll_count)
+
+    total_revenue = Payment.objects.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
+
     context = {
         'total_students': total_students,
         'total_courses': total_courses,
@@ -126,6 +149,10 @@ def admin_dashboard(request):
         'pending_messages': pending_messages,
         'pending_enrollments': pending_enrollments,
         'recent_messages': recent_messages,
+        'total_revenue': total_revenue,
+        'chart_labels': chart_labels,
+        'chart_revenue': chart_revenue,
+        'chart_enrollments': chart_enrollments,
     }
     return render(request, 'dashboard/admin.html', context)
 
@@ -457,6 +484,20 @@ def admin_fees(request):
     total_pending = approved.count() - payments.count()
     total_free = payments.filter(status='free').count()
 
+    from django.utils import timezone
+    from datetime import timedelta
+    now = timezone.now()
+    this_month = payments.filter(status='paid', created_at__month=now.month, created_at__year=now.year)
+    this_month_collected = this_month.aggregate(total=Sum('amount'))['total'] or 0
+    this_month_count = this_month.count()
+
+    unpaid_enrollments = []
+    for enr in approved:
+        has_payment = payments.filter(enrollment=enr).exists()
+        if not has_payment:
+            days_pending = (now.date() - enr.approved_at.date()).days if enr.approved_at else 0
+            unpaid_enrollments.append({'enrollment': enr, 'days_pending': days_pending})
+
     # Build WhatsApp URLs for each approved enrollment
     approved_with_whatsapp = []
     for enr in approved:
@@ -478,6 +519,9 @@ def admin_fees(request):
         'total_collected': total_collected,
         'total_pending': total_pending,
         'total_free': total_free,
+        'this_month_collected': this_month_collected,
+        'this_month_count': this_month_count,
+        'unpaid_enrollments': unpaid_enrollments,
     }
     return render(request, 'dashboard/fees.html', context)
 

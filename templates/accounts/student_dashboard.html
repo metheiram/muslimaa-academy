@@ -67,14 +67,14 @@
         <div class="stat-label">Pending Approvals</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-number">0</div>
-        <div class="stat-label">Completed</div>
-    </div>
-    <div class="stat-card">
         <div class="stat-icon">💰</div>
         <div class="stat-number">Rs. {{ total_paid|floatformat:0 }}</div>
         <div class="stat-label">Total Paid</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-number">Rs. {{ total_pending_payment|floatformat:0 }}</div>
+        <div class="stat-label">Pending Payment</div>
     </div>
 </div>
 

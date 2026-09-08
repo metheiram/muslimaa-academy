@@ -14,9 +14,12 @@
     .day-body { padding: 0.75rem; }
     .class-slot { background: rgba(71,24,32,0.04); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold); }
     .class-slot h4 { font-size: 0.82rem; color: var(--brand-700); margin-bottom: 0.25rem; }
-    .class-slot p { font-size: 0.72rem; color: var(--text-muted); }
+    .class-slot p { font-size: 0.72rem; color: var(--text-muted); margin: 0.1rem 0; }
     .class-slot .time { font-weight: 700; color: var(--text-secondary); font-size: 0.78rem; }
+    .class-slot .teacher-name { color: var(--accent-gold); font-weight: 600; }
+    .class-slot .room { font-size: 0.7rem; }
     .empty-day { text-align: center; padding: 2rem 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
+
     @media (max-width: 1024px) { .week-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 768px) { .week-grid { grid-template-columns: 1fr; } }
 </style>
@@ -24,21 +27,21 @@
 
 {% block teacher_content %}
 <div class="page-header">
-    <h1>📅 Class Schedule</h1>
+    <h1>Class Schedule</h1>
     <p>Your weekly class timetable</p>
 </div>
 
 <div class="week-grid">
-    {% for day in days %}
+    {% for day_name, day_schedules in schedule_items %}
     <div class="day-col">
-        <div class="day-header">{{ day|title }}</div>
+        <div class="day-header">{{ day_name|title }}</div>
         <div class="day-body">
-            {% for s in schedule_by_day.day %}
+            {% for s in day_schedules %}
             <div class="class-slot">
                 <h4>{{ s.course.title }}</h4>
                 <p class="time">{{ s.start_time|time:"g:i A" }} - {{ s.end_time|time:"g:i A" }}</p>
-                <p>{{ s.teacher.get_full_name }}</p>
-                {% if s.room %}<p>📍 {{ s.room }}</p>{% endif %}
+                <p class="teacher-name">{{ s.teacher.get_full_name }}</p>
+                {% if s.room %}<p class="room">Room: {{ s.room }}</p>{% endif %}
             </div>
             {% empty %}
             <div class="empty-day">No classes</div>

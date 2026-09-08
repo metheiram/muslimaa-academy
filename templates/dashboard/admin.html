@@ -357,6 +357,14 @@
 
     .animate-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
     .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    .chart-card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); padding: 1.5rem; }
+    .chart-card h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); margin-bottom: 1rem; }
+    .chart-card canvas { max-height: 250px; }
+    .revenue-total { font-size: 1.5rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; }
+
+    @media (max-width: 768px) { .charts-row { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
@@ -451,6 +459,19 @@
             </div>
         </div>
 
+        <!-- CHARTS -->
+        <div class="charts-row animate-on-scroll">
+            <div class="chart-card">
+                <h3>Revenue (Last 6 Months)</h3>
+                <div class="revenue-total">Rs. {{ total_revenue|floatformat:0 }}</div>
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Enrollments (Last 6 Months)</h3>
+                <canvas id="enrollmentChart"></canvas>
+            </div>
+        </div>
+
         <!-- CONTENT -->
         <div class="content-grid">
             <!-- Recent Messages -->
@@ -529,6 +550,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
@@ -541,6 +563,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, { threshold: 0.1 });
     document.querySelectorAll('.animate-on-scroll').forEach(function(el) { observer.observe(el); });
+
+    var labels = {{ chart_labels|safe }};
+    var revenue = {{ chart_revenue|safe }};
+    var enrollments = {{ chart_enrollments|safe }};
+
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Revenue (Rs.)',
+                data: revenue,
+                backgroundColor: 'rgba(212,165,116,0.6)',
+                borderColor: '#d4a574',
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return 'Rs.' + v; } } } }
+        }
+    });
+
+    new Chart(document.getElementById('enrollmentChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Enrollments',
+                data: enrollments,
+                borderColor: '#471820',
+                backgroundColor: 'rgba(71,24,32,0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#471820'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
 });
 </script>
 {% endblock %}

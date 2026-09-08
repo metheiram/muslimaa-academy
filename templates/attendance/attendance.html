@@ -8,29 +8,52 @@
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
     .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
-    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
     .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
     .card-body { padding: 1.25rem 1.5rem; }
-    .filter-row { display: flex; gap: 1rem; align-items: end; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .filter-row { display: flex; gap: 1rem; align-items: end; flex-wrap: wrap; }
     .filter-row label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.3rem; }
-    .filter-row select, .filter-row input { padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem; font-family: var(--font-sans); background: #fff; }
-    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .filter-row select, .filter-row input { padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem; font-family: var(--font-sans); background: #fff; min-width: 0; }
+    .filter-row select { min-width: 180px; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; white-space: nowrap; }
     .btn-primary { background: var(--brand-700); color: #fff; }
     .btn-primary:hover { background: var(--brand-800); }
     .btn-success { background: #228b22; color: #fff; }
     .btn-success:hover { background: #1a6b1a; }
-    .attendance-table { width: 100%; border-collapse: collapse; }
-    .attendance-table th { text-align: left; padding: 0.75rem 0; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid rgba(71,24,32,0.06); }
-    .attendance-table td { padding: 0.85rem 0; font-size: 0.88rem; color: var(--text-secondary); border-bottom: 1px solid rgba(71,24,32,0.04); }
-    .status-select { padding: 0.4rem 0.8rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); }
+    .btn-outline { background: transparent; border: 1.5px solid rgba(71,24,32,0.2); color: var(--brand-700); }
+    .btn-outline:hover { background: rgba(71,24,32,0.05); }
+    .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.78rem; }
+    .att-list { list-style: none; padding: 0; margin: 0; }
+    .att-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .att-item:last-child { border-bottom: none; }
+    .att-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-gold), #c4956a); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .att-info { flex: 1; min-width: 0; }
+    .att-name { font-weight: 600; font-size: 0.9rem; color: var(--text-primary); }
+    .att-email { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .att-controls { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+    .status-select { padding: 0.4rem 0.7rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); background: #fff; }
+    .notes-input { padding: 0.4rem 0.7rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); width: 120px; }
     .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
     .alert-box { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
+    .att-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(71,24,32,0.06); }
+
+    @media (max-width: 768px) {
+        .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        .filter-row { flex-direction: column; }
+        .filter-row select, .filter-row input { width: 100%; min-width: 0; }
+        .card-header { flex-direction: column; align-items: flex-start; }
+        .att-item { flex-wrap: wrap; }
+        .att-controls { width: 100%; flex-wrap: wrap; }
+        .notes-input { width: 100%; }
+        .att-actions { flex-direction: column; }
+        .att-actions .btn { width: 100%; justify-content: center; }
+    }
 </style>
 {% endblock %}
 
 {% block teacher_content %}
 <div class="page-header">
-    <h1>📝 Mark Attendance</h1>
+    <h1>Mark Attendance</h1>
 </div>
 
 {% if messages %}
@@ -43,71 +66,77 @@
     <div class="card-body">
         <form method="GET" action="{% url 'attendance:attendance' %}">
             <div class="filter-row">
-                <div>
+                <div style="flex:1; min-width:200px;">
                     <label>Course</label>
-                    <select name="course" required>
+                    <select name="course" required style="width:100%;">
                         <option value="">Select Course</option>
                         {% for course in courses %}
                         <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div>
+                <div style="flex:0.6; min-width:160px;">
                     <label>Date</label>
-                    <input type="date" name="date" value="{{ selected_date }}">
+                    <input type="date" name="date" value="{{ selected_date }}" style="width:100%;">
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary">🔍 Load Students</button>
+                    <button type="submit" class="btn btn-primary">Load Students</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-{% if students %}
+{% if students_with_status %}
 <div class="card">
     <div class="card-header">
-        <h3>Students — {{ selected_date }}</h3>
+        <h3>{{ students_with_status|length }} Students — {{ selected_date }}</h3>
     </div>
     <div class="card-body">
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="course_id" value="{{ selected_course }}">
             <input type="hidden" name="date" value="{{ selected_date }}">
-            <table class="attendance-table">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td><strong>{{ student.get_full_name }}</strong></td>
-                        <td>{{ student.email }}</td>
-                        <td>
-                            <select name="status_{{ student.id }}" class="status-select">
-                                <option value="present" {% if existing_attendance.0 == 'present' %}selected{% endif %}>✅ Present</option>
-                                <option value="absent" {% if existing_attendance.0 == 'absent' %}selected{% endif %}>❌ Absent</option>
-                                <option value="late" {% if existing_attendance.0 == 'late' %}selected{% endif %}>⏰ Late</option>
-                                <option value="excused" {% if existing_attendance.0 == 'excused' %}selected{% endif %}>📋 Excused</option>
-                            </select>
-                            <input type="hidden" name="student_ids" value="{{ student.id }}">
-                        </td>
-                        <td><input type="text" name="notes_{{ student.id }}" placeholder="Optional note" style="padding:0.4rem 0.8rem; border:1px solid rgba(71,24,32,0.15); border-radius:6px; font-size:0.82rem; width:150px;"></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div style="margin-top: 1.5rem;">
-                <button type="submit" class="btn btn-success">✅ Save Attendance</button>
+
+            <ul class="att-list">
+                {% for item in students_with_status %}
+                <li class="att-item">
+                    <div class="att-avatar">{{ item.student.first_name|first|upper }}{{ item.student.last_name|first|upper }}</div>
+                    <div class="att-info">
+                        <div class="att-name">{{ item.student.get_full_name }}</div>
+                        <div class="att-email">{{ item.student.email }}</div>
+                    </div>
+                    <div class="att-controls">
+                        <select name="status_{{ item.student.id }}" class="status-select">
+                            <option value="present" {% if item.existing_status == 'present' %}selected{% endif %}>Present</option>
+                            <option value="absent" {% if item.existing_status == 'absent' %}selected{% endif %}>Absent</option>
+                            <option value="late" {% if item.existing_status == 'late' %}selected{% endif %}>Late</option>
+                            <option value="excused" {% if item.existing_status == 'excused' %}selected{% endif %}>Excused</option>
+                        </select>
+                        <input type="text" name="notes_{{ item.student.id }}" placeholder="Note" class="notes-input">
+                        <input type="hidden" name="student_ids" value="{{ item.student.id }}">
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <div class="att-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('present')">Mark All Present</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('absent')">Mark All Absent</button>
+                <button type="submit" class="btn btn-success">Save Attendance</button>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+function markAll(status) {
+    document.querySelectorAll('.status-select').forEach(function(sel) {
+        sel.value = status;
+    });
+}
+</script>
+
 {% elif selected_course %}
 <div class="card">
     <div class="card-body">

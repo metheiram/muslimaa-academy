@@ -8,36 +8,90 @@
     .page-header { text-align: center; margin-bottom: 2rem; }
     .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; color: var(--brand-700); }
     .page-header p { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; }
-    .enroll-card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 10px rgba(71,24,32,0.04); padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s; }
+    .enroll-card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 10px rgba(71,24,32,0.04); padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s; }
     .enroll-card:hover { transform: translateY(-2px); }
-    .enroll-info h3 { font-family: var(--font-serif); font-size: 1.1rem; color: var(--brand-700); margin-bottom: 0.5rem; }
+    .enroll-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
+    .enroll-info h3 { font-family: var(--font-serif); font-size: 1.1rem; color: var(--brand-700); margin-bottom: 0.25rem; }
     .enroll-info p { font-size: 0.8rem; color: var(--text-muted); }
+    .enroll-meta { display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap; }
+    .enroll-meta span { font-size: 0.75rem; color: var(--text-muted); background: rgba(71,24,32,0.04); padding: 0.2rem 0.6rem; border-radius: 20px; }
     .status-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: capitalize; }
     .status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
     .status-approved { background: rgba(34,139,34,0.1); color: #228b22; }
     .status-rejected { background: rgba(220,53,69,0.1); color: #dc3545; }
-    .btn { display: inline-flex; align-items: center; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
     .btn-primary { background: var(--brand-700); color: #ffffff; }
     .btn-primary:hover { background: var(--brand-800); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 2px solid var(--brand-700); }
+    .btn-outline:hover { background: var(--brand-700); color: #fff; }
+    .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.78rem; }
+    .btn-upload { background: rgba(212,165,116,0.15); color: var(--brand-700); border: 1px solid rgba(212,165,116,0.3); }
+    .btn-upload:hover { background: var(--accent-gold); color: #fff; }
     .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
     .empty-state p { margin-bottom: 1rem; }
+
+    .screenshot-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(71,24,32,0.06); }
+    .screenshot-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; }
+    .screenshot-upload { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .screenshot-upload input[type="file"] { font-size: 0.82rem; }
+    .screenshot-preview { margin-top: 0.5rem; }
+    .screenshot-preview img { max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid rgba(71,24,32,0.1); }
+    .screenshot-done { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: #228b22; font-weight: 600; }
+
+    @media (max-width: 768px) {
+        .enroll-top { flex-direction: column; align-items: flex-start; }
+        .screenshot-upload { flex-direction: column; align-items: flex-start; }
+    }
 </style>
 {% endblock %}
 
 {% block student_content %}
 <div class="page-header">
-    <h1>📚 My Enrollments</h1>
-    <p>Track your enrollment status</p>
+    <h1>My Enrollments</h1>
+    <p>Track your enrollment status and upload payment screenshots</p>
 </div>
+
+{% if messages %}
+{% for message in messages %}
+<div style="padding:1rem 1.25rem; border-radius:10px; margin-bottom:1rem; font-size:0.9rem; font-weight:600; border-left:4px solid; {% if message.tags == 'success' %}background:rgba(212,165,116,0.12); color:#471820; border-color:#d4a574;{% elif message.tags == 'error' %}background:rgba(220,20,60,0.1); color:#dc143c; border-color:#dc143c;{% else %}background:rgba(255,165,0,0.1); color:#e67e00; border-color:#e67e00;{% endif %}">{{ message }}</div>
+{% endfor %}
+{% endif %}
 
 {% if enrollments %}
 {% for enrollment in enrollments %}
 <div class="enroll-card">
-    <div class="enroll-info">
-        <h3>{{ enrollment.course.title }}</h3>
-        <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }} · {{ enrollment.course.level|title }}</p>
+    <div class="enroll-top">
+        <div class="enroll-info">
+            <h3>{{ enrollment.course.title }}</h3>
+            <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+            <div class="enroll-meta">
+                <span>{{ enrollment.course.get_category_display }}</span>
+                <span>{{ enrollment.course.get_level_display }}</span>
+                {% if enrollment.course.price %}<span>Rs. {{ enrollment.course.price|floatformat:0 }}</span>{% endif %}
+            </div>
+        </div>
+        <span class="status-badge status-{{ enrollment.status }}">{{ enrollment.status }}</span>
     </div>
-    <span class="status-badge status-{{ enrollment.status }}">{{ enrollment.status }}</span>
+
+    {% if enrollment.status == 'approved' and enrollment.course.price %}
+    <div class="screenshot-section">
+        {% if enrollment.payment_screenshot %}
+            <div class="screenshot-done">
+                <span>Payment screenshot uploaded</span>
+            </div>
+            <div class="screenshot-preview">
+                <img src="{{ enrollment.payment_screenshot.url }}" alt="Payment Screenshot">
+            </div>
+        {% else %}
+            <div class="screenshot-label">Upload Payment Screenshot</div>
+            <form method="POST" action="{% url 'courses:upload_screenshot' enrollment.id %}" enctype="multipart/form-data" class="screenshot-upload">
+                {% csrf_token %}
+                <input type="file" name="payment_screenshot" accept="image/*" required>
+                <button type="submit" class="btn btn-upload btn-sm">Upload</button>
+            </form>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endfor %}
 {% else %}

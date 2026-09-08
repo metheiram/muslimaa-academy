@@ -30,10 +30,20 @@
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
 
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
     .stat-card { background: #ffffff; border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); }
     .stat-card h3 { font-size: 1.8rem; font-weight: 800; color: var(--brand-700); margin-bottom: 0.25rem; }
     .stat-card p { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+    .stat-card.accent h3 { color: var(--accent-gold); }
+    .stat-card.danger h3 { color: #dc143c; }
+
+    .overdue-list { list-style: none; padding: 0; margin: 0; }
+    .overdue-item { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .overdue-item:last-child { border-bottom: none; }
+    .overdue-info { flex: 1; }
+    .overdue-name { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
+    .overdue-course { font-size: 0.78rem; color: var(--text-muted); }
+    .overdue-days { background: rgba(220,20,60,0.1); color: #dc143c; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
 
     .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
     .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
@@ -102,8 +112,8 @@
     .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--brand-700); }
     .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: flex-end; gap: 0.75rem; }
 
-    @media (max-width: 768px) { .mobile-header { display: flex; } .sidebar { transform: translateX(-100%); z-index: 200; } .sidebar.open { transform: translateX(0); } .overlay.active { display: block; } .main-content { margin-left: 0; padding: 72px 1rem 1rem; } .stats-row { grid-template-columns: 1fr; } }
-    @media (max-width: 480px) { .main-content { padding: 68px 0.75rem 0.75rem; } }
+    @media (max-width: 768px) { .mobile-header { display: flex; } .sidebar { transform: translateX(-100%); z-index: 200; } .sidebar.open { transform: translateX(0); } .overlay.active { display: block; } .main-content { margin-left: 0; padding: 72px 1rem 1rem; } .stats-row { grid-template-columns: repeat(2, 1fr); } .data-table { display: block; overflow-x: auto; } .card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; } .overdue-item { flex-wrap: wrap; } }
+    @media (max-width: 480px) { .main-content { padding: 68px 0.75rem 0.75rem; } .stats-row { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
@@ -150,7 +160,11 @@
                 <h3>Rs. {{ total_collected|floatformat:0 }}</h3>
                 <p>Total Collected</p>
             </div>
-            <div class="stat-card">
+            <div class="stat-card accent">
+                <h3>Rs. {{ this_month_collected|floatformat:0 }}</h3>
+                <p>This Month ({{ this_month_count }} payments)</p>
+            </div>
+            <div class="stat-card danger">
                 <h3>{{ total_pending }}</h3>
                 <p>Pending Payments</p>
             </div>
@@ -158,7 +172,32 @@
                 <h3>{{ total_free }}</h3>
                 <p>Free Enrollments</p>
             </div>
+            <div class="stat-card">
+                <h3>{{ approved_enrollments|length }}</h3>
+                <p>Total Enrolled</p>
+            </div>
         </div>
+
+        {% if unpaid_enrollments %}
+        <div class="card" style="margin-bottom: 1.5rem; border-left: 3px solid #dc143c;">
+            <div class="card-header">
+                <h3 style="color: #dc143c;">Pending Payments (Overdue)</h3>
+            </div>
+            <div class="card-body">
+                <ul class="overdue-list">
+                    {% for item in unpaid_enrollments %}
+                    <li class="overdue-item">
+                        <div class="overdue-info">
+                            <div class="overdue-name">{{ item.enrollment.student.get_full_name }}</div>
+                            <div class="overdue-course">{{ item.enrollment.course.title }} — Rs. {{ item.enrollment.course.price|floatformat:0 }}</div>
+                        </div>
+                        <div class="overdue-days">{{ item.days_pending }} days pending</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
 
         <div class="card" style="margin-bottom: 1.5rem;">
             <div class="card-header">
@@ -212,6 +251,7 @@
                             <th>Course</th>
                             <th>Amount</th>
                             <th>Status</th>
+                            <th>Screenshot</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -227,6 +267,13 @@
                                 {% endif %}{% empty %}
                                 <span class="status-badge status-pending">Unpaid</span>
                                 {% endfor %}
+                            </td>
+                            <td>
+                                {% if item.enrollment.payment_screenshot %}
+                                <a href="{{ item.enrollment.payment_screenshot.url }}" target="_blank" class="btn-sm btn-record" style="text-decoration:none;">View Screenshot</a>
+                                {% else %}
+                                <span style="font-size:0.78rem; color:var(--text-muted);">-</span>
+                                {% endif %}
                             </td>
                             <td>
                                 <button class="btn-sm btn-record" onclick="openPaymentModal('{{ item.enrollment.id }}', '{{ item.enrollment.student.get_full_name }}', '{{ item.enrollment.course.title }}')">Record Payment</button>

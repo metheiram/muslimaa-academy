@@ -21,13 +21,13 @@ def schedule_view(request):
     day_order = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
     schedules = Schedule.objects.filter(course__in=courses, is_active=True).select_related('course', 'teacher').order_by('day', 'start_time')
 
-    schedule_by_day = {}
+    schedule_items = []
     for day in day_order:
-        schedule_by_day[day] = schedules.filter(day=day)
+        day_schedules = list(schedules.filter(day=day))
+        schedule_items.append((day, day_schedules))
 
     context = {
-        'schedule_by_day': schedule_by_day,
-        'days': day_order,
+        'schedule_items': schedule_items,
         'active_page': 'schedule',
     }
     if user.is_staff or user.is_superuser:

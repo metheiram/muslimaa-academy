@@ -10,6 +10,7 @@ urlpatterns = [
     path('hifz/', views.hifz_detail, name='hifz'),
     path('nazra/', views.nazra_detail, name='nazra'),
     path('enrollments/', enrollment_views.my_enrollments, name='my_enrollments'),
+    path('enrollment/<int:enrollment_id>/upload-screenshot/', enrollment_views.upload_screenshot, name='upload_screenshot'),
     path('<slug:slug>/enroll/', enrollment_views.enroll_course, name='enroll_course'),
     path('<slug:slug>/', views.course_detail, name='course_detail'),
 ]

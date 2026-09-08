@@ -2,8 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.http import JsonResponse
-from django.utils import timezone
 from datetime import date, timedelta
 from .models import Attendance, Schedule
 
@@ -64,10 +62,16 @@ def attendance_view(request):
         messages.success(request, f'Attendance marked for {course.title} on {att_date}!')
         return redirect(f'/attendance/?course={course_id}&date={att_date}')
 
+    students_with_status = []
+    for s in students:
+        students_with_status.append({
+            'student': s,
+            'existing_status': existing_attendance.get(s.id, 'present'),
+        })
+
     context = {
         'courses': courses,
-        'students': students,
-        'existing_attendance': existing_attendance,
+        'students_with_status': students_with_status,
         'selected_course': selected_course,
         'selected_date': selected_date,
         'active_page': 'attendance',
@@ -95,6 +99,7 @@ def student_attendance(request):
     absent = attendances.filter(status='absent').count()
     late = attendances.filter(status='late').count()
     excused = attendances.filter(status='excused').count()
+    percentage = round((present / total * 100), 1) if total > 0 else 0
 
     context = {
         'attendances': attendances[:50],
@@ -105,6 +110,7 @@ def student_attendance(request):
         'absent': absent,
         'late': late,
         'excused': excused,
+        'percentage': percentage,
         'active_page': 'attendance',
     }
     return render(request, 'attendance/student_attendance.html', context)

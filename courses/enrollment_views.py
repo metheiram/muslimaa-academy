@@ -108,3 +108,18 @@ def my_enrollments(request):
         'enrollments': enrollments,
         'active_page': 'browse',
     })
+
+
+@login_required
+def upload_screenshot(request, enrollment_id):
+    """Upload payment screenshot for an enrollment."""
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id, student=request.user)
+
+    if request.method == 'POST' and request.FILES.get('payment_screenshot'):
+        enrollment.payment_screenshot = request.FILES['payment_screenshot']
+        enrollment.save()
+        messages.success(request, f'Payment screenshot uploaded for {enrollment.course.title}.')
+    else:
+        messages.error(request, 'Please select a screenshot to upload.')
+
+    return redirect('courses:my_enrollments')
