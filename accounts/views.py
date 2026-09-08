@@ -97,6 +97,7 @@ def student_dashboard(request):
     from payments.models import Payment
     from courses.models import Course
     from django.db.models import Sum
+    from courses.enrollment_views import build_student_whatsapp_message
 
     user = request.user
     enrollments = Enrollment.objects.filter(student=user).select_related('course', 'course__instructor')
@@ -107,9 +108,16 @@ def student_dashboard(request):
     total_paid = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
     total_pending_payment = payments.filter(status='pending').aggregate(total=Sum('amount'))['total'] or 0
 
+    # Build WhatsApp URLs for each approved enrollment
+    approved_with_wa = []
+    for enr in approved_enrollments:
+        wa_url = build_student_whatsapp_message(user, enr.course)
+        approved_with_wa.append({'enrollment': enr, 'whatsapp_url': wa_url})
+
     context = {
         'enrollments': enrollments,
         'approved_enrollments': approved_enrollments,
+        'approved_with_wa': approved_with_wa,
         'pending_enrollments': pending_enrollments,
         'payments': payments,
         'total_paid': total_paid,

@@ -30,14 +30,22 @@
     <p>Track your enrollment status</p>
 </div>
 
-{% if enrollments %}
-{% for enrollment in enrollments %}
-<div class="enroll-card">
-    <div class="enroll-info">
-        <h3>{{ enrollment.course.title }}</h3>
-        <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }} · {{ enrollment.course.level|title }}</p>
+{% if enrollments_with_wa %}
+{% for item in enrollments_with_wa %}
+<div class="enroll-card" style="flex-direction:column; align-items:flex-start; gap:0.75rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <div class="enroll-info">
+            <h3>{{ item.enrollment.course.title }}</h3>
+            <p>Applied {{ item.enrollment.enrolled_at|date:"M d, Y" }} · {{ item.enrollment.course.level|title }}</p>
+            {% if item.enrollment.course.price and item.enrollment.course.price > 0 %}
+            <p style="font-weight:700; color:#471820; margin-top:0.25rem;">Fee: Rs. {{ item.enrollment.course.price|floatformat:0 }}</p>
+            {% endif %}
+        </div>
+        <span class="status-badge status-{{ item.enrollment.status }}">{{ item.enrollment.status }}</span>
     </div>
-    <span class="status-badge status-{{ enrollment.status }}">{{ enrollment.status }}</span>
+    {% if item.enrollment.status == 'approved' and item.whatsapp_url %}
+    <a href="{{ item.whatsapp_url }}" target="_blank" style="display:inline-flex; align-items:center; gap:0.4rem; background:#25d366; color:#fff; padding:0.5rem 1rem; border-radius:8px; font-size:0.82rem; font-weight:700; text-decoration:none;">📱 Send Payment Screenshot on WhatsApp</a>
+    {% endif %}
 </div>
 {% endfor %}
 {% else %}

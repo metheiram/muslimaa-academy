@@ -85,25 +85,26 @@
             <a href="{% url 'courses:course_list' %}" class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.75rem;">Browse More</a>
         </div>
         <div class="card-body">
-            {% if approved_enrollments %}
-            {% for enrollment in approved_enrollments %}
+            {% if approved_with_wa %}
+            {% for item in approved_with_wa %}
             <div class="course-item" style="flex-direction:column; align-items:flex-start; gap:0.5rem;">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <div class="course-info">
-                        <h4>{{ enrollment.course.title }}</h4>
-                        <p>{{ enrollment.course.get_level_display }} · {{ enrollment.course.duration }}</p>
+                        <h4>{{ item.enrollment.course.title }}</h4>
+                        <p>{{ item.enrollment.course.get_level_display }} · {{ item.enrollment.course.duration }}</p>
                         <div class="course-meta">
-                            <span>📚 {{ enrollment.course.get_category_display }}</span>
-                            {% if enrollment.course.instructor %}
-                            <span>👩‍🏫 {{ enrollment.course.instructor.get_full_name }}</span>
+                            <span>📚 {{ item.enrollment.course.get_category_display }}</span>
+                            {% if item.enrollment.course.instructor %}
+                            <span>👩‍🏫 {{ item.enrollment.course.instructor.get_full_name }}</span>
                             {% endif %}
                         </div>
                     </div>
                     <span class="status-badge status-approved">Active</span>
                 </div>
-                {% if enrollment.course.price and enrollment.course.price > 0 %}
-                <div style="width:100%; background:rgba(212,165,116,0.1); border-radius:8px; padding:0.6rem 0.8rem; margin-top:0.25rem;">
-                    <span style="font-size:0.8rem; font-weight:700; color:#471820;">Fee: Rs. {{ enrollment.course.price|floatformat:0 }}</span>
+                {% if item.enrollment.course.price and item.enrollment.course.price > 0 %}
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center; background:rgba(212,165,116,0.1); border-radius:8px; padding:0.6rem 0.8rem; margin-top:0.25rem;">
+                    <span style="font-size:0.8rem; font-weight:700; color:#471820;">Fee: Rs. {{ item.enrollment.course.price|floatformat:0 }}</span>
+                    <a href="{{ item.whatsapp_url }}" target="_blank" style="display:inline-flex; align-items:center; gap:0.4rem; background:#25d366; color:#fff; padding:0.35rem 0.8rem; border-radius:6px; font-size:0.75rem; font-weight:700; text-decoration:none;">📱 Send Screenshot</a>
                 </div>
                 {% endif %}
             </div>
