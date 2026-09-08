@@ -111,11 +111,10 @@ def student_dashboard(request):
     total_paid = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
     total_pending_payment = payments.filter(status='pending').aggregate(total=Sum('amount'))['total'] or 0
 
-    # Upcoming meetings
+    # Upcoming meetings — only meetings where student is assigned
     from classes.models import Meeting
-    enrolled_course_ids = approved_enrollments.values_list('course_id', flat=True)
     upcoming_meetings = Meeting.objects.filter(
-        course_id__in=enrolled_course_ids,
+        students=user,
         status='upcoming',
         scheduled_at__gte=timezone.now()
     ).select_related('course', 'teacher').order_by('scheduled_at')[:3]

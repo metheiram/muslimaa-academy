@@ -187,13 +187,11 @@ def teacher_meetings(request):
 
 @login_required
 def student_meetings(request):
-    """Student sees upcoming meetings for enrolled courses."""
+    """Student sees upcoming meetings assigned to them."""
     from classes.models import Meeting
-    from courses.enrollment_models import Enrollment
 
     user = request.user
-    enrolled_courses = Enrollment.objects.filter(student=user, status='approved').values_list('course_id', flat=True)
-    meetings = Meeting.objects.filter(course_id__in=enrolled_courses).select_related('course', 'teacher').order_by('-scheduled_at')
+    meetings = Meeting.objects.filter(students=user).select_related('course', 'teacher').order_by('-scheduled_at')
 
     upcoming = meetings.filter(status='upcoming')
     past = meetings.exclude(status='upcoming')
