@@ -45,7 +45,7 @@ def course_detail(request, slug):
     user_enrollment = None
     if request.user.is_authenticated:
         user_rating = Rating.objects.filter(student=request.user, course=course).first()
-        user_enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+        user_enrollment = Enrollment.objects.filter(student=request.user, course=course).select_related('teacher').first()
     context = {
         'course': course,
         'ratings': ratings,
