@@ -10,41 +10,198 @@
     .dashboard-wrapper { display: flex; min-height: 100vh; }
 
     /* Sidebar */
-    .sidebar { width: 260px; background: var(--brand-700); color: #fff; padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; transition: transform 0.3s ease; }
-    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
-    .sidebar-brand h2 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; }
-    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
-    .sidebar-avatar { width: 50px; height: 50px; background: rgba(212,165,116,0.2); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 1rem; }
-    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
-    .sidebar-nav li a { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
-    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #fff; border-left-color: var(--accent-gold); }
-    .sidebar-nav .section-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
-    .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
-    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: color 0.3s ease; }
+    .sidebar {
+        width: 260px;
+        background: linear-gradient(180deg, #471820 0%, #3d1319 100%);
+        color: #fff;
+        padding: 1.5rem 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    .sidebar-brand {
+        padding: 0 1.5rem 1.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    .sidebar-avatar {
+        width: 60px;
+        height: 60px;
+        background: rgba(212,165,116,0.15);
+        border: 2px solid rgba(212,165,116,0.4);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 0.75rem;
+        box-shadow: 0 0 20px rgba(212,165,116,0.15);
+        transition: all 0.3s ease;
+    }
+    .sidebar-brand:hover .sidebar-avatar {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 25px rgba(212,165,116,0.25);
+    }
+    .sidebar-brand h2 {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+    .sidebar-brand p {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.5);
+        margin-top: 0.25rem;
+    }
+
+    /* Nav */
+    .sidebar-nav {
+        list-style: none;
+        padding: 0.5rem 0;
+        margin: 0;
+        flex: 1;
+    }
+    .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        color: rgba(255,255,255,0.65);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+        position: relative;
+    }
+    .sidebar-nav li a:hover {
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        border-left-color: rgba(212,165,116,0.5);
+    }
+    .sidebar-nav li a.active {
+        background: rgba(212,165,116,0.1);
+        color: var(--accent-gold);
+        border-left-color: var(--accent-gold);
+        font-weight: 600;
+    }
+    .sidebar-nav li a.active .icon {
+        transform: scale(1.1);
+    }
+    .sidebar-nav li a .icon {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+        transition: transform 0.2s ease;
+    }
+    .sidebar-nav .section-label {
+        padding: 1.25rem 1.5rem 0.4rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: rgba(255,255,255,0.3);
+    }
+
+    /* Footer */
+    .sidebar-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        margin-top: auto;
+    }
+    .sidebar-footer a {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255,255,255,0.5);
+        text-decoration: none;
+        font-size: 0.82rem;
+        padding: 0.5rem 0;
+        transition: color 0.2s ease;
+    }
     .sidebar-footer a:hover { color: #fff; }
 
     /* Main */
     .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
 
-    /* Hamburger */
-    .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--brand-700); z-index: 150; align-items: center; padding: 0 1rem; }
-    .hamburger { background: none; border: none; cursor: pointer; padding: 0.5rem; }
-    .hamburger span { display: block; width: 22px; height: 2px; background: #fff; margin: 5px 0; border-radius: 2px; transition: all 0.3s ease; }
-    .mobile-header h2 { font-family: var(--font-serif); font-size: 1rem; color: #fff; margin-left: 0.75rem; }
-    .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+    /* Mobile Header */
+    .mobile-header {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: var(--brand-700);
+        z-index: 150;
+        align-items: center;
+        padding: 0 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .hamburger {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+    .hamburger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: #fff;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+        transform-origin: center;
+    }
+    .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-header h2 {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        color: #fff;
+        margin-left: 0.5rem;
+    }
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99;
+        backdrop-filter: blur(2px);
+    }
 
     /* Mobile */
     @media (max-width: 768px) {
         .mobile-header { display: flex; }
-        .sidebar { transform: translateX(-100%); z-index: 200; }
-        .sidebar.open { transform: translateX(0); }
+        .sidebar { transform: translateX(-100%); z-index: 200; width: 280px; }
+        .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.3); }
         .overlay.active { display: block; }
         .main-content { margin-left: 0; padding: 72px 1rem 1rem; }
     }
-
-    /* Mobile responsive for dashboard content */
     @media (max-width: 480px) {
         .main-content { padding: 68px 0.75rem 0.75rem; }
+        .sidebar { width: 260px; }
     }
 </style>
 {% block student_extra_head %}{% endblock %}
@@ -52,9 +209,8 @@
 
 {% block content %}
 <div class="dashboard-wrapper">
-    <!-- Mobile Header -->
     <div class="mobile-header">
-        <button class="hamburger" onclick="toggleSidebar()">
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
             <span></span><span></span><span></span>
         </button>
         <h2>Muslimaa Academy</h2>
@@ -68,23 +224,23 @@
             <p>Student</p>
         </div>
         <ul class="sidebar-nav">
-            <li><a href="{% url 'student_dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="{% url 'student_dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📊</span> Dashboard</a></li>
             <div class="section-label">Learning</div>
-            <li><a href="{% url 'courses:my_enrollments' %}" class="{% if active_page == 'enrollments' %}active{% endif %}"><span class="icon">📚</span> My Courses</a></li>
-            <li><a href="{% url 'courses:course_list' %}" class="{% if active_page == 'browse' %}active{% endif %}"><span class="icon">🔍</span> Browse Courses</a></li>
+            <li><a href="{% url 'courses:my_enrollments' %}" class="{% if active_page == 'enrollments' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📚</span> My Courses</a></li>
+            <li><a href="{% url 'courses:course_list' %}" class="{% if active_page == 'browse' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🔍</span> Browse Courses</a></li>
             <div class="section-label">Academics</div>
-            <li><a href="{% url 'attendance:student_attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}"><span class="icon">✅</span> My Attendance</a></li>
-            <li><a href="{% url 'classes:schedule' %}" class="{% if active_page == 'schedule' %}active{% endif %}"><span class="icon">📅</span> Class Schedule</a></li>
-            <li><a href="{% url 'classes:student_meetings' %}" class="{% if active_page == 'meetings' %}active{% endif %}"><span class="icon">🎥</span> Meetings</a></li>
-            <li><a href="{% url 'homework:student_homework' %}" class="{% if active_page == 'homework' %}active{% endif %}"><span class="icon">📝</span> Homework</a></li>
-            <li><a href="{% url 'messaging:inbox' %}" class="{% if active_page == 'messages' %}active{% endif %}"><span class="icon">✉️</span> Messages</a></li>
-            <li><a href="{% url 'workshops:workshop_list' %}" class="{% if active_page == 'workshops' %}active{% endif %}"><span class="icon">🎓</span> Workshops</a></li>
+            <li><a href="{% url 'attendance:student_attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}" onclick="closeMobile()"><span class="icon">✅</span> My Attendance</a></li>
+            <li><a href="{% url 'classes:schedule' %}" class="{% if active_page == 'schedule' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📅</span> Class Schedule</a></li>
+            <li><a href="{% url 'classes:student_meetings' %}" class="{% if active_page == 'meetings' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🎥</span> Meetings</a></li>
+            <li><a href="{% url 'homework:student_homework' %}" class="{% if active_page == 'homework' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📝</span> Homework</a></li>
+            <li><a href="{% url 'messaging:inbox' %}" class="{% if active_page == 'messages' %}active{% endif %}" onclick="closeMobile()"><span class="icon">✉️</span> Messages</a></li>
+            <li><a href="{% url 'workshops:workshop_list' %}" class="{% if active_page == 'workshops' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🎓</span> Workshops</a></li>
             <div class="section-label">Account</div>
-            <li><a href="{% url 'accounts:edit_profile' %}" class="{% if active_page == 'profile' %}active{% endif %}"><span class="icon">👤</span> My Profile</a></li>
+            <li><a href="{% url 'accounts:edit_profile' %}" class="{% if active_page == 'profile' %}active{% endif %}" onclick="closeMobile()"><span class="icon">👤</span> My Profile</a></li>
         </ul>
         <div class="sidebar-footer">
             <a href="{% url 'home' %}">🏠 Back to Site</a>
-            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+            <a href="{% url 'accounts:logout' %}">🚪 Logout</a>
         </div>
     </aside>
 
@@ -97,6 +253,14 @@
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('active');
+    document.getElementById('hamburgerBtn').classList.toggle('active');
+}
+function closeMobile() {
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('active');
+        document.getElementById('hamburgerBtn').classList.remove('active');
+    }
 }
 </script>
 {% endblock %}
