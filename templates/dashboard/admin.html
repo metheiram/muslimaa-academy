@@ -36,7 +36,15 @@
         bottom: 0;
         overflow-y: auto;
         z-index: 100;
+        transition: transform 0.3s ease;
     }
+
+    /* MOBILE HEADER */
+    .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--brand-700); z-index: 150; align-items: center; padding: 0 1rem; }
+    .hamburger { background: none; border: none; cursor: pointer; padding: 0.5rem; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: #fff; margin: 5px 0; border-radius: 2px; transition: all 0.3s ease; }
+    .mobile-header h2 { font-family: var(--font-serif); font-size: 1rem; color: #fff; margin-left: 0.75rem; }
+    .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; }
 
     .sidebar-brand {
         padding: 0 1.5rem 1.5rem;
@@ -334,8 +342,16 @@
     }
 
     @media (max-width: 768px) {
-        .sidebar { display: none; }
-        .main-content { margin-left: 0; }
+        .mobile-header { display: flex; }
+        .sidebar { transform: translateX(-100%); z-index: 200; }
+        .sidebar.open { transform: translateX(0); }
+        .overlay.active { display: block; }
+        .main-content { margin-left: 0; padding: 72px 1rem 1rem; }
+        .stats-grid { grid-template-columns: 1fr 1fr; }
+        .recent-messages { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+        .main-content { padding: 68px 0.75rem 0.75rem; }
         .stats-grid { grid-template-columns: 1fr; }
     }
 
@@ -346,8 +362,15 @@
 
 {% block content %}
 <div class="dashboard-wrapper">
+    <!-- MOBILE HEADER -->
+    <div class="mobile-header">
+        <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+        <h2>Muslimaa Academy</h2>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <h2>Muslimaa Academy</h2>
             <p>Admin Dashboard</p>
@@ -507,6 +530,10 @@
 
 {% block extra_scripts %}
 <script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+}
 document.addEventListener('DOMContentLoaded', function() {
     var observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
