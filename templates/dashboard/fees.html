@@ -331,6 +331,7 @@
         {% endif %}
     </main>
 </div>
+{% endblock %}
 
 <!-- RECORD PAYMENT MODAL -->
 <div class="modal-overlay" id="paymentModal">
@@ -431,11 +432,9 @@ function openPaymentModal(enrollmentId, studentName, courseTitle) {
     document.getElementById('paymentModal').classList.add('active');
 }
 </script>
-{% block extra_scripts %}
 <script>
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('active');
 }
 </script>
-{% endblock %}
