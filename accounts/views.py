@@ -112,6 +112,7 @@ def student_dashboard(request):
         'total_pending_payment': total_pending_payment,
         'approved_count': approved_enrollments.count(),
         'pending_count': pending_enrollments.count(),
+        'active_page': 'dashboard',
     }
     return render(request, 'accounts/student_dashboard.html', context)
 
@@ -212,8 +213,12 @@ def change_password(request):
     else:
         form = PasswordChangeForm(user=request.user)
 
-    context = {'form': form}
-    return render(request, 'accounts/change_password.html', context)
+    template = 'accounts/change_password.html'
+    if request.user.is_staff and not request.user.is_superuser:
+        template = 'accounts/change_password_teacher.html'
+
+    context = {'form': form, 'active_page': 'profile'}
+    return render(request, template, context)
 
 
 def forgot_password(request):

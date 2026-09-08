@@ -105,5 +105,6 @@ def student_attendance(request):
         'absent': absent,
         'late': late,
         'excused': excused,
+        'active_page': 'attendance',
     }
     return render(request, 'attendance/student_attendance.html', context)

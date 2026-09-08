@@ -1,38 +1,31 @@
-{% extends 'base/base.html' %}
+{% extends 'base/base_student.html' %}
 {% load static %}
 
 {% block title %}Edit Profile | Muslimaa Academy{% endblock %}
 
-{% block extra_head %}
+{% block student_extra_head %}
 <style>
-    :root { --brand-700: #471820; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-    body { font-family: var(--font-sans); background: #faf6f1; }
-    .profile-container { max-width: 700px; margin: 2rem auto; padding: 0 1.5rem; }
+    .profile-container { max-width: 700px; margin: 0 auto; }
     .profile-header { text-align: center; margin-bottom: 2rem; }
-    .profile-header h1 { font-family: var(--font-serif); font-size: 1.8rem; color: var(--brand-700); }
+    .profile-header h1 { font-family: var(--font-serif); font-size: 1.6rem; color: var(--brand-700); }
     .profile-card { background: #fff; border-radius: 16px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 4px 20px rgba(71,24,32,0.06); overflow: hidden; }
     .profile-avatar { width: 100px; height: 100px; background: rgba(71,24,32,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; border: 3px solid var(--accent-gold); }
     .profile-body { padding: 2rem; }
     .form-group { margin-bottom: 1.25rem; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
-    .form-group input, .form-group select { width: 100%; padding: 0.75rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 10px; font-size: 0.92rem; font-family: var(--font-sans); transition: border-color 0.3s; }
-    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--brand-700); box-shadow: 0 0 0 3px rgba(71,24,32,0.08); }
+    .form-group input { width: 100%; padding: 0.75rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 10px; font-size: 0.92rem; font-family: var(--font-sans); transition: border-color 0.3s; }
+    .form-group input:focus { outline: none; border-color: var(--brand-700); box-shadow: 0 0 0 3px rgba(71,24,32,0.08); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
     .btn-primary { background: var(--brand-700); color: #fff; }
     .btn-primary:hover { background: var(--brand-800); transform: translateY(-1px); }
     .btn-outline { background: transparent; color: var(--brand-700); border: 2px solid var(--brand-700); }
     .btn-outline:hover { background: var(--brand-700); color: #fff; }
-    .btn-gold { background: var(--accent-gold); color: #fff; }
-    .btn-gold:hover { background: #c49464; }
     .actions-row { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
-    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
-    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; }
-    .alert-error { background: rgba(220,20,60,0.1); color: #dc143c; }
 </style>
 {% endblock %}
 
-{% block content %}
+{% block student_content %}
 <div class="profile-container">
     <div class="profile-header">
         <h1>👤 Edit Profile</h1>
@@ -40,7 +33,7 @@
 
     {% if messages %}
     {% for message in messages %}
-    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">{{ message }}</div>
+    <div style="padding:0.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.88rem; font-weight:500; {% if message.tags == 'success' %}background:rgba(34,139,34,0.1); color:#228b22;{% else %}background:rgba(220,20,60,0.1); color:#dc143c;{% endif %}">{{ message }}</div>
     {% endfor %}
     {% endif %}
 
@@ -50,7 +43,7 @@
                 {% if profile_user.first_name %}{{ profile_user.first_name|first }}{% else %}👤{% endif %}
             </div>
             <h2 style="font-family: var(--font-serif); color: var(--brand-700); margin-bottom: 0.25rem;">{{ profile_user.get_full_name|default:profile_user.username }}</h2>
-            <p style="color: var(--text-muted); font-size: 0.88rem;">{% if profile_user.is_superuser %}Admin{% elif profile_user.is_staff %}Teacher{% else %}Student{% endif %} · {{ profile_user.email }}</p>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Student · {{ profile_user.email }}</p>
         </div>
 
         <div class="profile-body">
@@ -77,23 +70,10 @@
                     <input type="text" name="phone" value="{{ profile_user.profile.phone|default:'' }}" placeholder="03XX-XXXXXXX">
                 </div>
 
-                {% if profile_user.is_staff %}
-                <div class="form-group">
-                    <label>Subject / Specialization</label>
-                    <input type="text" name="subject" value="{{ profile_user.profile.subject|default:'' }}" placeholder="e.g. Tajweed, Hifz, Nazra">
-                </div>
-                {% endif %}
-
                 <div class="actions-row">
                     <button type="submit" class="btn btn-primary">💾 Save Changes</button>
                     <a href="{% url 'accounts:change_password' %}" class="btn btn-outline">🔑 Change Password</a>
-                    {% if profile_user.is_superuser %}
-                    <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-gold">📊 Dashboard</a>
-                    {% elif profile_user.is_staff %}
-                    <a href="{% url 'teacher_dashboard' %}" class="btn btn-gold">📊 Dashboard</a>
-                    {% else %}
-                    <a href="{% url 'student_dashboard' %}" class="btn btn-gold">📊 Dashboard</a>
-                    {% endif %}
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-outline">📊 Dashboard</a>
                 </div>
             </form>
         </div>

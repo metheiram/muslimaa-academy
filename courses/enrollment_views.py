@@ -37,4 +37,7 @@ def enroll_course(request, slug):
 def my_enrollments(request):
     """View all enrollments for current user."""
     enrollments = Enrollment.objects.filter(student=request.user).select_related('course')
-    return render(request, 'courses/my_enrollments.html', {'enrollments': enrollments})
+    return render(request, 'courses/my_enrollments.html', {
+        'enrollments': enrollments,
+        'active_page': 'browse',
+    })
