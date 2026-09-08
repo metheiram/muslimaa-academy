@@ -121,10 +121,33 @@ def teacher_meetings(request):
             meeting_type = request.POST.get('meeting_type', 'live')
             meet_link = request.POST.get('meet_link', '').strip()
             scheduled_at = request.POST.get('scheduled_at')
-            duration = request.POST.get('duration_minutes', 60)
+            duration = request.POST.get('duration_minutes', '60')
 
-            if title and course_id and meet_link and scheduled_at:
+            if not all([title, course_id, meet_link, scheduled_at]):
+                messages.error(request, 'All fields are required.')
+                return redirect('classes:teacher_meetings')
+
+            try:
                 course = Course.objects.get(id=course_id)
+            except (Course.DoesNotExist, ValueError):
+                messages.error(request, 'Invalid course selected.')
+                return redirect('classes:teacher_meetings')
+
+            try:
+                duration_int = int(duration)
+            except (ValueError, TypeError):
+                duration_int = 60
+
+            from django.utils.dateparse import parse_datetime
+            from django.utils import timezone as tz
+            dt = parse_datetime(scheduled_at)
+            if dt is None:
+                messages.error(request, 'Invalid date/time format. Please try again.')
+                return redirect('classes:teacher_meetings')
+            if tz.is_naive(dt):
+                dt = tz.make_aware(dt)
+
+            try:
                 meeting = Meeting.objects.create(
                     title=title,
                     description=description,
@@ -132,42 +155,44 @@ def teacher_meetings(request):
                     teacher=user,
                     meeting_type=meeting_type,
                     meet_link=meet_link,
-                    scheduled_at=scheduled_at,
-                    duration_minutes=int(duration),
+                    scheduled_at=dt,
+                    duration_minutes=duration_int,
                 )
-                # Auto-add only teacher's assigned students
-                if user.is_superuser:
-                    enrolled = Enrollment.objects.filter(course=course, status='approved').values_list('student_id', flat=True)
-                else:
-                    enrolled = Enrollment.objects.filter(course=course, status='approved', teacher=user).values_list('student_id', flat=True)
-                meeting.students.set(enrolled)
+            except Exception as e:
+                messages.error(request, f'Could not create meeting: {str(e)}')
+                return redirect('classes:teacher_meetings')
 
-                # Internal message to students
-                from messaging.models import Message
-                for sid in enrolled:
-                    try:
-                        student = User.objects.get(id=sid)
-                        Message.objects.create(
-                            sender=user,
-                            recipient=student,
-                            subject=f"🎥 New Meeting: {title} — {course.title}",
-                            body=(
-                                f"Assalam-o-Alaikum {student.first_name},\n\n"
-                                f"A new {meeting.get_meeting_type_display()} has been scheduled.\n\n"
-                                f"📌 Title: {title}\n"
-                                f"📅 Date: {meeting.scheduled_at.strftime('%B %d, %Y at %I:%M %p')}\n"
-                                f"⏱ Duration: {duration} minutes\n\n"
-                                f"🔗 Join Link:\n{meet_link}\n\n"
-                                f"Click the link above to join the meeting.\n\n"
-                                f"JazakAllah Khair!"
-                            ),
-                        )
-                    except User.DoesNotExist:
-                        pass
-
-                messages.success(request, f'Meeting "{title}" created and students notified!')
+            # Auto-add only teacher's assigned students
+            if user.is_superuser:
+                enrolled = Enrollment.objects.filter(course=course, status='approved').values_list('student_id', flat=True)
             else:
-                messages.error(request, 'All fields are required.')
+                enrolled = Enrollment.objects.filter(course=course, status='approved', teacher=user).values_list('student_id', flat=True)
+            meeting.students.set(enrolled)
+
+            # Internal message to students
+            from messaging.models import Message
+            for sid in enrolled:
+                try:
+                    student = User.objects.get(id=sid)
+                    Message.objects.create(
+                        sender=user,
+                        recipient=student,
+                        subject=f"🎥 New Meeting: {title} — {course.title}",
+                        body=(
+                            f"Assalam-o-Alaikum {student.first_name},\n\n"
+                            f"A new {meeting.get_meeting_type_display()} has been scheduled.\n\n"
+                            f"📌 Title: {title}\n"
+                            f"📅 Date: {meeting.scheduled_at.strftime('%B %d, %Y at %I:%M %p')}\n"
+                            f"⏱ Duration: {duration_int} minutes\n\n"
+                            f"🔗 Join Link:\n{meet_link}\n\n"
+                            f"Click the link above to join the meeting.\n\n"
+                            f"JazakAllah Khair!"
+                        ),
+                    )
+                except User.DoesNotExist:
+                    pass
+
+            messages.success(request, f'Meeting "{title}" created and students notified!')
             return redirect('classes:teacher_meetings')
 
         elif action == 'delete':
