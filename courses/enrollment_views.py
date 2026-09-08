@@ -104,12 +104,7 @@ def enroll_course(request, slug):
 def my_enrollments(request):
     """View all enrollments for current user."""
     enrollments = Enrollment.objects.filter(student=request.user).select_related('course')
-    enrollments_with_wa = []
-    for enr in enrollments:
-        wa_url = build_student_whatsapp_message(request.user, enr.course) if enr.status == 'approved' else ''
-        enrollments_with_wa.append({'enrollment': enr, 'whatsapp_url': wa_url})
     return render(request, 'courses/my_enrollments.html', {
         'enrollments': enrollments,
-        'enrollments_with_wa': enrollments_with_wa,
         'active_page': 'browse',
     })
