@@ -140,6 +140,8 @@ def teacher_meetings(request):
 
                 # Email students
                 from core.utils import send_email_notification
+                # Internal message to students
+                from messaging.models import Message
                 for sid in enrolled:
                     try:
                         student = User.objects.get(id=sid)
@@ -158,6 +160,22 @@ def teacher_meetings(request):
                             f"New Meeting: {title} | {course.title}",
                             msg,
                             student.email,
+                        )
+                        # Internal message
+                        Message.objects.create(
+                            sender=user,
+                            recipient=student,
+                            subject=f"🎥 New Meeting: {title} — {course.title}",
+                            body=(
+                                f"Assalam-o-Alaikum {student.first_name},\n\n"
+                                f"A new {meeting.get_meeting_type_display()} has been scheduled.\n\n"
+                                f"📌 Title: {title}\n"
+                                f"📅 Date: {meeting.scheduled_at.strftime('%B %d, %Y at %I:%M %p')}\n"
+                                f"⏱ Duration: {duration} minutes\n\n"
+                                f"🔗 Join Link:\n{meet_link}\n\n"
+                                f"Click the link above to join the meeting.\n\n"
+                                f"JazakAllah Khair!"
+                            ),
                         )
                     except User.DoesNotExist:
                         pass
