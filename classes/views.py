@@ -138,30 +138,11 @@ def teacher_meetings(request):
                 enrolled = Enrollment.objects.filter(course=course, status='approved').values_list('student_id', flat=True)
                 meeting.students.set(enrolled)
 
-                # Email students
-                from core.utils import send_email_notification
                 # Internal message to students
                 from messaging.models import Message
                 for sid in enrolled:
                     try:
                         student = User.objects.get(id=sid)
-                        msg = (
-                            f"Assalam-o-Alaikum {student.first_name},\n\n"
-                            f"A new {meeting.get_meeting_type_display()} has been scheduled:\n\n"
-                            f"📚 Course: {course.title}\n"
-                            f"📌 Title: {title}\n"
-                            f"📅 Date: {meeting.scheduled_at.strftime('%B %d, %Y at %I:%M %p')}\n"
-                            f"⏱ Duration: {duration} minutes\n"
-                            f"🔗 Join Link: {meet_link}\n\n"
-                            f"JazakAllah Khair!\n"
-                            f"Muslimaa Academy Team"
-                        )
-                        send_email_notification(
-                            f"New Meeting: {title} | {course.title}",
-                            msg,
-                            student.email,
-                        )
-                        # Internal message
                         Message.objects.create(
                             sender=user,
                             recipient=student,
