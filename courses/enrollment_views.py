@@ -31,11 +31,14 @@ def enroll_course(request, slug):
         )
 
         # --- Email: enrollment pending confirmation ---
+        price = course.price
+        price_text = f"Rs. {int(price)}" if price and price > 0 else "To be confirmed"
         try:
             send_mail(
                 f'Enrollment Received — {course.title} | Muslimaa Academy',
                 f"Assalam-o-Alaikum {request.user.first_name},\n\n"
                 f"JazakAllah Khair for enrolling in \"{course.title}\"!\n\n"
+                f"Course Fee: {price_text}\n\n"
                 f"We have received your enrollment request. Our team will review it shortly.\n\n"
                 f"You will receive an email with payment details once your enrollment is approved.\n\n"
                 f"If you have any questions, feel free to reply to this email.\n\n"

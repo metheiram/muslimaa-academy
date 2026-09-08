@@ -67,8 +67,12 @@ def register(request):
             user.profile.phone = phone
             user.profile.save()
 
-        messages.success(request, 'Registration successful! You will receive enrollment details via email and WhatsApp within 24 hours after admin approval.')
-        return redirect('accounts:login')
+        # Auto-login after registration
+        from django.contrib.auth import login
+        login(request, user)
+
+        messages.success(request, f'Welcome {user.first_name}! 🎉 Browse our courses and enroll to start your learning journey.')
+        return redirect('student_dashboard')
 
     context = {'form_data': {}}
     return render(request, 'accounts/register.html', context)

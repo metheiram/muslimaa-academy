@@ -54,15 +54,18 @@ def get_payment_info_text():
 def build_enrollment_approved_message(enrollment):
     """Build WhatsApp receipt message for enrollment approval."""
     payment_info = get_payment_info_text()
+    price = enrollment.course.price
+    price_text = f"Rs. {int(price)}" if price and price > 0 else "Free"
     return (
         f"Assalam-o-Alaikum {enrollment.student.first_name}! 🌙\n\n"
         f"🎉 *Enrollment Confirmed — Muslimaa Academy*\n\n"
         f"Alhamdulillah! Your enrollment has been approved.\n\n"
         f"📋 *Course:* {enrollment.course.title}\n"
+        f"💰 *Fee:* {price_text}\n"
         f"📅 *Enrolled:* {enrollment.enrolled_at.strftime('%d %b, %Y')}\n\n"
-        f"💰 *Payment Details:*\n"
+        f"💳 *Payment Details:*\n"
         f"{payment_info}\n"
-        f"📸 After sending payment, share screenshot here.\n\n"
+        f"📸 After sending payment, please send the screenshot here on WhatsApp.\n\n"
         f"Once verified, your course access will be activated.\n\n"
         f"JazakAllah Khair! 🤲\n"
         f"Muslimaa Academy Team"
@@ -279,12 +282,15 @@ def admin_enrollments(request):
 
             # --- Email to student ---
             payment_info = get_payment_info_text()
+            price = enrollment.course.price
+            price_text = f"Rs. {int(price)}" if price and price > 0 else "Free"
             email_msg = (
                 f"Assalam-o-Alaikum {enrollment.student.first_name},\n\n"
                 f"Alhamdulillah! Your enrollment in \"{enrollment.course.title}\" has been approved.\n\n"
+                f"Course Fee: {price_text}\n\n"
                 f"Please complete your payment by sending the fee to:\n\n"
                 f"{payment_info}\n"
-                f"After sending payment, share the screenshot on this WhatsApp or email.\n\n"
+                f"After sending payment, please send the screenshot on this email ({enrollment.student.email}).\n\n"
                 f"Once verified, your course access will be activated.\n\n"
                 f"JazakAllah Khair!\n"
                 f"Muslimaa Academy Team"
