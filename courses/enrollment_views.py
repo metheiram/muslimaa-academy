@@ -95,7 +95,7 @@ def enroll_course(request, slug):
             pass
 
         messages.success(request, f'Enrollment for {course.title} submitted! Check your email for payment details.')
-        return redirect('accounts:student_dashboard')
+        return redirect('courses:course_detail', slug=slug)
     
     return render(request, 'courses/enroll.html', {'course': course})
 

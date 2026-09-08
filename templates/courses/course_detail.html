@@ -194,10 +194,16 @@
                     <div class="btn" style="background: rgba(255,165,0,0.15); color: #e67e00; cursor: default;">⏳ Enrollment Pending</div>
                     <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Waiting for admin approval. You'll receive an email once approved.</p>
                 {% else %}
-                    <a class="btn btn-primary" href="{% url 'courses:enroll_course' slug=course.slug %}">Re-Apply for Enrollment</a>
+                    <form method="POST" action="{% url 'courses:enroll_course' slug=course.slug %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Re-Apply for Enrollment</button>
+                    </form>
                 {% endif %}
             {% else %}
-                <a class="btn btn-primary" href="{% url 'courses:enroll_course' slug=course.slug %}">Enroll in This Course</a>
+                <form method="POST" action="{% url 'courses:enroll_course' slug=course.slug %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Enroll in This Course</button>
+                </form>
             {% endif %}
         </div>
     </div>
