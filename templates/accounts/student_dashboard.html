@@ -87,18 +87,25 @@
         <div class="card-body">
             {% if approved_enrollments %}
             {% for enrollment in approved_enrollments %}
-            <div class="course-item">
-                <div class="course-info">
-                    <h4>{{ enrollment.course.title }}</h4>
-                    <p>{{ enrollment.course.get_level_display }} · {{ enrollment.course.duration }}</p>
-                    <div class="course-meta">
-                        <span>📚 {{ enrollment.course.get_category_display }}</span>
-                        {% if enrollment.course.instructor %}
-                        <span>👩‍🏫 {{ enrollment.course.instructor.get_full_name }}</span>
-                        {% endif %}
+            <div class="course-item" style="flex-direction:column; align-items:flex-start; gap:0.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                    <div class="course-info">
+                        <h4>{{ enrollment.course.title }}</h4>
+                        <p>{{ enrollment.course.get_level_display }} · {{ enrollment.course.duration }}</p>
+                        <div class="course-meta">
+                            <span>📚 {{ enrollment.course.get_category_display }}</span>
+                            {% if enrollment.course.instructor %}
+                            <span>👩‍🏫 {{ enrollment.course.instructor.get_full_name }}</span>
+                            {% endif %}
+                        </div>
                     </div>
+                    <span class="status-badge status-approved">Active</span>
                 </div>
-                <span class="status-badge status-approved">Active</span>
+                {% if enrollment.course.price and enrollment.course.price > 0 %}
+                <div style="width:100%; background:rgba(212,165,116,0.1); border-radius:8px; padding:0.6rem 0.8rem; margin-top:0.25rem;">
+                    <span style="font-size:0.8rem; font-weight:700; color:#471820;">Fee: Rs. {{ enrollment.course.price|floatformat:0 }}</span>
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
             {% elif pending_enrollments %}

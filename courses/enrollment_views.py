@@ -8,6 +8,23 @@ from courses.models import Course
 from courses.enrollment_models import Enrollment
 
 
+def get_payment_info_text():
+    """Get formatted payment methods info text."""
+    from payments.models import PaymentMethod
+    methods = PaymentMethod.objects.filter(is_active=True)
+    if not methods.exists():
+        return "Contact admin for payment details."
+    lines = []
+    for pm in methods:
+        lines.append(f"{pm.get_method_display()}: {pm.account_number}")
+        if pm.account_title:
+            lines.append(f"  Title: {pm.account_title}")
+        if pm.instructions:
+            lines.append(f"  Note: {pm.instructions}")
+        lines.append("")
+    return "\n".join(lines)
+
+
 @login_required
 def enroll_course(request, slug):
     """Student enrolls in a course."""
@@ -30,18 +47,23 @@ def enroll_course(request, slug):
             status='pending'
         )
 
-        # --- Email: enrollment pending confirmation ---
+        # --- Email: enrollment + payment details ---
         price = course.price
         price_text = f"Rs. {int(price)}" if price and price > 0 else "To be confirmed"
+        payment_info = get_payment_info_text()
+
         try:
             send_mail(
                 f'Enrollment Received — {course.title} | Muslimaa Academy',
                 f"Assalam-o-Alaikum {request.user.first_name},\n\n"
                 f"JazakAllah Khair for enrolling in \"{course.title}\"!\n\n"
                 f"Course Fee: {price_text}\n\n"
-                f"We have received your enrollment request. Our team will review it shortly.\n\n"
-                f"You will receive an email with payment details once your enrollment is approved.\n\n"
+                f"Please send your payment to any of the following accounts:\n\n"
+                f"{payment_info}"
+                f"After sending payment, please send the screenshot on this email ({request.user.email}).\n\n"
+                f"Your enrollment is pending approval. Once approved, your course access will be activated.\n\n"
                 f"If you have any questions, feel free to reply to this email.\n\n"
+                f"JazakAllah Khair!\n"
                 f"Muslimaa Academy Team",
                 settings.DEFAULT_FROM_EMAIL,
                 [request.user.email],
@@ -50,8 +72,8 @@ def enroll_course(request, slug):
         except Exception:
             pass
 
-        messages.success(request, f'Enrollment request for {course.title} submitted! Payment details will be sent after approval.')
-        return redirect('accounts:profile')
+        messages.success(request, f'Enrollment request for {course.title} submitted! Check your email for payment details.')
+        return redirect('accounts:student_dashboard')
     
     return render(request, 'courses/enroll.html', {'course': course})
 
