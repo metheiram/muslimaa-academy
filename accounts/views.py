@@ -97,6 +97,7 @@ def student_dashboard(request):
     from payments.models import Payment
     from courses.models import Course
     from django.db.models import Sum
+    from django.utils import timezone
 
     user = request.user
     enrollments = Enrollment.objects.filter(student=user).select_related('course', 'course__instructor')
@@ -107,6 +108,23 @@ def student_dashboard(request):
     total_paid = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
     total_pending_payment = payments.filter(status='pending').aggregate(total=Sum('amount'))['total'] or 0
 
+    # Upcoming meetings
+    from classes.models import Meeting
+    enrolled_course_ids = approved_enrollments.values_list('course_id', flat=True)
+    upcoming_meetings = Meeting.objects.filter(
+        course_id__in=enrolled_course_ids,
+        status='upcoming',
+        scheduled_at__gte=timezone.now()
+    ).select_related('course', 'teacher').order_by('scheduled_at')[:3]
+
+    # Pending homework
+    from homework.models import HomeworkSubmission
+    pending_homework = HomeworkSubmission.objects.filter(
+        student=user,
+        homework__due_date__gte=timezone.now(),
+        submitted_at__isnull=True
+    ).select_related('homework', 'homework__course')[:3]
+
     context = {
         'enrollments': enrollments,
         'approved_enrollments': approved_enrollments,
@@ -116,6 +134,8 @@ def student_dashboard(request):
         'total_pending_payment': total_pending_payment,
         'approved_count': approved_enrollments.count(),
         'pending_count': pending_enrollments.count(),
+        'upcoming_meetings': upcoming_meetings,
+        'pending_homework': pending_homework,
         'active_page': 'dashboard',
     }
     return render(request, 'accounts/student_dashboard.html', context)
@@ -127,6 +147,7 @@ def teacher_dashboard(request):
     from courses.enrollment_models import Enrollment
     from courses.models import Course
     from payments.models import Payment
+    from django.utils import timezone
 
     user = request.user
     courses_taught = Course.objects.filter(instructor=user, is_active=True)
@@ -142,12 +163,29 @@ def teacher_dashboard(request):
         status='pending'
     ).count()
 
+    # Upcoming meetings
+    from classes.models import Meeting
+    upcoming_meetings = Meeting.objects.filter(
+        teacher=user,
+        status='upcoming',
+        scheduled_at__gte=timezone.now()
+    ).select_related('course').order_by('scheduled_at')[:5]
+
+    # Pending homework submissions
+    from homework.models import Homework, HomeworkSubmission
+    pending_submissions = HomeworkSubmission.objects.filter(
+        homework__teacher=user,
+        grade__isnull=True
+    ).select_related('student', 'homework')[:5]
+
     context = {
         'courses_taught': courses_taught,
         'enrolled_students': enrolled_students,
         'total_students': total_students,
         'total_courses': total_courses,
         'total_pending': total_pending,
+        'upcoming_meetings': upcoming_meetings,
+        'pending_submissions': pending_submissions,
         'active_page': 'dashboard',
     }
     return render(request, 'accounts/teacher_dashboard.html', context)

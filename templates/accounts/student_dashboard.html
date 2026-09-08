@@ -34,12 +34,25 @@
     .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
     .empty-msg a { color: var(--brand-700); font-weight: 600; }
     .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1.25rem; background: rgba(71,24,32,0.04); border: 1px solid rgba(71,24,32,0.08); border-radius: 12px; color: var(--brand-700); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; }
+    .actions-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; }
+    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1.25rem; background: rgba(71,24,32,0.04); border: 1px solid rgba(71,24,32,0.08); border-radius: 12px; color: var(--brand-700); text-decoration: none; font-size: 0.82rem; font-weight: 600; transition: all 0.3s ease; }
     .action-btn:hover { background: var(--brand-700); color: #fff; border-color: var(--brand-700); }
     .action-icon { font-size: 1.5rem; }
-    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .actions-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .actions-grid { grid-template-columns: 1fr; } }
+    .meeting-item { padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .meeting-item:last-child { border-bottom: none; }
+    .meeting-title { font-size: 0.9rem; font-weight: 700; color: var(--brand-700); }
+    .meeting-meta { font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.2rem; }
+    .btn-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-success:hover { background: #228b22; color: #fff; }
+    .homework-item { padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .homework-item:last-child { border-bottom: none; }
+    .homework-title { font-size: 0.9rem; font-weight: 700; color: var(--brand-700); }
+    .homework-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .badge-overdue { background: rgba(220,53,69,0.1); color: #dc3545; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-pending { background: rgba(255,165,0,0.1); color: #e67e00; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .actions-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .actions-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .actions-grid { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
@@ -75,6 +88,59 @@
         <div class="stat-icon">📋</div>
         <div class="stat-number">Rs. {{ total_pending_payment|floatformat:0 }}</div>
         <div class="stat-label">Pending Payment</div>
+    </div>
+</div>
+
+<div class="content-grid">
+    <div class="card">
+        <div class="card-header">
+            <h3>Upcoming Meetings</h3>
+            <a href="{% url 'classes:student_meetings' %}" style="font-size:0.8rem; color:var(--brand-700); font-weight:600; text-decoration:none;">View All →</a>
+        </div>
+        <div class="card-body">
+            {% if upcoming_meetings %}
+            {% for meeting in upcoming_meetings %}
+            <div class="meeting-item">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+                    <div>
+                        <div class="meeting-title">{{ meeting.title }}</div>
+                        <div class="meeting-meta">
+                            <span>📚 {{ meeting.course.title }}</span>
+                            <span>📅 {{ meeting.scheduled_at|date:"M d, h:i A" }}</span>
+                        </div>
+                    </div>
+                    <a href="{{ meeting.meet_link }}" target="_blank" class="btn btn-success" style="padding:0.4rem 0.8rem; font-size:0.75rem;">🔗 Join</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="empty-msg">No upcoming meetings.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Pending Homework</h3>
+            <a href="{% url 'homework:student_homework' %}" style="font-size:0.8rem; color:var(--brand-700); font-weight:600; text-decoration:none;">View All →</a>
+        </div>
+        <div class="card-body">
+            {% if pending_homework %}
+            {% for sub in pending_homework %}
+            <div class="homework-item">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div class="homework-title">{{ sub.homework.title }}</div>
+                        <div class="homework-meta">📚 {{ sub.homework.course.title }} · Due {{ sub.homework.due_date|date:"M d" }}</div>
+                    </div>
+                    <span class="badge-pending">Pending</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="empty-msg">No pending homework. Great job!</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 
@@ -158,9 +224,17 @@
                 <span class="action-icon">📋</span>
                 My Enrollments
             </a>
-            <a href="{% url 'workshops:workshop_list' %}" class="action-btn">
-                <span class="action-icon">🎓</span>
-                View Workshops
+            <a href="{% url 'classes:student_meetings' %}" class="action-btn">
+                <span class="action-icon">🎥</span>
+                Meetings
+            </a>
+            <a href="{% url 'homework:student_homework' %}" class="action-btn">
+                <span class="action-icon">📝</span>
+                Homework
+            </a>
+            <a href="{% url 'messaging:inbox' %}" class="action-btn">
+                <span class="action-icon">✉️</span>
+                Messages
             </a>
             <a href="{% url 'content:contact' %}" class="action-btn">
                 <span class="action-icon">💬</span>

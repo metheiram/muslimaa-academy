@@ -9,7 +9,7 @@
     .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212,165,116,0.15) 0%, transparent 70%); border-radius: 50%; }
     .welcome-banner h1 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; position: relative; }
     .welcome-banner p { font-size: 0.9rem; color: rgba(255,255,255,0.8); position: relative; }
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
     .stat-card { background: #ffffff; border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); text-align: center; transition: transform 0.2s; }
     .stat-card:hover { transform: translateY(-2px); }
     .stat-card .stat-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
@@ -36,7 +36,21 @@
     .btn-whatsapp:hover { background: #1da851; }
     .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
     .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+    .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1.25rem; background: rgba(71,24,32,0.04); border: 1px solid rgba(71,24,32,0.08); border-radius: 12px; color: var(--brand-700); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; }
+    .action-btn:hover { background: var(--brand-700); color: #fff; border-color: var(--brand-700); }
+    .action-icon { font-size: 1.5rem; }
+    .meeting-item { padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .meeting-item:last-child { border-bottom: none; }
+    .meeting-title { font-size: 0.9rem; font-weight: 700; color: var(--brand-700); }
+    .meeting-meta { font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.2rem; }
+    .submission-item { padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .submission-item:last-child { border-bottom: none; }
+    .submission-title { font-size: 0.9rem; font-weight: 700; color: var(--brand-700); }
+    .submission-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .badge-waiting { background: rgba(255,165,0,0.1); color: #e67e00; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .actions-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .actions-grid { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
@@ -56,12 +70,76 @@
     <div class="stat-card">
         <div class="stat-icon">📚</div>
         <div class="stat-number">{{ total_courses }}</div>
-        <div class="stat-label">Courses Assigned</div>
+        <div class="stat-label">My Courses</div>
     </div>
     <div class="stat-card">
         <div class="stat-icon">👩‍🎓</div>
         <div class="stat-number">{{ total_students }}</div>
         <div class="stat-label">Active Students</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-number">{{ total_pending }}</div>
+        <div class="stat-label">Pending Enrollments</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-number">{{ pending_submissions|length }}</div>
+        <div class="stat-label">To Grade</div>
+    </div>
+</div>
+
+<div class="content-grid">
+    <div class="card">
+        <div class="card-header">
+            <h3>Upcoming Meetings</h3>
+            <a href="{% url 'classes:teacher_meetings' %}" style="font-size:0.8rem; color:var(--brand-700); font-weight:600; text-decoration:none;">View All →</a>
+        </div>
+        <div class="card-body">
+            {% if upcoming_meetings %}
+            {% for meeting in upcoming_meetings %}
+            <div class="meeting-item">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+                    <div>
+                        <div class="meeting-title">{{ meeting.title }}</div>
+                        <div class="meeting-meta">
+                            <span>📚 {{ meeting.course.title }}</span>
+                            <span>📅 {{ meeting.scheduled_at|date:"M d, h:i A" }}</span>
+                            <span class="meeting-badge badge-{{ meeting.meeting_type }}">{{ meeting.get_meeting_type_display }}</span>
+                        </div>
+                    </div>
+                    <a href="{{ meeting.meet_link }}" target="_blank" class="btn btn-success" style="padding:0.4rem 0.8rem; font-size:0.75rem;">🔗 Join</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="empty-msg">No upcoming meetings.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Pending Homework to Grade</h3>
+            <a href="{% url 'homework:teacher_homework' %}" style="font-size:0.8rem; color:var(--brand-700); font-weight:600; text-decoration:none;">View All →</a>
+        </div>
+        <div class="card-body">
+            {% if pending_submissions %}
+            {% for sub in pending_submissions %}
+            <div class="submission-item">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div class="submission-title">{{ sub.homework.title }}</div>
+                        <div class="submission-meta">👩‍🎓 {{ sub.student.get_full_name }} · Submitted {{ sub.submitted_at|date:"M d" }}</div>
+                    </div>
+                    <span class="badge-waiting">Needs Grade</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="empty-msg">All caught up! No submissions to grade.</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 
@@ -113,6 +191,32 @@
             {% else %}
             <div class="empty-msg">No students enrolled in your courses yet.</div>
             {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Quick Actions</h3>
+    </div>
+    <div class="card-body">
+        <div class="actions-grid">
+            <a href="{% url 'attendance:attendance' %}" class="action-btn">
+                <span class="action-icon">✅</span>
+                Attendance
+            </a>
+            <a href="{% url 'classes:teacher_meetings' %}" class="action-btn">
+                <span class="action-icon">🎥</span>
+                Meetings
+            </a>
+            <a href="{% url 'homework:teacher_homework' %}" class="action-btn">
+                <span class="action-icon">📝</span>
+                Homework
+            </a>
+            <a href="{% url 'messaging:inbox' %}" class="action-btn">
+                <span class="action-icon">✉️</span>
+                Messages
+            </a>
         </div>
     </div>
 </div>
