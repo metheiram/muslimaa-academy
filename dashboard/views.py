@@ -301,8 +301,27 @@ def admin_teachers(request):
             messages.success(request, f'Teacher "{name}" deleted successfully!')
             return redirect('dashboard:admin_teachers')
 
+        elif action == 'assign_student':
+            teacher_id = request.POST.get('teacher_id')
+            student_id = request.POST.get('student_id')
+            if teacher_id and student_id:
+                from courses.enrollment_models import Enrollment
+                teacher = get_object_or_404(User, id=teacher_id)
+                enrollment = get_object_or_404(Enrollment, id=student_id)
+                enrollment.teacher = teacher
+                enrollment.save()
+                messages.success(request, f'{enrollment.student.get_full_name()} assigned to {teacher.get_full_name()} for {enrollment.course.title}.')
+            return redirect('dashboard:admin_teachers')
+
     teachers = User.objects.filter(is_staff=True, is_superuser=False).select_related('profile').order_by('-date_joined')
-    context = {'teachers': teachers, 'active_tab': 'teachers'}
+    from courses.enrollment_models import Enrollment
+    from courses.models import Course
+    approved_enrollments = Enrollment.objects.filter(status='approved').select_related('student', 'course', 'teacher')
+    context = {
+        'teachers': teachers,
+        'approved_enrollments': approved_enrollments,
+        'active_tab': 'teachers',
+    }
     return render(request, 'dashboard/teachers.html', context)
 
 

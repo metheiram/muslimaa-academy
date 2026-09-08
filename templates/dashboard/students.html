@@ -148,7 +148,6 @@
         </div>
     </main>
 </div>
-{% endblock %}
 
 <!-- ADD STUDENT MODAL -->
 <div class="modal-overlay" id="addStudentModal">
@@ -249,10 +248,9 @@ function openEditModal(id, firstName, lastName, email, username, phone) {
     document.getElementById('edit_phone').value = phone;
     document.getElementById('editStudentModal').classList.add('active');
 }
-</script>
-<script>
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('active');
 }
 </script>
+{% endblock %}
