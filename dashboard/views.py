@@ -4,7 +4,10 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Sum, Q, F
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 from datetime import timedelta
+import urllib.parse
 
 
 def admin_required(view_func):
@@ -17,6 +20,83 @@ def admin_required(view_func):
             return redirect('home')
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def build_whatsapp_url(phone, message):
+    """Build a WhatsApp wa.me URL with pre-filled message."""
+    if not phone:
+        return ''
+    clean = phone.replace('+', '').replace('-', '').replace(' ', '').replace('(', '').replace(')', '')
+    if not clean.startswith('92'):
+        clean = '92' + clean.lstrip('0')
+    encoded = urllib.parse.quote(message)
+    return f"https://wa.me/{clean}?text={encoded}"
+
+
+def get_payment_info_text():
+    """Get formatted payment methods info text."""
+    from payments.models import PaymentMethod
+    methods = PaymentMethod.objects.filter(is_active=True)
+    if not methods.exists():
+        return "Contact admin for payment details."
+    lines = []
+    for pm in methods:
+        lines.append(f"*{pm.get_method_display()}*")
+        lines.append(f"  Number: {pm.account_number}")
+        if pm.account_title:
+            lines.append(f"  Title: {pm.account_title}")
+        if pm.instructions:
+            lines.append(f"  Note: {pm.instructions}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def build_enrollment_approved_message(enrollment):
+    """Build WhatsApp receipt message for enrollment approval."""
+    payment_info = get_payment_info_text()
+    return (
+        f"Assalam-o-Alaikum {enrollment.student.first_name}! 🌙\n\n"
+        f"🎉 *Enrollment Confirmed — Muslimaa Academy*\n\n"
+        f"Alhamdulillah! Your enrollment has been approved.\n\n"
+        f"📋 *Course:* {enrollment.course.title}\n"
+        f"📅 *Enrolled:* {enrollment.enrolled_at.strftime('%d %b, %Y')}\n\n"
+        f"💰 *Payment Details:*\n"
+        f"{payment_info}\n"
+        f"📸 After sending payment, share screenshot here.\n\n"
+        f"Once verified, your course access will be activated.\n\n"
+        f"JazakAllah Khair! 🤲\n"
+        f"Muslimaa Academy Team"
+    )
+
+
+def build_payment_received_message(payment):
+    """Build WhatsApp message for payment confirmation."""
+    return (
+        f"Assalam-o-Alaikum {payment.student.first_name}! 🌙\n\n"
+        f"✅ *Payment Received — Muslimaa Academy*\n\n"
+        f"📋 *Course:* {payment.course.title}\n"
+        f"💰 *Amount:* Rs. {payment.amount}\n"
+        f"💳 *Method:* {payment.get_method_display()}\n"
+        f"📅 *Date:* {payment.created_at.strftime('%d %b, %Y')}\n\n"
+        f"Your payment has been verified. Course access is now active!\n\n"
+        f"JazakAllah Khair! 🤲\n"
+        f"Muslimaa Academy Team"
+    )
+
+
+def send_email_notification(subject, message, recipient_email):
+    """Send email notification silently."""
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [recipient_email],
+            fail_silently=True,
+        )
+        return True
+    except Exception:
+        return False
 
 
 @admin_required
@@ -150,9 +230,8 @@ def admin_teachers(request):
 
 @admin_required
 def admin_enrollments(request):
-    """Manage enrollments - approve/reject."""
+    """Manage enrollments - approve/reject with email + WhatsApp."""
     from courses.enrollment_models import Enrollment
-    from django.utils import timezone
 
     whatsapp_url = ''
 
@@ -166,63 +245,35 @@ def admin_enrollments(request):
             enrollment.approved_at = timezone.now()
             enrollment.approved_by = request.user
             enrollment.save()
-            
-            from payments.models import PaymentMethod
-            payment_methods = PaymentMethod.objects.filter(is_active=True)
-            if payment_methods.exists():
-                method_lines = []
-                for pm in payment_methods:
-                    method_lines.append(f"{pm.get_method_display()}: {pm.account_number}")
-                    if pm.account_title:
-                        method_lines.append(f"  Account Title: {pm.account_title}")
-                    if pm.instructions:
-                        method_lines.append(f"  Note: {pm.instructions}")
-                    method_lines.append("")
-                payment_info = "\n".join(method_lines)
-            else:
-                payment_info = "No payment methods configured yet. Contact admin for details."
 
-            import urllib.parse
-            phone = getattr(enrollment.student.profile, 'phone', '') or ''
-
-            welcome_msg = (
-                f"Assalam-o-Alaikum {enrollment.student.first_name}! 🌙\n\n"
-                f"Welcome to Muslimaa Academy! 🎉\n\n"
+            # --- Email to student ---
+            payment_info = get_payment_info_text()
+            email_msg = (
+                f"Assalam-o-Alaikum {enrollment.student.first_name},\n\n"
                 f"Alhamdulillah! Your enrollment in \"{enrollment.course.title}\" has been approved.\n\n"
-                f"We are excited to have you on board. Please complete your payment by sending the fee to the following account:\n\n"
-                f"💳 *Payment Details:*\n"
+                f"Please complete your payment by sending the fee to:\n\n"
                 f"{payment_info}\n"
-                f"After sending the payment, please share the screenshot of your payment on:\n"
-                f"📧 Email: {settings.DEFAULT_FROM_EMAIL}\n"
-                f"📱 WhatsApp: Reply to this message\n\n"
-                f"Once we verify your payment, your course access will be activated immediately.\n\n"
-                f"If you have any questions, feel free to reach out.\n\n"
-                f"JazakAllah Khair! 🤲\n"
+                f"After sending payment, share the screenshot on this WhatsApp or email.\n\n"
+                f"Once verified, your course access will be activated.\n\n"
+                f"JazakAllah Khair!\n"
                 f"Muslimaa Academy Team"
             )
+            email_sent = send_email_notification(
+                f'Enrollment Approved — {enrollment.course.title} | Muslimaa Academy',
+                email_msg,
+                enrollment.student.email,
+            )
 
-            try:
-                from django.core.mail import send_mail
-                from django.conf import settings
-                send_mail(
-                    f'Welcome to Muslimaa Academy - {enrollment.course.title}',
-                    welcome_msg,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [enrollment.student.email],
-                    fail_silently=True,
-                )
-            except Exception:
-                pass
+            # --- WhatsApp URL ---
+            phone = getattr(enrollment.student.profile, 'phone', '') or ''
+            whatsapp_msg = build_enrollment_approved_message(enrollment)
+            whatsapp_url = build_whatsapp_url(phone, whatsapp_msg)
 
-            if phone:
-                clean_phone = phone.replace('+', '').replace('-', '').replace(' ', '')
-                if not clean_phone.startswith('92'):
-                    clean_phone = '92' + clean_phone.lstrip('0')
-                whatsapp_msg = welcome_msg
-                encoded_msg = urllib.parse.quote(whatsapp_msg)
-                whatsapp_url = f"https://wa.me/{clean_phone}?text={encoded_msg}"
+            if email_sent:
+                messages.success(request, f'Enrollment for {enrollment.student.get_full_name()} approved! Email sent & WhatsApp ready.')
+            else:
+                messages.success(request, f'Enrollment approved! Email failed but WhatsApp ready.')
 
-            messages.success(request, f'Enrollment for {enrollment.student.get_full_name()} approved! Email sent automatically.')
             return redirect('dashboard:admin_enrollments')
 
         elif action == 'reject':
@@ -234,11 +285,20 @@ def admin_enrollments(request):
     pending = Enrollment.objects.filter(status='pending').select_related('student', 'course')
     approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
     rejected = Enrollment.objects.filter(status='rejected').select_related('student', 'course')
-    
+
+    # Build WhatsApp URLs for all approved enrollments
+    approved_with_whatsapp = []
+    for enr in approved:
+        phone = getattr(enr.student.profile, 'phone', '') or ''
+        msg = build_enrollment_approved_message(enr)
+        wurl = build_whatsapp_url(phone, msg)
+        approved_with_whatsapp.append({'enrollment': enr, 'whatsapp_url': wurl})
+
     context = {
         'active_tab': 'enrollments',
         'pending_enrollments': pending,
         'approved_enrollments': approved,
+        'approved_with_whatsapp': approved_with_whatsapp,
         'rejected_enrollments': rejected,
         'whatsapp_url': whatsapp_url,
     }
@@ -289,7 +349,7 @@ def admin_fees(request):
             notes = request.POST.get('notes', '')
             payment_status = request.POST.get('payment_status', 'paid')
 
-            Payment.objects.create(
+            payment = Payment.objects.create(
                 enrollment=enrollment,
                 student=enrollment.student,
                 course=enrollment.course,
@@ -299,7 +359,26 @@ def admin_fees(request):
                 notes=notes,
                 recorded_by=request.user,
             )
-            messages.success(request, f'Payment recorded for {enrollment.student.get_full_name()} — Rs. {amount}')
+
+            # --- Email to student ---
+            if payment_status == 'paid':
+                email_msg = (
+                    f"Assalam-o-Alaikum {enrollment.student.first_name},\n\n"
+                    f"Your payment has been received!\n\n"
+                    f"Course: {enrollment.course.title}\n"
+                    f"Amount: Rs. {amount}\n"
+                    f"Method: {payment.get_method_display()}\n"
+                    f"Date: {payment.created_at.strftime('%d %b, %Y')}\n\n"
+                    f"Your course access is now active. JazakAllah Khair!\n\n"
+                    f"Muslimaa Academy Team"
+                )
+                send_email_notification(
+                    f'Payment Received — {enrollment.course.title} | Muslimaa Academy',
+                    email_msg,
+                    enrollment.student.email,
+                )
+
+            messages.success(request, f'Payment recorded for {enrollment.student.get_full_name()} — Rs. {amount}.')
             return redirect('dashboard:admin_fees')
 
         elif action == 'mark_free':
@@ -315,7 +394,22 @@ def admin_fees(request):
                 notes='Course marked as free',
                 recorded_by=request.user,
             )
-            messages.success(request, f'{enrollment.course.title} marked as free for {enrollment.student.get_full_name()}.')
+
+            # --- Email to student ---
+            email_msg = (
+                f"Assalam-o-Alaikum {enrollment.student.first_name},\n\n"
+                f"Good news! \"{enrollment.course.title}\" has been marked as FREE for you.\n\n"
+                f"No payment required. Your course access is now active.\n\n"
+                f"JazakAllah Khair!\n"
+                f"Muslimaa Academy Team"
+            )
+            send_email_notification(
+                f'Course Free — {enrollment.course.title} | Muslimaa Academy',
+                email_msg,
+                enrollment.student.email,
+            )
+
+            messages.success(request, f'{enrollment.course.title} marked as free for {enrollment.student.get_full_name()}. Email sent.')
             return redirect('dashboard:admin_fees')
 
     approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
@@ -326,9 +420,22 @@ def admin_fees(request):
     total_pending = approved.count() - payments.count()
     total_free = payments.filter(status='free').count()
 
+    # Build WhatsApp URLs for each approved enrollment
+    approved_with_whatsapp = []
+    for enr in approved:
+        phone = getattr(enr.student.profile, 'phone', '') or ''
+        payment_for_enr = payments.filter(enrollment=enr).first()
+        if payment_for_enr and payment_for_enr.status == 'paid':
+            msg = build_payment_received_message(payment_for_enr)
+        else:
+            msg = build_enrollment_approved_message(enr)
+        wurl = build_whatsapp_url(phone, msg)
+        approved_with_whatsapp.append({'enrollment': enr, 'whatsapp_url': wurl})
+
     context = {
         'active_tab': 'fees',
         'approved_enrollments': approved,
+        'approved_with_whatsapp': approved_with_whatsapp,
         'payments': payments,
         'payment_methods': payment_methods,
         'total_collected': total_collected,

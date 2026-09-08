@@ -39,13 +39,16 @@
     .enroll-item:last-child { border-bottom: none; }
     .enroll-info h4 { font-size: 0.9rem; color: var(--brand-700); margin-bottom: 0.25rem; }
     .enroll-info p { font-size: 0.8rem; color: var(--text-muted); }
-    .enroll-actions { display: flex; gap: 0.5rem; }
+    .enroll-actions { display: flex; gap: 0.5rem; align-items: center; }
     .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
     .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: all 0.3s; }
     .btn-approve { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .btn-approve:hover { background: #228b22; color: #fff; }
     .btn-reject { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
     .btn-reject:hover { background: #dc3545; color: #fff; }
+    .btn-whatsapp { background: rgba(37,211,102,0.1); color: #25d366; border: 1px solid rgba(37,211,102,0.2); }
+    .btn-whatsapp:hover { background: #25d366; color: #fff; }
+    .btn-no-phone { background: rgba(150,150,150,0.1); color: #999; border: 1px solid rgba(150,150,150,0.2); cursor: not-allowed; }
     .status-badge { display: inline-block; padding: 0.3rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 600; }
     .status-badge.status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
     .status-badge.status-approved { background: rgba(34,139,34,0.1); color: #228b22; }
@@ -54,6 +57,7 @@
     .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
     .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
+    .phone-note { font-size: 0.7rem; color: var(--text-muted); font-style: italic; }
     @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
 </style>
 {% endblock %}
@@ -94,8 +98,8 @@
         {% if whatsapp_url %}
         <div style="background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.3); border-radius: 10px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
             <div>
-                <strong style="color: #25d366; font-size: 0.9rem;">📱 WhatsApp Payment Details Ready!</strong>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Click the button to send payment details to student via WhatsApp</p>
+                <strong style="color: #25d366; font-size: 0.9rem;">📱 WhatsApp Receipt Ready!</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Click to send enrollment confirmation + payment details to student</p>
             </div>
             <a href="{{ whatsapp_url }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #25d366; color: #fff; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">Send on WhatsApp</a>
         </div>
@@ -120,7 +124,7 @@
                         <div class="enroll-item">
                             <div class="enroll-info">
                                 <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
-                                <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+                                <p>Applied {{ enrollment.enrolled_at|date:"M d, Y" }} · {{ enrollment.student.email }}</p>
                             </div>
                             <div class="enroll-actions">
                                 <form method="POST" style="display:inline;">
@@ -148,17 +152,25 @@
             <div class="card">
                 <div class="card-header">
                     <h3>Approved Enrollments</h3>
+                    <span style="font-size:0.78rem; color: var(--text-muted);">WhatsApp receipt available for each student</span>
                 </div>
                 <div class="card-body">
-                    {% if approved_enrollments %}
+                    {% if approved_with_whatsapp %}
                     <div class="enroll-list">
-                        {% for enrollment in approved_enrollments %}
+                        {% for item in approved_with_whatsapp %}
                         <div class="enroll-item">
                             <div class="enroll-info">
-                                <h4>{{ enrollment.student.get_full_name }} → {{ enrollment.course.title }}</h4>
-                                <p>Approved {{ enrollment.approved_at|date:"M d, Y" }}</p>
+                                <h4>{{ item.enrollment.student.get_full_name }} → {{ item.enrollment.course.title }}</h4>
+                                <p>Approved {{ item.enrollment.approved_at|date:"M d, Y" }} · {{ item.enrollment.student.email }}</p>
                             </div>
-                            <span class="status-badge status-approved">Approved</span>
+                            <div class="enroll-actions">
+                                <span class="status-badge status-approved">Approved</span>
+                                {% if item.whatsapp_url %}
+                                <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp" title="Send receipt on WhatsApp">📱 WhatsApp</a>
+                                {% else %}
+                                <span class="btn-sm btn-no-phone" title="No phone number on file">📱 No Phone</span>
+                                {% endif %}
+                            </div>
                         </div>
                         {% endfor %}
                     </div>

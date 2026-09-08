@@ -54,6 +54,8 @@
     .btn-mark:hover { background: #228b22; color: #fff; }
     .btn-record { background: rgba(71,24,32,0.08); color: var(--brand-700); border: 1px solid rgba(71,24,32,0.15); }
     .btn-record:hover { background: var(--brand-700); color: #fff; }
+    .btn-whatsapp { background: rgba(37,211,102,0.1); color: #25d366; border: 1px solid rgba(37,211,102,0.2); }
+    .btn-whatsapp:hover { background: #25d366; color: #fff; }
 
     .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
 
@@ -191,7 +193,7 @@
                 <h3>Enrolled Students — Fee Status</h3>
             </div>
             <div class="card-body">
-                {% if approved_enrollments %}
+                {% if approved_with_whatsapp %}
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -203,25 +205,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for enrollment in approved_enrollments %}
+                        {% for item in approved_with_whatsapp %}
                         <tr>
-                            <td><strong>{{ enrollment.student.get_full_name }}</strong></td>
-                            <td>{{ enrollment.course.title }}</td>
-                            <td>{% for payment in payments %}{% if payment.enrollment.id == enrollment.id %}Rs. {{ payment.amount }}{% endif %}{% empty %}-{% endfor %}</td>
+                            <td><strong>{{ item.enrollment.student.get_full_name }}</strong></td>
+                            <td>{{ item.enrollment.course.title }}</td>
+                            <td>{% for payment in payments %}{% if payment.enrollment.id == item.enrollment.id %}Rs. {{ payment.amount }}{% endif %}{% empty %}-{% endfor %}</td>
                             <td>
-                                {% for payment in payments %}{% if payment.enrollment.id == enrollment.id %}
+                                {% for payment in payments %}{% if payment.enrollment.id == item.enrollment.id %}
                                 <span class="status-badge status-{{ payment.status }}">{{ payment.get_status_display }}</span>
                                 {% endif %}{% empty %}
                                 <span class="status-badge status-pending">Unpaid</span>
                                 {% endfor %}
                             </td>
                             <td>
-                                <button class="btn-sm btn-record" onclick="openPaymentModal('{{ enrollment.id }}', '{{ enrollment.student.get_full_name }}', '{{ enrollment.course.title }}')">Record Payment</button>
+                                <button class="btn-sm btn-record" onclick="openPaymentModal('{{ item.enrollment.id }}', '{{ item.enrollment.student.get_full_name }}', '{{ item.enrollment.course.title }}')">Record Payment</button>
                                 <form method="POST" style="display:inline;">
                                     {% csrf_token %}
-                                    <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
+                                    <input type="hidden" name="enrollment_id" value="{{ item.enrollment.id }}">
                                     <button type="submit" name="action" value="mark_free" class="btn-sm btn-mark">Mark Free</button>
                                 </form>
+                                {% if item.whatsapp_url %}
+                                <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp" title="Send receipt on WhatsApp">📱</a>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

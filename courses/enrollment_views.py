@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 from courses.models import Course
 from courses.enrollment_models import Enrollment
 
@@ -27,6 +29,24 @@ def enroll_course(request, slug):
             course=course,
             status='pending'
         )
+
+        # --- Email: enrollment pending confirmation ---
+        try:
+            send_mail(
+                f'Enrollment Received — {course.title} | Muslimaa Academy',
+                f"Assalam-o-Alaikum {request.user.first_name},\n\n"
+                f"JazakAllah Khair for enrolling in \"{course.title}\"!\n\n"
+                f"We have received your enrollment request. Our team will review it shortly.\n\n"
+                f"You will receive an email with payment details once your enrollment is approved.\n\n"
+                f"If you have any questions, feel free to reply to this email.\n\n"
+                f"Muslimaa Academy Team",
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
         messages.success(request, f'Enrollment request for {course.title} submitted! Payment details will be sent after approval.')
         return redirect('accounts:profile')
     
