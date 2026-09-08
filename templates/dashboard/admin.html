@@ -443,19 +443,19 @@
                 <p>Active Courses</p>
             </div>
             <div class="stat-card animate-on-scroll">
-                <div class="stat-icon workshops">🎓</div>
-                <h3>{{ total_workshops }}</h3>
-                <p>Workshops</p>
+                <div class="stat-icon enrollments">📝</div>
+                <h3>{{ pending_enrollments }}</h3>
+                <p>Pending Enrollments</p>
+            </div>
+            <div class="stat-card animate-on-scroll">
+                <div class="stat-icon messages" style="background:rgba(220,20,60,0.1); color:#dc143c;">💰</div>
+                <h3 style="color:#dc143c;">{{ pending_fees }}</h3>
+                <p>Pending Fees</p>
             </div>
             <div class="stat-card animate-on-scroll">
                 <div class="stat-icon messages">✉️</div>
                 <h3>{{ pending_messages }}</h3>
                 <p>Pending Messages</p>
-            </div>
-            <div class="stat-card animate-on-scroll">
-                <div class="stat-icon enrollments">📝</div>
-                <h3>{{ pending_enrollments }}</h3>
-                <p>Pending Enrollments</p>
             </div>
         </div>
 
@@ -469,6 +469,23 @@
             <div class="chart-card">
                 <h3>Enrollments (Last 6 Months)</h3>
                 <canvas id="enrollmentChart"></canvas>
+            </div>
+        </div>
+
+        <!-- FEE REMINDER INFO -->
+        <div class="card animate-on-scroll" style="margin-bottom: 1.5rem; border-left: 3px solid var(--accent-gold);">
+            <div class="card-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+                <div>
+                    <h3 style="font-family:var(--font-serif); font-size:1rem; font-weight:700; color:var(--brand-700); margin-bottom:0.25rem;">Fee Reminder Schedule</h3>
+                    <p style="font-size:0.82rem; color:var(--text-muted);">Auto-reminders sent on <strong>1st</strong>, <strong>3rd</strong>, and <strong>5th</strong> (last date) of each month via email + WhatsApp link.</p>
+                </div>
+                <form method="POST" style="margin:0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="send_fee_reminders">
+                    <button type="submit" class="btn btn-primary" style="font-size:0.82rem; padding:0.5rem 1rem;" onclick="return confirm('Send fee reminders now?')">
+                        Send Now
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -537,6 +554,14 @@
                             <span class="action-icon">💰</span>
                             Track Fees
                         </a>
+                        <form method="POST" style="margin:0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="send_fee_reminders">
+                            <button type="submit" class="action-btn" style="width:100%; border:none; cursor:pointer; font-family:var(--font-sans);" onclick="return confirm('Send fee reminders to all unpaid students?')">
+                                <span class="action-icon">📱</span>
+                                Send Fee Reminders
+                            </button>
+                        </form>
                         <a href="{% url 'admin:index' %}" class="action-btn">
                             <span class="action-icon">⚙️</span>
                             Django Admin

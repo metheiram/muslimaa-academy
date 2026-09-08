@@ -113,12 +113,28 @@ def admin_dashboard(request):
 
     today = timezone.now().date()
 
+    if request.method == 'POST' and request.POST.get('action') == 'send_fee_reminders':
+        from django.core.management import call_command
+        from io import StringIO
+        out = StringIO()
+        call_command('send_fee_reminders', force_day=today.day, stdout=out)
+        output = out.getvalue().strip()
+        if 'No unpaid students' in output:
+            messages.info(request, 'No unpaid students found for today\'s reminder.')
+        else:
+            messages.success(request, f'Fee reminders sent! {output}')
+        return redirect('dashboard:admin_dashboard')
+
     total_students = User.objects.filter(is_superuser=False, is_staff=False).count()
     total_courses = Course.objects.filter(is_active=True).count()
     total_workshops = Workshop.objects.filter(is_active=True).count()
     pending_messages = ContactMessage.objects.filter(is_read=False).count()
     pending_enrollments = Enrollment.objects.filter(status='pending').count()
     recent_messages = ContactMessage.objects.all().order_by('-created_at')[:5]
+
+    approved = Enrollment.objects.filter(status='approved')
+    paid_enrollment_ids = Payment.objects.filter(status='paid').values_list('enrollment_id', flat=True)
+    pending_fees = approved.exclude(id__in=paid_enrollment_ids).count()
 
     # Chart data — last 6 months
     chart_labels = []
@@ -148,6 +164,7 @@ def admin_dashboard(request):
         'total_workshops': total_workshops,
         'pending_messages': pending_messages,
         'pending_enrollments': pending_enrollments,
+        'pending_fees': pending_fees,
         'recent_messages': recent_messages,
         'total_revenue': total_revenue,
         'chart_labels': chart_labels,
