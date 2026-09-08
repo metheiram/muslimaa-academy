@@ -1,7 +1,51 @@
 {% if messages %}
-  <ul class="messages">
-  {% for message in messages %}
-    <li class="{{ message.tags }}">{{ message }}</li>
-  {% endfor %}
-  </ul>
+<style>
+    .flash-messages { position: fixed; top: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem; max-width: 420px; width: calc(100% - 40px); }
+    .flash-msg { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem 1.25rem; border-radius: 12px; font-family: 'Inter', sans-serif; box-shadow: 0 8px 30px rgba(0,0,0,0.12); animation: slideInRight 0.4s cubic-bezier(0.22,1,0.36,1); position: relative; overflow: hidden; }
+    .flash-msg::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+    .flash-msg-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+    .flash-msg-content { flex: 1; }
+    .flash-msg-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.2rem; }
+    .flash-msg-text { font-size: 0.82rem; line-height: 1.5; opacity: 0.85; }
+    .flash-msg-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.5; padding: 0; line-height: 1; flex-shrink: 0; }
+    .flash-msg-close:hover { opacity: 1; }
+    .flash-msg-success { background: #f0faf4; border: 1px solid rgba(34,139,34,0.15); color: #1a5c2a; }
+    .flash-msg-success::before { background: #228b22; }
+    .flash-msg-error { background: #fef2f2; border: 1px solid rgba(220,53,69,0.15); color: #991b1b; }
+    .flash-msg-error::before { background: #dc3545; }
+    .flash-msg-warning { background: #fffbeb; border: 1px solid rgba(245,158,11,0.15); color: #92400e; }
+    .flash-msg-warning::before { background: #f59e0b; }
+    .flash-msg-info { background: #eff6ff; border: 1px solid rgba(59,130,246,0.15); color: #1e40af; }
+    .flash-msg-info::before { background: #3b82f6; }
+    .flash-msg-success .flash-email-cta { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.6rem; padding: 0.45rem 1rem; background: #228b22; color: #fff; border-radius: 8px; font-size: 0.78rem; font-weight: 700; text-decoration: none; transition: all 0.3s; }
+    .flash-msg-success .flash-email-cta:hover { background: #1a6b1a; transform: translateY(-1px); }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
+    @media (max-width: 480px) { .flash-messages { right: 10px; left: 10px; max-width: none; width: auto; top: 70px; } }
+</style>
+<div class="flash-messages" id="flashMessages">
+{% for message in messages %}
+<div class="flash-msg flash-msg-{{ message.tags }}" id="flash-{{ forloop.counter }}">
+    <span class="flash-msg-icon">
+        {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+    </span>
+    <div class="flash-msg-content">
+        <div class="flash-msg-title">
+            {% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Error{% elif message.tags == 'warning' %}Warning{% else %}Info{% endif %}
+        </div>
+        <div class="flash-msg-text">{{ message }}</div>
+        {% if 'Enrollment' in message and 'submitted' in message %}
+        <a href="https://mail.google.com" target="_blank" class="flash-email-cta">📧 Open Email Now</a>
+        {% endif %}
+    </div>
+    <button class="flash-msg-close" onclick="this.parentElement.style.animation='fadeOut 0.3s forwards'; setTimeout(()=>this.parentElement.remove(), 300);">&times;</button>
+</div>
+{% endfor %}
+</div>
+<script>
+setTimeout(function() {
+    var el = document.getElementById('flashMessages');
+    if (el) { el.querySelectorAll('.flash-msg').forEach(function(msg) { msg.style.animation = 'fadeOut 0.3s forwards'; setTimeout(function() { msg.remove(); }, 300); }); }
+}, 6000);
+</script>
 {% endif %}

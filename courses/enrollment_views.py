@@ -94,7 +94,7 @@ def enroll_course(request, slug):
         except Exception:
             pass
 
-        messages.success(request, f'Enrollment for {course.title} submitted! Check your email for payment details.')
+        messages.success(request, f'Enrollment for {course.title} submitted successfully! 📧 Please check your email for payment details and instructions.')
         return redirect('courses:course_detail', slug=slug)
     
     return render(request, 'courses/enroll.html', {'course': course})
