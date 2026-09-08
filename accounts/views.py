@@ -83,6 +83,9 @@ class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     
     def get_success_url(self):
+        next_url = self.request.GET.get('next') or self.request.POST.get('next')
+        if next_url:
+            return next_url
         if self.request.user.is_superuser:
             return '/dashboard/'
         elif self.request.user.is_staff:

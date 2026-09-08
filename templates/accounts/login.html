@@ -237,6 +237,7 @@
 
                 <form method="post">
                     {% csrf_token %}
+                    {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
                     {% for field in form %}
                     <div class="form-group">
