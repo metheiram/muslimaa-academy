@@ -177,7 +177,6 @@
         </div>
     </main>
 </div>
-{% endblock %}
 
 <!-- ADD COURSE MODAL -->
 <div class="modal-overlay" id="addCourseModal">
@@ -410,10 +409,10 @@ function openEditModal(id, title, description, shortDesc, category, level, durat
     document.getElementById('edit_active').checked = isActive === 'true';
     document.getElementById('editCourseModal').classList.add('active');
 }
-</script>
-<script>
+
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('active');
 }
 </script>
+{% endblock %}
