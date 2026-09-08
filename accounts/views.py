@@ -127,6 +127,13 @@ def student_dashboard(request):
         submitted_at__isnull=True
     ).select_related('homework', 'homework__course')[:3]
 
+    # Attendance stats
+    from attendance.models import Attendance
+    total_attendance = Attendance.objects.filter(student=user).count()
+    present_count = Attendance.objects.filter(student=user, status='present').count()
+    absent_count = Attendance.objects.filter(student=user, status='absent').count()
+    attendance_pct = round((present_count / total_attendance * 100), 1) if total_attendance > 0 else 0
+
     context = {
         'enrollments': enrollments,
         'approved_enrollments': approved_enrollments,
@@ -138,6 +145,10 @@ def student_dashboard(request):
         'pending_count': pending_enrollments.count(),
         'upcoming_meetings': upcoming_meetings,
         'pending_homework': pending_homework,
+        'total_attendance': total_attendance,
+        'present_count': present_count,
+        'absent_count': absent_count,
+        'attendance_pct': attendance_pct,
         'active_page': 'dashboard',
     }
     return render(request, 'accounts/student_dashboard.html', context)
@@ -180,6 +191,13 @@ def teacher_dashboard(request):
         grade__isnull=True
     ).select_related('student', 'homework')[:5]
 
+    # Recent attendance
+    from attendance.models import Attendance
+    from django.utils import timezone as tz
+    recent_attendance = Attendance.objects.filter(
+        marked_by=user
+    ).select_related('student', 'course').order_by('-date')[:5]
+
     context = {
         'courses_taught': Course.objects.filter(id__in=assigned_course_ids, is_active=True),
         'enrolled_students': enrolled_students,
@@ -188,6 +206,7 @@ def teacher_dashboard(request):
         'total_pending': total_pending,
         'upcoming_meetings': upcoming_meetings,
         'pending_submissions': pending_submissions,
+        'recent_attendance': recent_attendance,
         'active_page': 'dashboard',
     }
     return render(request, 'accounts/teacher_dashboard.html', context)
