@@ -53,15 +53,16 @@
     <div class="stat-card"><div class="num">{{ excused }}</div><div class="label">Excused</div></div>
 </div>
 
-<div class="filter-bar">
-    <form method="GET">
-        <select name="course" onchange="this.form.submit()">
+<div style="display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+    <form method="GET" style="display:flex; gap:0.75rem; align-items:end; flex-wrap:wrap;">
+        <select name="course" onchange="this.form.submit()" style="padding:0.6rem 1rem; border:1px solid rgba(71,24,32,0.15); border-radius:8px; font-size:0.88rem; background:#fff;">
             <option value="">All Courses</option>
             {% for course in courses %}
             <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.title }}</option>
             {% endfor %}
         </select>
     </form>
+    <a href="{% url 'attendance:attendance_report' %}" style="padding:0.6rem 1.25rem; background:var(--brand-700); color:#fff; border-radius:8px; font-size:0.85rem; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;">Download Report</a>
 </div>
 
 <div class="att-card">

@@ -1,0 +1,147 @@
+{% extends 'base/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Create Announcement | Muslimaa Academy Admin{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root { --brand-700: #471820; --brand-800: #3d1319; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: var(--brand-700); color: #ffffff; padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; transition: transform 0.3s ease; }
+    .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--brand-700); z-index: 150; align-items: center; padding: 0 1rem; }
+    .hamburger { background: none; border: none; cursor: pointer; padding: 0.5rem; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: #fff; margin: 5px 0; border-radius: 2px; transition: all 0.3s ease; }
+    .mobile-header h2 { font-family: var(--font-serif); font-size: 1rem; color: #fff; margin-left: 0.75rem; }
+    .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .sidebar-brand h2 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; }
+    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
+    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #ffffff; border-left-color: var(--accent-gold); }
+    .sidebar-nav .section-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
+    .sidebar-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; }
+    .sidebar-footer a:hover { color: #ffffff; }
+    .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; transition: border-color 0.3s ease; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--brand-700); }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #ffffff; }
+    .btn-primary:hover { background: var(--brand-800); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1.5px solid rgba(71,24,32,0.2); }
+    .btn-outline:hover { background: rgba(71,24,32,0.05); }
+    .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .help-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .course-select { display: none; }
+    .course-select.visible { display: block; }
+
+    @media (max-width: 768px) { .mobile-header { display: flex; } .sidebar { transform: translateX(-100%); z-index: 200; } .sidebar.open { transform: translateX(0); } .overlay.active { display: block; } .main-content { margin-left: 0; padding: 72px 1rem 1rem; } .form-row { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="mobile-header">
+        <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+        <h2>Muslimaa Academy</h2>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><h2>Muslimaa Academy</h2><p>{% if user.is_superuser %}Admin{% else %}Teacher{% endif %} Dashboard</p></div>
+        <ul class="sidebar-nav">
+            <li><a href="{% if user.is_superuser %}{% url 'dashboard:admin_dashboard' %}{% else %}{% url 'teacher_dashboard' %}{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
+            <div class="section-label">Content</div>
+            <li><a href="{% url 'announcements:announcement_list' %}" class="active"><span class="icon">📢</span> Announcements</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Create Announcement</h1>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" name="title" required placeholder="e.g. Holiday Notice, Exam Schedule...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Message *</label>
+                        <textarea name="message" required placeholder="Write your announcement here..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Send To *</label>
+                            <select name="target" id="target_select" onchange="toggleCourseField()">
+                                <option value="all">All Students</option>
+                                <option value="course">Specific Course</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select name="priority">
+                                <option value="normal">Normal</option>
+                                <option value="important">Important</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group course-select" id="course_field">
+                        <label>Course *</label>
+                        <select name="course_id">
+                            <option value="">Select Course</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Post Announcement</button>
+                        <a href="{% url 'announcements:announcement_list' %}" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+}
+function toggleCourseField() {
+    var val = document.getElementById('target_select').value;
+    document.getElementById('course_field').classList.toggle('visible', val === 'course');
+}
+</script>
+{% endblock %}

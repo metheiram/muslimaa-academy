@@ -37,8 +37,17 @@ def course_list(request):
 
 def course_detail(request, slug):
     """Display a single course."""
+    from .models import Rating
     course = get_object_or_404(Course, slug=slug, is_active=True)
-    context = {'course': course}
+    ratings = Rating.objects.filter(course=course).select_related('student')
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = Rating.objects.filter(student=request.user, course=course).first()
+    context = {
+        'course': course,
+        'ratings': ratings,
+        'user_rating': user_rating,
+    }
     return render(request, 'courses/course_detail.html', context)
 
 

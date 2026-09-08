@@ -55,3 +55,31 @@ class Course(models.Model):
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
         super().save(*args, **kwargs)
+
+    @property
+    def average_rating(self):
+        ratings = self.ratings.all()
+        if not ratings:
+            return 0
+        return round(sum(r.rating for r in ratings) / len(ratings), 1)
+
+    @property
+    def total_reviews(self):
+        return self.ratings.count()
+
+
+class Rating(models.Model):
+    """Student rating and review for a course."""
+
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_ratings')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='ratings')
+    rating = models.IntegerField(default=5)
+    review = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'course')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.student.get_full_name()} - {self.course.title} ({self.rating}/5)"

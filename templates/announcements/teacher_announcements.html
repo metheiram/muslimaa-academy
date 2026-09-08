@@ -1,0 +1,70 @@
+{% extends 'base/base_teacher.html' %}
+{% load static %}
+
+{% block title %}Announcements | Muslimaa Academy{% endblock %}
+
+{% block teacher_extra_head %}
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+    .btn-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-danger:hover { background: #dc3545; color: #fff; }
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-body { padding: 1.25rem 1.5rem; }
+    .announcement-item { padding: 1.25rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .announcement-item:last-child { border-bottom: none; }
+    .announcement-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+    .announcement-title { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.35rem; }
+    .announcement-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .announcement-msg { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+    .priority-badge { padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .priority-normal { background: rgba(71,24,32,0.08); color: var(--brand-700); }
+    .priority-important { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .priority-urgent { background: rgba(220,20,60,0.1); color: #dc143c; }
+    .target-badge { font-size: 0.72rem; color: var(--text-muted); background: rgba(71,24,32,0.04); padding: 0.15rem 0.5rem; border-radius: 20px; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; }
+</style>
+{% endblock %}
+
+{% block teacher_content %}
+<div class="page-header">
+    <h1>Announcements</h1>
+    <a href="{% url 'announcements:create_announcement' %}" class="btn btn-primary">+ New Announcement</a>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        {% if announcements %}
+        {% for ann in announcements %}
+        <div class="announcement-item">
+            <div class="announcement-top">
+                <div>
+                    <div class="announcement-title">{{ ann.title }}</div>
+                    <div class="announcement-meta">
+                        By {{ ann.created_by.get_full_name }} · {{ ann.created_at|date:"M d, Y g:i A" }}
+                        <span class="target-badge">{{ ann.target_display }}</span>
+                    </div>
+                </div>
+                <span class="priority-badge priority-{{ ann.priority }}">{{ ann.get_priority_display }}</span>
+            </div>
+            <div class="announcement-msg">{{ ann.message|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="empty-msg">No announcements yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

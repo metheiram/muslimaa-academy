@@ -1,0 +1,57 @@
+{% extends 'base/base_student.html' %}
+{% load static %}
+
+{% block title %}Announcements | Muslimaa Academy{% endblock %}
+
+{% block student_extra_head %}
+<style>
+    .page-header { text-align: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; color: var(--brand-700); }
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-body { padding: 1.25rem 1.5rem; }
+    .announcement-item { padding: 1.25rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .announcement-item:last-child { border-bottom: none; }
+    .announcement-item:first-child { padding-top: 0; }
+    .announcement-title { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.35rem; }
+    .announcement-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .announcement-msg { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+    .priority-badge { padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .priority-normal { background: rgba(71,24,32,0.08); color: var(--brand-700); }
+    .priority-important { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .priority-urgent { background: rgba(220,20,60,0.1); color: #dc143c; border: 1px solid rgba(220,20,60,0.15); }
+    .target-badge { font-size: 0.72rem; color: var(--text-muted); background: rgba(71,24,32,0.04); padding: 0.15rem 0.5rem; border-radius: 20px; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .urgent-banner { background: rgba(220,20,60,0.06); border-left: 3px solid #dc143c; padding: 0.5rem 1rem; border-radius: 0 8px 8px 0; margin-bottom: 1rem; font-size: 0.82rem; color: #dc143c; font-weight: 600; }
+
+    @media (max-width: 768px) { .announcement-meta { flex-direction: column; gap: 0.35rem; } }
+</style>
+{% endblock %}
+
+{% block student_content %}
+<div class="page-header">
+    <h1>Announcements</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if announcements %}
+        {% for ann in announcements %}
+        <div class="announcement-item">
+            {% if ann.priority == 'urgent' %}
+            <div class="urgent-banner">Urgent — Action may be required</div>
+            {% endif %}
+            <div class="announcement-title">{{ ann.title }}</div>
+            <div class="announcement-meta">
+                <span>{{ ann.created_at|date:"M d, Y g:i A" }}</span>
+                <span class="priority-badge priority-{{ ann.priority }}">{{ ann.get_priority_display }}</span>
+                <span class="target-badge">{{ ann.target_display }}</span>
+            </div>
+            <div class="announcement-msg">{{ ann.message|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="empty-msg">No announcements at this time.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

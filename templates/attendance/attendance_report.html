@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Report - {{ month_name }} {{ year }} | Muslimaa Academy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; color: #2d0d0f; background: #fff; padding: 2rem; }
+        .report { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid #471820; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #471820; margin-bottom: 0.25rem; }
+        .subtitle { font-size: 0.85rem; color: #8a7a85; }
+        .report-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #471820; margin: 1.5rem 0 0.5rem; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .info-item { padding: 0.75rem; background: #faf6f1; border-radius: 8px; }
+        .info-item .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #8a7a85; margin-bottom: 0.25rem; }
+        .info-item .value { font-size: 1rem; font-weight: 700; color: #471820; }
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .stat-box { text-align: center; padding: 1rem; border-radius: 8px; border: 1px solid rgba(71,24,32,0.1); }
+        .stat-box .num { font-size: 1.5rem; font-weight: 800; color: #471820; }
+        .stat-box .lbl { font-size: 0.7rem; color: #8a7a85; text-transform: uppercase; margin-top: 0.2rem; }
+        .stat-box.present .num { color: #228b22; }
+        .stat-box.absent .num { color: #dc143c; }
+        .stat-box.late .num { color: #e67e00; }
+        .stat-box.pct .num { color: #d4a574; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+        th { text-align: left; padding: 0.6rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #8a7a85; border-bottom: 2px solid rgba(71,24,32,0.1); background: #faf6f1; }
+        td { padding: 0.5rem 0.6rem; font-size: 0.85rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
+        .badge { padding: 0.15rem 0.5rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+        .badge-present { background: rgba(34,139,34,0.1); color: #228b22; }
+        .badge-absent { background: rgba(220,20,60,0.1); color: #dc143c; }
+        .badge-late { background: rgba(255,165,0,0.1); color: #e67e00; }
+        .badge-excused { background: rgba(100,100,200,0.1); color: #6464c8; }
+        .footer { text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(71,24,32,0.1); font-size: 0.78rem; color: #8a7a85; }
+        .btn-print { display: inline-block; padding: 0.6rem 1.5rem; background: #471820; color: #fff; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-bottom: 1.5rem; }
+        .btn-print:hover { background: #3d1319; }
+        .controls { display: flex; gap: 1rem; align-items: end; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .controls label { display: block; font-size: 0.78rem; font-weight: 600; color: #5a4a55; margin-bottom: 0.25rem; }
+        .controls select, .controls input { padding: 0.5rem 0.75rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.85rem; }
+        .controls button { padding: 0.5rem 1rem; background: #471820; color: #fff; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        @media print { body { padding: 0; } .btn-print, .controls, .no-print { display: none !important; } .report { max-width: 100%; } }
+        @media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .info-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="report">
+        <div class="no-print" style="text-align:center;">
+            <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+            <a href="{% url 'attendance:student_attendance' %}" style="display:inline-block; padding:0.6rem 1.5rem; background:transparent; color:#471820; border:1.5px solid #471820; border-radius:8px; font-size:0.85rem; font-weight:700; text-decoration:none; margin-left:0.5rem;">Back to Attendance</a>
+        </div>
+
+        <div class="header">
+            <div class="logo">Muslimaa Academy</div>
+            <div class="subtitle">Attendance Report</div>
+        </div>
+
+        <div class="no-print">
+            <form class="controls" method="GET">
+                <div>
+                    <label>Month</label>
+                    <select name="month">
+                        {% for m in "123456789101112" %}
+                        {% with month_num=m|add:"0" %}
+                        <option value="{{ month_num }}" {% if month == month_num %}selected{% endif %}>
+                            {% if month_num == 1 %}January{% elif month_num == 2 %}February{% elif month_num == 3 %}March{% elif month_num == 4 %}April{% elif month_num == 5 %}May{% elif month_num == 6 %}June{% elif month_num == 7 %}July{% elif month_num == 8 %}August{% elif month_num == 9 %}September{% elif month_num == 10 %}October{% elif month_num == 11 %}November{% elif month_num == 12 %}December{% endif %}
+                        </option>
+                        {% endwith %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Year</label>
+                    <input type="number" name="year" value="{{ year }}" min="2024" max="2030">
+                </div>
+                <div>
+                    <label>Course</label>
+                    <select name="course">
+                        <option value="">All Courses</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <button type="submit">Generate</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">Student Name</div>
+                <div class="value">{{ student.get_full_name }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Email</div>
+                <div class="value">{{ student.email }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Report Period</div>
+                <div class="value">{{ month_name }} {{ year }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Generated On</div>
+                <div class="value">{% now "M d, Y" %}</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box pct"><div class="num">{{ percentage }}%</div><div class="lbl">Attendance</div></div>
+            <div class="stat-box"><div class="num">{{ total }}</div><div class="lbl">Total</div></div>
+            <div class="stat-box present"><div class="num">{{ present }}</div><div class="lbl">Present</div></div>
+            <div class="stat-box absent"><div class="num">{{ absent }}</div><div class="lbl">Absent</div></div>
+            <div class="stat-box late"><div class="num">{{ late }}</div><div class="lbl">Late</div></div>
+        </div>
+
+        {% if course_attendance %}
+        <div class="report-title">Course-wise Summary</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Total</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Late</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cname, stats in course_attendance.items %}
+                <tr>
+                    <td><strong>{{ cname }}</strong></td>
+                    <td>{{ stats.total }}</td>
+                    <td>{{ stats.present }}</td>
+                    <td>{{ stats.absent }}</td>
+                    <td>{{ stats.late }}</td>
+                    <td>{% if stats.total > 0 %}{{ stats.present|floatformat:0 }}/{{ stats.total }} ({{ stats.present|floatformat:0 }}%){% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if attendances %}
+        <div class="report-title">Detailed Attendance</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Course</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendances %}
+                <tr>
+                    <td>{{ att.date|date:"M d, Y" }}</td>
+                    <td>{{ att.course.title }}</td>
+                    <td><span class="badge badge-{{ att.status }}">{{ att.get_status_display }}</span></td>
+                    <td>{{ att.notes|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="text-align:center; padding:2rem; color:#8a7a85;">No attendance records for this period.</p>
+        {% endif %}
+
+        <div class="footer">
+            <p>Muslimaa Academy &mdash; Attendance Report</p>
+            <p>This is a system-generated report.</p>
+        </div>
+    </div>
+</body>
+</html>

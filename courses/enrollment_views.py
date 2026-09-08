@@ -123,3 +123,34 @@ def upload_screenshot(request, enrollment_id):
         messages.error(request, 'Please select a screenshot to upload.')
 
     return redirect('courses:my_enrollments')
+
+
+@login_required
+def rate_course(request, course_id):
+    """Submit a rating and review for a course."""
+    from courses.models import Course, Rating
+
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        rating_value = request.POST.get('rating', '5')
+        review_text = request.POST.get('review', '').strip()
+
+        try:
+            rating_value = int(rating_value)
+            if rating_value < 1 or rating_value > 5:
+                rating_value = 5
+        except (ValueError, TypeError):
+            rating_value = 5
+
+        Rating.objects.update_or_create(
+            student=request.user,
+            course=course,
+            defaults={
+                'rating': rating_value,
+                'review': review_text,
+            }
+        )
+        messages.success(request, f'Thank you! Your rating for {course.title} has been submitted.')
+
+    return redirect('courses:course_detail', slug=course.slug)

@@ -26,16 +26,52 @@
     .btn-primary:hover { background: var(--brand-800); transform: translateY(-2px); }
     .btn-outline { background: transparent; color: var(--brand-700); border: 2px solid var(--brand-700); }
     .btn-outline:hover { background: var(--brand-700); color: #fff; }
+    .btn-sm { padding: 0.5rem 1.2rem; font-size: 0.82rem; width: auto; margin-top: 0; }
     .features-list { list-style: none; padding: 0; margin: 1rem 0; }
     .features-list li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; font-size: 0.9rem; color: var(--text-secondary); }
-    .features-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent-gold); font-weight: 700; }
-    @media (max-width: 768px) { .course-body { grid-template-columns: 1fr; } }
+    .features-list li::before { content: '\2713'; position: absolute; left: 0; color: var(--accent-gold); font-weight: 700; }
+
+    .ratings-section { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid rgba(71,24,32,0.1); }
+    .ratings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .ratings-header h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--brand-700); }
+    .ratings-summary { display: flex; align-items: center; gap: 0.75rem; }
+    .avg-rating { font-size: 2rem; font-weight: 800; color: var(--accent-gold); }
+    .stars { color: var(--accent-gold); font-size: 1.1rem; letter-spacing: 2px; }
+    .review-count { font-size: 0.82rem; color: var(--text-muted); }
+
+    .rating-form { background: #fff; border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(71,24,32,0.06); margin-bottom: 1.5rem; }
+    .rating-form h4 { font-family: var(--font-serif); font-size: 1rem; color: var(--brand-700); margin-bottom: 1rem; }
+    .star-input { display: flex; gap: 0.35rem; margin-bottom: 1rem; }
+    .star-input input { display: none; }
+    .star-input label { font-size: 1.8rem; color: #ddd; cursor: pointer; transition: color 0.2s; }
+    .star-input label:hover, .star-input label:hover ~ label, .star-input input:checked ~ label { color: var(--accent-gold); }
+    .star-input { direction: rtl; }
+    .rating-form textarea { width: 100%; padding: 0.75rem; border: 1.5px solid rgba(71,24,32,0.15); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; resize: vertical; min-height: 80px; margin-bottom: 1rem; }
+    .rating-form textarea:focus { outline: none; border-color: var(--brand-700); }
+
+    .rating-card { background: #fff; border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(71,24,32,0.06); margin-bottom: 1rem; }
+    .rating-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .rating-author { font-weight: 600; font-size: 0.9rem; color: var(--brand-700); }
+    .rating-date { font-size: 0.75rem; color: var(--text-muted); }
+    .rating-stars { color: var(--accent-gold); font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
+    .rating-text { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+    .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
+    .alert-success { background: rgba(212,165,116,0.15); color: var(--brand-700); border-left: 3px solid var(--accent-gold); }
+
+    @media (max-width: 768px) { .course-body { grid-template-columns: 1fr; } .ratings-header { flex-direction: column; align-items: flex-start; } }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="course-detail">
-    <a href="{% url 'courses:course_list' %}" class="back-link">← Back to Courses</a>
+    <a href="{% url 'courses:course_list' %}" class="back-link">&larr; Back to Courses</a>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
 
     {% if course.image_url or course.image %}
     <img src="{% if course.image_url %}{{ course.image_url }}{% elif course.image %}{{ course.image.url }}{% endif %}" 
@@ -45,11 +81,14 @@
     <h1 class="course-title">{{ course.title }}</h1>
 
     <div class="course-meta">
-        <span class="meta-badge">📚 {{ course.get_category_display }}</span>
-        <span class="meta-badge">📊 {{ course.get_level_display }}</span>
-        <span class="meta-badge">⏱️ {{ course.duration }}</span>
+        <span class="meta-badge">{{ course.get_category_display }}</span>
+        <span class="meta-badge">{{ course.get_level_display }}</span>
+        <span class="meta-badge">{{ course.duration }}</span>
         {% if course.instructor %}
-        <span class="meta-badge">👩‍🏫 {{ course.instructor.get_full_name|default:course.instructor.username }}</span>
+        <span class="meta-badge">{{ course.instructor.get_full_name|default:course.instructor.username }}</span>
+        {% endif %}
+        {% if course.average_rating > 0 %}
+        <span class="meta-badge">{{ course.average_rating }} ({{ course.total_reviews }} reviews)</span>
         {% endif %}
     </div>
 
@@ -77,6 +116,55 @@
             <h3 style="font-family: var(--font-serif); color: var(--brand-700); margin-top: 2rem; margin-bottom: 0.5rem;">FAQ</h3>
             <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.8;">{{ course.faq|linebreaks }}</div>
             {% endif %}
+
+            <!-- RATINGS SECTION -->
+            <div class="ratings-section">
+                <div class="ratings-header">
+                    <h3>Student Reviews</h3>
+                    {% if course.average_rating > 0 %}
+                    <div class="ratings-summary">
+                        <span class="avg-rating">{{ course.average_rating }}</span>
+                        <div>
+                            <div class="stars">{% for i in "12345" %}{% if forloop.counter <= course.average_rating %}&#9733;{% else %}&#9734;{% endif %}{% endfor %}</div>
+                            <div class="review-count">{{ course.total_reviews }} review{{ course.total_reviews|pluralize }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if user.is_authenticated and user != course.instructor %}
+                <div class="rating-form">
+                    <h4>{% if user_rating %}Update Your Review{% else %}Write a Review{% endif %}</h4>
+                    <form method="POST" action="{% url 'courses:rate_course' course.id %}">
+                        {% csrf_token %}
+                        <div class="star-input">
+                            <input type="radio" name="rating" value="5" id="star5" {% if user_rating.rating == 5 %}checked{% elif not user_rating %}checked{% endif %}><label for="star5">&#9733;</label>
+                            <input type="radio" name="rating" value="4" id="star4" {% if user_rating.rating == 4 %}checked{% endif %}><label for="star4">&#9733;</label>
+                            <input type="radio" name="rating" value="3" id="star3" {% if user_rating.rating == 3 %}checked{% endif %}><label for="star3">&#9733;</label>
+                            <input type="radio" name="rating" value="2" id="star2" {% if user_rating.rating == 2 %}checked{% endif %}><label for="star2">&#9733;</label>
+                            <input type="radio" name="rating" value="1" id="star1" {% if user_rating.rating == 1 %}checked{% endif %}><label for="star1">&#9733;</label>
+                        </div>
+                        <textarea name="review" placeholder="Share your experience with this course (optional)...">{{ user_rating.review|default:"" }}</textarea>
+                        <button type="submit" class="btn btn-primary btn-sm" style="width:auto;">Submit Review</button>
+                    </form>
+                </div>
+                {% endif %}
+
+                {% if ratings %}
+                {% for r in ratings %}
+                <div class="rating-card">
+                    <div class="rating-top">
+                        <span class="rating-author">{{ r.student.get_full_name }}</span>
+                        <span class="rating-date">{{ r.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="rating-stars">{% for i in "12345" %}{% if forloop.counter <= r.rating %}&#9733;{% else %}&#9734;{% endif %}{% endfor %}</div>
+                    {% if r.review %}<div class="rating-text">{{ r.review }}</div>{% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="empty-msg">No reviews yet. Be the first to review!</p>
+                {% endif %}
+            </div>
         </div>
 
         <div class="course-sidebar">
@@ -84,7 +172,7 @@
             <div class="sidebar-item"><strong>Level</strong><span>{{ course.get_level_display }}</span></div>
             <div class="sidebar-item"><strong>Duration</strong><span>{{ course.duration }}</span></div>
             {% if course.price %}
-            <div class="sidebar-item"><strong>Price</strong><span>${{ course.price }}</span></div>
+            <div class="sidebar-item"><strong>Price</strong><span>Rs. {{ course.price|floatformat:0 }}</span></div>
             {% endif %}
             {% if course.instructor %}
             <div class="sidebar-item"><strong>Instructor</strong><span>{{ course.instructor.get_full_name }}</span></div>

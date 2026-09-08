@@ -114,3 +114,72 @@ def student_attendance(request):
         'active_page': 'attendance',
     }
     return render(request, 'attendance/student_attendance.html', context)
+
+
+@login_required
+def attendance_report(request):
+    """Generate printable attendance report for student."""
+    user = request.user
+    from courses.enrollment_models import Enrollment
+    from datetime import date
+    import calendar
+
+    month = int(request.GET.get('month', date.today().month))
+    year = int(request.GET.get('year', date.today().year))
+    course_id = request.GET.get('course')
+
+    month = max(1, min(12, month))
+    month_name = calendar.month_name[month]
+    days_in_month = calendar.monthrange(year, month)[1]
+
+    from django.utils import timezone
+    start_date = date(year, month, 1)
+    end_date = date(year, month, days_in_month)
+
+    enrollments = Enrollment.objects.filter(student=user, status='approved').select_related('course')
+    courses = [e.course for e in enrollments]
+
+    course_filter = None
+    if course_id:
+        course_filter = int(course_id)
+        attendances = Attendance.objects.filter(
+            student=user, date__gte=start_date, date__lte=end_date, course_id=course_id
+        ).select_related('course')
+    else:
+        attendances = Attendance.objects.filter(
+            student=user, date__gte=start_date, date__lte=end_date
+        ).select_related('course')
+
+    total = attendances.count()
+    present = attendances.filter(status='present').count()
+    absent = attendances.filter(status='absent').count()
+    late = attendances.filter(status='late').count()
+    excused = attendances.filter(status='excused').count()
+    percentage = round((present / total * 100), 1) if total > 0 else 0
+
+    course_attendance = {}
+    for att in attendances:
+        cname = att.course.title
+        if cname not in course_attendance:
+            course_attendance[cname] = {'total': 0, 'present': 0, 'absent': 0, 'late': 0, 'excused': 0}
+        course_attendance[cname]['total'] += 1
+        course_attendance[cname][att.status] += 1
+
+    context = {
+        'student': user,
+        'month': month,
+        'year': year,
+        'month_name': month_name,
+        'courses': courses,
+        'selected_course': course_id,
+        'attendances': attendances,
+        'total': total,
+        'present': present,
+        'absent': absent,
+        'late': late,
+        'excused': excused,
+        'percentage': percentage,
+        'course_attendance': course_attendance,
+        'active_page': 'attendance',
+    }
+    return render(request, 'attendance/attendance_report.html', context)
