@@ -229,6 +229,7 @@
             <li><a href="{% url 'courses:my_enrollments' %}" class="{% if active_page == 'enrollments' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📚</span> My Courses</a></li>
             <li><a href="{% url 'courses:course_list' %}" class="{% if active_page == 'browse' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🔍</span> Browse Courses</a></li>
             <div class="section-label">Academics</div>
+            <li><a href="{% url 'attendance:self_attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📝</span> Mark Attendance</a></li>
             <li><a href="{% url 'attendance:student_attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}" onclick="closeMobile()"><span class="icon">✅</span> My Attendance</a></li>
             <li><a href="{% url 'classes:schedule' %}" class="{% if active_page == 'schedule' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📅</span> Class Schedule</a></li>
             <li><a href="{% url 'classes:student_meetings' %}" class="{% if active_page == 'meetings' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🎥</span> Meetings</a></li>
