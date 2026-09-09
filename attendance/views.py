@@ -91,6 +91,7 @@ def attendance_view(request):
 def student_attendance(request):
     """Student views attendance + marks own attendance."""
     from courses.enrollment_models import Enrollment
+    from courses.models import Course
     from datetime import date
 
     user = request.user
@@ -104,7 +105,11 @@ def student_attendance(request):
         course_id = request.POST.get('course_id')
         status = request.POST.get('status', 'present')
         if course_id:
-            course = get_object_or_404(Course, id=course_id)
+            try:
+                course = Course.objects.get(id=course_id)
+            except (Course.DoesNotExist, ValueError):
+                messages.error(request, 'Invalid course.')
+                return redirect('attendance:student_attendance')
             existing = Attendance.objects.filter(student=user, course=course, date=today).first()
             if existing:
                 messages.warning(request, f'Attendance for {course.title} already marked today as {existing.get_status_display()}.')
