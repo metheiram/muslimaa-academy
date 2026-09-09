@@ -1,0 +1,107 @@
+{% extends 'base/base_student.html' %}
+{% load static %}
+
+{% block title %}Mark Attendance | Muslimaa Academy{% endblock %}
+
+{% block student_extra_head %}
+<style>
+    .page-header { text-align: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.6rem; color: var(--brand-700); }
+    .page-header p { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 10px rgba(71,24,32,0.04); padding: 1.5rem; margin-bottom: 1rem; }
+    .card h3 { font-family: var(--font-serif); font-size: 1.1rem; color: var(--brand-700); margin-bottom: 1rem; }
+    .course-att { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); flex-wrap: wrap; }
+    .course-att:last-child { border-bottom: none; }
+    .course-att-info h4 { font-size: 0.95rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.2rem; }
+    .course-att-info p { font-size: 0.78rem; color: var(--text-muted); }
+    .status-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .status-present { background: rgba(34,139,34,0.1); color: #228b22; }
+    .status-absent { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .status-late { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .status-excused { background: rgba(100,100,100,0.1); color: #666; }
+    .mark-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .mark-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; }
+    .mark-btn-present { background: rgba(34,139,34,0.08); color: #228b22; border-color: rgba(34,139,34,0.2); }
+    .mark-btn-present:hover { background: #228b22; color: #fff; }
+    .mark-btn-absent { background: rgba(220,53,69,0.08); color: #dc3545; border-color: rgba(220,53,69,0.2); }
+    .mark-btn-absent:hover { background: #dc3545; color: #fff; }
+    .mark-btn-late { background: rgba(255,165,0,0.08); color: #e67e00; border-color: rgba(255,165,0,0.2); }
+    .mark-btn-late:hover { background: #e67e00; color: #fff; }
+    .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); }
+    .alert-box { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
+</style>
+{% endblock %}
+
+{% block student_content %}
+<div class="page-header">
+    <h1>📝 Mark Your Attendance</h1>
+    <p>{{ today|date:"l, F d, Y" }} — Mark present for your enrolled courses</p>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert-box" style="{% if message.tags == 'success' %}background:rgba(34,139,34,0.1); color:#228b22;{% elif message.tags == 'error' %}background:rgba(220,20,60,0.1); color:#dc143c;{% elif message.tags == 'warning' %}background:rgba(255,165,0,0.1); color:#e67e00;{% else %}background:rgba(59,130,246,0.1); color:#1e40af;{% endif %}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+
+{% if courses_pending %}
+<div class="card">
+    <h3>✅ Mark Attendance</h3>
+    {% for enr in courses_pending %}
+    <div class="course-att">
+        <div class="course-att-info">
+            <h4>{{ enr.course.title }}</h4>
+            <p>👩‍🏫 {{ enr.teacher.get_full_name|default:"Teacher not assigned" }}</p>
+        </div>
+        <div class="mark-btns">
+            <form method="POST" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="course_id" value="{{ enr.course.id }}">
+                <button type="submit" name="status" value="present" class="mark-btn mark-btn-present">✅ Present</button>
+            </form>
+            <form method="POST" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="course_id" value="{{ enr.course.id }}">
+                <button type="submit" name="status" value="late" class="mark-btn mark-btn-late">⏰ Late</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if courses_with_attendance %}
+<div class="card">
+    <h3>📋 Today's Status</h3>
+    {% for item in courses_with_attendance %}
+    <div class="course-att">
+        <div class="course-att-info">
+            <h4>{{ item.enrollment.course.title }}</h4>
+            <p>👩‍🏫 {{ item.enrollment.teacher.get_full_name|default:"—" }}</p>
+        </div>
+        {% if item.attendance %}
+            {% if item.attendance.status == 'present' %}
+            <span class="status-badge status-present">✅ Present</span>
+            {% elif item.attendance.status == 'absent' %}
+            <span class="status-badge status-absent">❌ Absent</span>
+            {% elif item.attendance.status == 'late' %}
+            <span class="status-badge status-late">⏰ Late</span>
+            {% else %}
+            <span class="status-badge status-excused">📋 Excused</span>
+            {% endif %}
+        {% else %}
+            <span class="status-badge" style="background:rgba(100,100,100,0.08); color:#999;">Not marked</span>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if not courses_pending and not courses_with_attendance %}
+<div class="card">
+    <div class="empty-msg">
+        <p>No approved enrollments yet. Enroll in a courses first!</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

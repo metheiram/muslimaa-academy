@@ -191,3 +191,63 @@ def attendance_report(request):
         'active_page': 'attendance',
     }
     return render(request, 'attendance/attendance_report.html', context)
+
+
+@login_required
+def self_attendance(request):
+    """Student marks their own attendance for enrolled courses."""
+    from courses.enrollment_models import Enrollment
+    from datetime import date
+
+    user = request.user
+    today = date.today()
+
+    approved_enrollments = Enrollment.objects.filter(
+        student=user, status='approved'
+    ).select_related('course', 'teacher')
+
+    # Check which courses already have attendance marked today
+    courses_with_attendance = []
+    courses_pending = []
+    for enr in approved_enrollments:
+        att = Attendance.objects.filter(
+            student=user, course=enr.course, date=today
+        ).first()
+        courses_with_attendance.append({
+            'enrollment': enr,
+            'attendance': att,
+        })
+        if not att:
+            courses_pending.append(enr)
+
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        status = request.POST.get('status', 'present')
+
+        if course_id:
+            course = get_object_or_404(Course, id=course_id)
+            existing = Attendance.objects.filter(
+                student=user, course=course, date=today
+            ).first()
+            if existing:
+                messages.warning(request, f'Attendance for {course.title} already marked today as {existing.get_status_display()}.')
+            else:
+                Attendance.objects.create(
+                    student=user,
+                    course=course,
+                    date=today,
+                    status=status,
+                    marked_by=user,
+                    notes='Self-marked',
+                )
+                messages.success(request, f'Attendance marked for {course.title} — {status.title()}!')
+
+        return redirect('attendance:self_attendance')
+
+    context = {
+        'courses_with_attendance': courses_with_attendance,
+        'courses_pending': courses_pending,
+        'today': today,
+        'active_page': 'attendance',
+    }
+    return render(request, 'attendance/self_attendance.html', context)

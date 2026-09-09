@@ -30,11 +30,15 @@
     .att-info { flex: 1; min-width: 0; }
     .att-name { font-weight: 600; font-size: 0.9rem; color: var(--text-primary); }
     .att-email { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
-    .att-controls { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
-    .status-select { padding: 0.4rem 0.7rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); background: #fff; }
-    .notes-input { padding: 0.4rem 0.7rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); width: 120px; }
+    .att-controls { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+    .status-btn { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.78rem; font-weight: 700; border: 2px solid transparent; cursor: pointer; transition: all 0.2s ease; background: #f5f0eb; color: var(--text-muted); }
+    .status-btn:hover { transform: translateY(-1px); }
+    .status-btn.active-present { background: rgba(34,139,34,0.12); color: #228b22; border-color: #228b22; }
+    .status-btn.active-absent { background: rgba(220,53,69,0.12); color: #dc3545; border-color: #dc3545; }
+    .status-btn.active-late { background: rgba(255,165,0,0.12); color: #e67e00; border-color: #e67e00; }
+    .status-btn.active-excused { background: rgba(100,100,100,0.12); color: #666; border-color: #666; }
+    .notes-input { padding: 0.4rem 0.7rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); width: 100px; }
     .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
-    .alert-box { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500; }
     .att-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(71,24,32,0.06); }
 
     @media (max-width: 768px) {
@@ -43,7 +47,7 @@
         .filter-row select, .filter-row input { width: 100%; min-width: 0; }
         .card-header { flex-direction: column; align-items: flex-start; }
         .att-item { flex-wrap: wrap; }
-        .att-controls { width: 100%; flex-wrap: wrap; }
+        .att-controls { width: 100%; }
         .notes-input { width: 100%; }
         .att-actions { flex-direction: column; }
         .att-actions .btn { width: 100%; justify-content: center; }
@@ -58,7 +62,7 @@
 
 {% if messages %}
 {% for message in messages %}
-<div class="alert-box" style="{% if message.tags == 'success' %}background:rgba(34,139,34,0.1); color:#228b22;{% elif message.tags == 'error' %}background:rgba(220,20,60,0.1); color:#dc143c;{% else %}background:rgba(255,165,0,0.1); color:#e67e00;{% endif %}">{{ message }}</div>
+<div style="padding:0.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.88rem; font-weight:500; {% if message.tags == 'success' %}background:rgba(34,139,34,0.1); color:#228b22;{% elif message.tags == 'error' %}background:rgba(220,20,60,0.1); color:#dc143c;{% else %}background:rgba(255,165,0,0.1); color:#e67e00;{% endif %}">{{ message }}</div>
 {% endfor %}
 {% endif %}
 
@@ -93,7 +97,7 @@
         <h3>{{ students_with_status|length }} Students — {{ selected_date }}</h3>
     </div>
     <div class="card-body">
-        <form method="POST">
+        <form method="POST" id="attendanceForm">
             {% csrf_token %}
             <input type="hidden" name="course_id" value="{{ selected_course }}">
             <input type="hidden" name="date" value="{{ selected_date }}">
@@ -107,12 +111,11 @@
                         <div class="att-email">{{ item.student.email }}</div>
                     </div>
                     <div class="att-controls">
-                        <select name="status_{{ item.student.id }}" class="status-select">
-                            <option value="present" {% if item.existing_status == 'present' %}selected{% endif %}>Present</option>
-                            <option value="absent" {% if item.existing_status == 'absent' %}selected{% endif %}>Absent</option>
-                            <option value="late" {% if item.existing_status == 'late' %}selected{% endif %}>Late</option>
-                            <option value="excused" {% if item.existing_status == 'excused' %}selected{% endif %}>Excused</option>
-                        </select>
+                        <input type="hidden" name="status_{{ item.student.id }}" value="{{ item.existing_status }}" id="status_{{ item.student.id }}">
+                        <button type="button" class="status-btn {% if item.existing_status == 'present' %}active-present{% endif %}" onclick="setStatus({{ item.student.id }}, 'present', this)" title="Present">✅ Present</button>
+                        <button type="button" class="status-btn {% if item.existing_status == 'absent' %}active-absent{% endif %}" onclick="setStatus({{ item.student.id }}, 'absent', this)" title="Absent">❌ Absent</button>
+                        <button type="button" class="status-btn {% if item.existing_status == 'late' %}active-late{% endif %}" onclick="setStatus({{ item.student.id }}, 'late', this)" title="Late">⏰ Late</button>
+                        <button type="button" class="status-btn {% if item.existing_status == 'excused' %}active-excused{% endif %}" onclick="setStatus({{ item.student.id }}, 'excused', this)" title="Excused">📋 Excused</button>
                         <input type="text" name="notes_{{ item.student.id }}" placeholder="Note" class="notes-input">
                         <input type="hidden" name="student_ids" value="{{ item.student.id }}">
                     </div>
@@ -121,18 +124,34 @@
             </ul>
 
             <div class="att-actions">
-                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('present')">Mark All Present</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('absent')">Mark All Absent</button>
-                <button type="submit" class="btn btn-success">Save Attendance</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('present')">✅ Mark All Present</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('absent')">❌ Mark All Absent</button>
+                <button type="submit" class="btn btn-success">💾 Save Attendance</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
+function setStatus(studentId, status, btn) {
+    document.getElementById('status_' + studentId).value = status;
+    var parent = btn.closest('.att-controls');
+    parent.querySelectorAll('.status-btn').forEach(function(b) {
+        b.className = 'status-btn';
+    });
+    btn.classList.add('active-' + status);
+}
+
 function markAll(status) {
-    document.querySelectorAll('.status-select').forEach(function(sel) {
-        sel.value = status;
+    document.querySelectorAll('[id^="status_"]').forEach(function(input) {
+        input.value = status;
+    });
+    document.querySelectorAll('.att-item').forEach(function(item) {
+        item.querySelectorAll('.status-btn').forEach(function(b) {
+            b.className = 'status-btn';
+        });
+        var activeBtn = item.querySelector('.status-btn[onclick*="' + status + '"]');
+        if (activeBtn) activeBtn.classList.add('active-' + status);
     });
 }
 </script>

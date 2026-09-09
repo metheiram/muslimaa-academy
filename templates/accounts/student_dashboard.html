@@ -217,7 +217,7 @@
     <div class="card">
         <div class="card-header">
             <h3>My Attendance</h3>
-            <a href="{% url 'attendance:student_attendance' %}" style="font-size:0.8rem; color:var(--brand-700); font-weight:600; text-decoration:none;">View Full Report →</a>
+            <a href="{% url 'attendance:self_attendance' %}" style="font-size:0.8rem; color:#228b22; font-weight:700; text-decoration:none;">📝 Mark Today →</a>
         </div>
         <div class="card-body">
             {% if total_attendance > 0 %}
@@ -269,7 +269,11 @@
             </a>
             <a href="{% url 'attendance:student_attendance' %}" class="action-btn">
                 <span class="action-icon">✅</span>
-                Attendance
+                My Attendance
+            </a>
+            <a href="{% url 'attendance:self_attendance' %}" class="action-btn" style="border: 2px solid #228b22; color: #228b22;">
+                <span class="action-icon">📝</span>
+                Mark Attendance
             </a>
             <a href="{% url 'messaging:inbox' %}" class="action-btn">
                 <span class="action-icon">✉️</span>
