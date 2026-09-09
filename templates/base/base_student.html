@@ -20,6 +20,7 @@
         left: 0;
         bottom: 0;
         overflow-y: auto;
+        scroll-behavior: smooth;
         z-index: 100;
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
@@ -115,9 +116,10 @@
 
     /* Footer */
     .sidebar-footer {
-        padding: 1rem 1.5rem;
+        padding: 1rem 1.5rem 2rem;
         border-top: 1px solid rgba(255,255,255,0.08);
         margin-top: auto;
+        flex-shrink: 0;
     }
     .sidebar-footer a {
         display: flex;
@@ -126,7 +128,7 @@
         color: rgba(255,255,255,0.5);
         text-decoration: none;
         font-size: 0.82rem;
-        padding: 0.5rem 0;
+        padding: 0.6rem 0;
         transition: color 0.2s ease;
     }
     .sidebar-footer a:hover { color: #fff; }
