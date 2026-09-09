@@ -89,16 +89,42 @@ def attendance_view(request):
 
 @login_required
 def student_attendance(request):
-    """Student views their own attendance."""
-    user = request.user
+    """Student views attendance + marks own attendance."""
     from courses.enrollment_models import Enrollment
+    from datetime import date
 
-    enrollments = Enrollment.objects.filter(student=user, status='approved').select_related('course')
+    user = request.user
+    today = date.today()
+
+    enrollments = Enrollment.objects.filter(student=user, status='approved').select_related('course', 'teacher')
     courses = [e.course for e in enrollments]
 
+    # Handle self-attendance POST
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        status = request.POST.get('status', 'present')
+        if course_id:
+            course = get_object_or_404(Course, id=course_id)
+            existing = Attendance.objects.filter(student=user, course=course, date=today).first()
+            if existing:
+                messages.warning(request, f'Attendance for {course.title} already marked today as {existing.get_status_display()}.')
+            else:
+                Attendance.objects.create(
+                    student=user, course=course, date=today,
+                    status=status, marked_by=user, notes='Self-marked',
+                )
+                messages.success(request, f'Attendance marked for {course.title} — {status.title()}!')
+        return redirect('attendance:student_attendance')
+
+    # Which courses have attendance today
+    courses_today = []
+    for enr in enrollments:
+        att = Attendance.objects.filter(student=user, course=enr.course, date=today).first()
+        courses_today.append({'enrollment': enr, 'attendance': att})
+
+    # Report stats
     course_id = request.GET.get('course')
     attendances = Attendance.objects.filter(student=user).select_related('course')
-
     if course_id:
         attendances = attendances.filter(course_id=course_id)
 
@@ -110,6 +136,8 @@ def student_attendance(request):
     percentage = round((present / total * 100), 1) if total > 0 else 0
 
     context = {
+        'courses_today': courses_today,
+        'today': today,
         'attendances': attendances[:50],
         'courses': courses,
         'selected_course': course_id,
