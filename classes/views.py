@@ -119,18 +119,25 @@ def teacher_meetings(request):
             description = request.POST.get('description', '').strip()
             course_id = request.POST.get('course_id')
             meeting_type = request.POST.get('meeting_type', 'live')
-            meet_link = request.POST.get('meet_link', '').strip()
+            meet_link = request.POST.get('meet_link', '').strip().rstrip('/')
             scheduled_at = request.POST.get('scheduled_at')
             duration = request.POST.get('duration_minutes', '60')
 
+            if not meet_link.startswith('http'):
+                meet_link = 'https://' + meet_link
+
             if not all([title, course_id, meet_link, scheduled_at]):
-                messages.error(request, 'All fields are required.')
+                messages.error(request, 'Please fill in all required fields.')
                 return redirect('classes:teacher_meetings')
 
             try:
                 course = Course.objects.get(id=course_id)
             except (Course.DoesNotExist, ValueError):
-                messages.error(request, 'Invalid course selected.')
+                messages.error(request, 'Please select a valid course.')
+                return redirect('classes:teacher_meetings')
+
+            if not courses.filter(id=course.id).exists():
+                messages.error(request, 'You are not assigned to this course.')
                 return redirect('classes:teacher_meetings')
 
             try:
@@ -142,8 +149,15 @@ def teacher_meetings(request):
             from django.utils import timezone as tz
             dt = parse_datetime(scheduled_at)
             if dt is None:
-                messages.error(request, 'Invalid date/time format. Please try again.')
-                return redirect('classes:teacher_meetings')
+                try:
+                    from datetime import datetime
+                    dt = datetime.strptime(scheduled_at, '%Y-%m-%dT%H:%M')
+                except (ValueError, TypeError):
+                    try:
+                        dt = datetime.strptime(scheduled_at, '%Y-%m-%d %H:%M')
+                    except (ValueError, TypeError):
+                        messages.error(request, 'Invalid date/time. Please select a valid date and time.')
+                        return redirect('classes:teacher_meetings')
             if tz.is_naive(dt):
                 dt = tz.make_aware(dt)
 
@@ -159,7 +173,11 @@ def teacher_meetings(request):
                     duration_minutes=duration_int,
                 )
             except Exception as e:
-                messages.error(request, f'Could not create meeting: {str(e)}')
+                error_msg = str(e)
+                if 'URL' in error_msg or 'meet_link' in error_msg:
+                    messages.error(request, 'Invalid meeting link. Please enter a valid URL (e.g., https://meet.google.com/abc-defg-hij).')
+                else:
+                    messages.error(request, f'Could not create meeting: {error_msg}')
                 return redirect('classes:teacher_meetings')
 
             # Auto-add only teacher's assigned students
