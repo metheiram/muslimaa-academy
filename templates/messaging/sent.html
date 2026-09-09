@@ -1,24 +1,66 @@
 {% extends 'messaging/base_messaging.html' %}
 
-{% block msg_content %}
-<div class="card">
-    {% if messages_list %}
-    <ul class="msg-list">
-        {% for msg in messages_list %}
-        <a href="{% url 'messaging:view_message' msg.id %}" class="msg-item">
-            <div class="msg-avatar">{{ msg.recipient.first_name|first|upper }}{{ msg.recipient.last_name|first|upper }}</div>
-            <div class="msg-content">
-                <div class="msg-top">
-                    <div class="msg-subject">{{ msg.subject }}</div>
-                    <div class="msg-time">{{ msg.created_at|date:"M d" }}</div>
+{% block chat_content %}
+<div class="chat-sidebar">
+    <div class="sidebar-header">
+        <div style="display:flex;align-items:center;">
+            <h2>💬 Messages</h2>
+        </div>
+        <div class="sidebar-actions">
+            <a href="{% url 'messaging:compose' %}" title="New Message">✏️</a>
+        </div>
+    </div>
+    <div class="sidebar-search">
+        <input type="text" id="searchContacts" placeholder="Search sent..." oninput="filterContacts()">
+    </div>
+    <div class="sidebar-tabs">
+        <a href="{% url 'messaging:inbox' %}" class="sidebar-tab">Inbox</a>
+        <a href="{% url 'messaging:sent' %}" class="sidebar-tab active">Sent</a>
+    </div>
+    <div class="contact-list" id="contactList">
+        {% for msg in messages %}
+        <a href="{% url 'messaging:view_message' msg.id %}" class="contact-item" data-name="{{ msg.recipient.get_full_name|lower }} {{ msg.recipient.username|lower }}">
+            <div class="contact-avatar">
+                {% if msg.recipient.get_initials %}{{ msg.recipient.get_initials }}{% else %}{{ msg.recipient.username|truncatechars:2 }}{% endif %}
+            </div>
+            <div class="contact-info">
+                <div class="contact-top">
+                    <span class="contact-name">{{ msg.recipient.get_full_name|default:msg.recipient.username }}</span>
+                    <span class="contact-time">{{ msg.created_at|timesince_short }}</span>
                 </div>
-                <div class="msg-preview">To {{ msg.recipient.get_full_name }} — {{ msg.body|truncatewords:15 }}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="contact-preview">{{ msg.body|truncatechars:50 }}</span>
+                    {% if msg.is_read %}<span style="color:var(--accent-gold);font-size:0.7rem;">✓✓</span>{% endif %}
+                </div>
             </div>
         </a>
+        {% empty %}
+        <div style="padding:3rem 1.5rem;text-align:center;color:var(--text-muted);">
+            <div style="font-size:2.5rem;margin-bottom:0.75rem;opacity:0.3;">📤</div>
+            <h3 style="font-family:var(--font-serif);font-size:1rem;color:var(--brand-700);margin-bottom:0.4rem;">No Sent Messages</h3>
+            <p style="font-size:0.82rem;">Messages you send will appear here.</p>
+        </div>
         {% endfor %}
-    </ul>
-    {% else %}
-    <p class="empty-msg">No sent messages.</p>
-    {% endif %}
+    </div>
 </div>
+
+<div class="chat-area">
+    <div class="chat-empty">
+        <div class="chat-empty-icon">📤</div>
+        <h3>Sent Messages</h3>
+        <p>Select a message to view the conversation</p>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function filterContacts() {
+    var input = document.getElementById('searchContacts').value.toLowerCase();
+    document.querySelectorAll('.contact-item').forEach(function(item) {
+        var name = item.getAttribute('data-name') || '';
+        item.style.display = name.includes(input) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}
 {% endblock %}

@@ -8,14 +8,44 @@ from django.conf import settings
 from .models import Message
 
 
+def _get_conversations(user):
+    """Group messages into conversations (like WhatsApp chat list)."""
+    all_msgs = Message.objects.filter(
+        Q(sender=user) | Q(recipient=user)
+    ).select_related('sender', 'recipient').order_by('-created_at')
+
+    seen = {}
+    for msg in all_msgs:
+        other = msg.recipient if msg.sender == user else msg.sender
+        key = other.id
+        if key not in seen:
+            unread = Message.objects.filter(
+                sender=other, recipient=user, is_read=False
+            ).count() if other != user else 0
+            seen[key] = {
+                'other_user': other,
+                'latest_message': msg,
+                'unread_count': unread,
+            }
+
+    return sorted(seen.values(), key=lambda x: x['latest_message'].created_at, reverse=True)
+
+
+def _get_thread(user, other_user_id):
+    """Get all messages between user and another user, ordered oldest first."""
+    return Message.objects.filter(
+        (Q(sender=user) & Q(recipient_id=other_user_id)) |
+        (Q(sender_id=other_user_id) & Q(recipient=user))
+    ).select_related('sender', 'recipient').order_by('created_at')
+
+
 @login_required
 def inbox(request):
-    """View received messages."""
-    received = Message.objects.filter(recipient=request.user).select_related('sender')
-    unread_count = received.filter(is_read=False).count()
+    conversations = _get_conversations(request.user)
+    unread_count = Message.objects.filter(recipient=request.user, is_read=False).count()
 
     context = {
-        'messages_list': received,
+        'conversations': conversations,
         'unread_count': unread_count,
         'active_page': 'inbox',
     }
@@ -24,11 +54,12 @@ def inbox(request):
 
 @login_required
 def sent(request):
-    """View sent messages."""
-    sent_msgs = Message.objects.filter(sender=request.user).select_related('recipient')
+    sent_msgs = Message.objects.filter(
+        sender=request.user
+    ).select_related('recipient').order_by('-created_at')
 
     context = {
-        'messages_list': sent_msgs,
+        'messages': sent_msgs,
         'active_page': 'sent',
     }
     return render(request, 'messaging/sent.html', context)
@@ -36,11 +67,6 @@ def sent(request):
 
 @login_required
 def compose(request, recipient_id=None):
-    """Compose a new message."""
-    recipient = None
-    if recipient_id:
-        recipient = get_object_or_404(User, id=recipient_id)
-
     if request.user.is_superuser:
         available_users = User.objects.filter(is_active=True).exclude(id=request.user.id)
     elif request.user.is_staff:
@@ -56,31 +82,34 @@ def compose(request, recipient_id=None):
         admins = User.objects.filter(is_superuser=True)
         available_users = (teachers | admins).exclude(id=request.user.id).distinct()
 
+    selected_recipient = None
+    if recipient_id:
+        selected_recipient = int(recipient_id)
+
     if request.method == 'POST':
-        recipient_id = request.POST.get('recipient')
+        rid = request.POST.get('recipient')
         subject = request.POST.get('subject', '').strip()
         body = request.POST.get('body', '').strip()
 
-        if not all([recipient_id, subject, body]):
-            messages.error(request, 'All fields are required.')
+        if not all([rid, body]):
+            messages.error(request, 'Please select a recipient and type a message.')
             return redirect('messaging:compose')
 
-        recipient_user = get_object_or_404(User, id=recipient_id)
+        recipient_user = get_object_or_404(User, id=rid)
 
         Message.objects.create(
             sender=request.user,
             recipient=recipient_user,
-            subject=subject,
+            subject=subject or 'No Subject',
             body=body,
         )
 
         if recipient_user.email:
             try:
                 send_mail(
-                    f'New Message: {subject} | Muslimaa Academy',
+                    f'New Message from {request.user.get_full_name()} | Muslimaa Academy',
                     f"Assalam-o-Alaikum {recipient_user.first_name},\n\n"
                     f"You have a new message from {request.user.get_full_name()}:\n\n"
-                    f"Subject: {subject}\n\n"
                     f"{body}\n\n"
                     f"Log in to your dashboard to reply.\n\n"
                     f"Muslimaa Academy Team",
@@ -92,18 +121,18 @@ def compose(request, recipient_id=None):
                 pass
 
         messages.success(request, f'Message sent to {recipient_user.get_full_name()}!')
-        return redirect('messaging:sent')
+        return redirect('messaging:view_message_by_user', user_id=recipient_user.id)
 
     context = {
-        'available_users': available_users,
-        'selected_recipient': recipient,
+        'users': available_users,
+        'selected_recipient': selected_recipient,
+        'active_page': 'compose',
     }
     return render(request, 'messaging/compose.html', context)
 
 
 @login_required
 def view_message(request, message_id):
-    """View a single message."""
     msg = get_object_or_404(
         Message.objects.filter(Q(sender=request.user) | Q(recipient=request.user)),
         id=message_id
@@ -113,15 +142,51 @@ def view_message(request, message_id):
         msg.is_read = True
         msg.save()
 
+    other_user = msg.sender if msg.sender != request.user else msg.recipient
+    thread = _get_thread(request.user, other_user.id)
+    conversations = _get_conversations(request.user)
+    unread_count = Message.objects.filter(recipient=request.user, is_read=False).count()
+
     context = {
-        'msg': msg,
+        'message': msg,
+        'other_user': other_user,
+        'thread': thread,
+        'conversations': conversations,
+        'unread_count': unread_count,
+        'selected_id': msg.id,
+    }
+    return render(request, 'messaging/view_message.html', context)
+
+
+@login_required
+def view_message_by_user(request, user_id):
+    """View conversation with a specific user (by user ID)."""
+    other_user = get_object_or_404(User, id=user_id)
+
+    unread_msgs = Message.objects.filter(
+        sender=other_user, recipient=request.user, is_read=False
+    )
+    unread_msgs.update(is_read=True)
+
+    thread = _get_thread(request.user, user_id)
+    latest_msg = thread.first() if thread else None
+
+    conversations = _get_conversations(request.user)
+    unread_count = Message.objects.filter(recipient=request.user, is_read=False).count()
+
+    context = {
+        'message': latest_msg,
+        'other_user': other_user,
+        'thread': thread,
+        'conversations': conversations,
+        'unread_count': unread_count,
+        'selected_id': latest_msg.id if latest_msg else None,
     }
     return render(request, 'messaging/view_message.html', context)
 
 
 @login_required
 def reply_message(request, message_id):
-    """Reply to a message."""
     original = get_object_or_404(
         Message.objects.filter(Q(sender=request.user) | Q(recipient=request.user)),
         id=message_id
@@ -138,18 +203,17 @@ def reply_message(request, message_id):
                 body=body,
             )
             messages.success(request, f'Reply sent to {reply_to.get_full_name()}!')
-            return redirect('messaging:view_message', message_id=original.id)
 
     return redirect('messaging:view_message', message_id=original.id)
 
 
 @login_required
 def delete_message(request, message_id):
-    """Delete a message."""
     msg = get_object_or_404(
         Message.objects.filter(Q(sender=request.user) | Q(recipient=request.user)),
         id=message_id
     )
+    other_user = msg.sender if msg.sender != request.user else msg.recipient
     msg.delete()
     messages.success(request, 'Message deleted.')
     return redirect('messaging:inbox')

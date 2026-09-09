@@ -1,35 +1,66 @@
 {% extends 'messaging/base_messaging.html' %}
 
-{% block msg_content %}
-<div class="card">
-    <div class="card-body">
-        <form method="POST" class="compose-form">
-            {% csrf_token %}
-            <div class="form-group">
-                <label>To *</label>
-                <select name="recipient" required>
-                    <option value="">Select Recipient</option>
-                    {% for user in available_users %}
-                    <option value="{{ user.id }}" {% if selected_recipient and selected_recipient.id == user.id %}selected{% endif %}>
-                        {{ user.get_full_name|default:user.username }}
-                        {% if user.is_superuser %}(Admin){% elif user.is_staff %}(Teacher){% endif %}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Subject *</label>
-                <input type="text" name="subject" required placeholder="Message subject...">
-            </div>
-            <div class="form-group">
-                <label>Message *</label>
-                <textarea name="body" required placeholder="Write your message..."></textarea>
-            </div>
-            <div style="display:flex; gap:0.75rem;">
-                <button type="submit" class="btn btn-primary">Send Message</button>
-                <a href="{% url 'messaging:inbox' %}" class="btn btn-outline">Cancel</a>
-            </div>
-        </form>
+{% block chat_content %}
+<div class="chat-sidebar">
+    <div class="sidebar-header">
+        <div style="display:flex;align-items:center;">
+            <h2>💬 Messages</h2>
+        </div>
+        <div class="sidebar-actions">
+            <a href="{% url 'messaging:compose' %}" title="New Message" style="background:rgba(255,255,255,0.25);">✏️</a>
+        </div>
+    </div>
+    <div class="sidebar-tabs">
+        <a href="{% url 'messaging:inbox' %}" class="sidebar-tab">Inbox</a>
+        <a href="{% url 'messaging:sent' %}" class="sidebar-tab">Sent</a>
+    </div>
+    <div class="contact-list">
+        <div style="padding:2rem 1.5rem;text-align:center;color:var(--text-muted);">
+            <div style="font-size:2.5rem;margin-bottom:0.75rem;opacity:0.3;">✏️</div>
+            <h3 style="font-family:var(--font-serif);font-size:1rem;color:var(--brand-700);margin-bottom:0.4rem;">New Message</h3>
+            <p style="font-size:0.82rem;">Select a recipient and start typing</p>
+        </div>
+    </div>
+</div>
+
+<div class="chat-area">
+    <div class="chat-header">
+        <div class="chat-header-avatar">✏️</div>
+        <div class="chat-header-info">
+            <div class="chat-header-name">New Message</div>
+            <div class="chat-header-status">Choose a recipient</div>
+        </div>
+    </div>
+
+    <div class="chat-messages" style="justify-content:center;">
+        <div style="max-width:500px;width:100%;padding:2rem;">
+            <form method="post" action="{% url 'messaging:compose' %}">
+                {% csrf_token %}
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.3rem;">To</label>
+                    <select name="recipient" required style="width:100%;padding:0.65rem 1rem;border:1.5px solid rgba(71,24,32,0.12);border-radius:8px;font-family:var(--font-sans);font-size:0.88rem;background:#fff;">
+                        <option value="">Select recipient...</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if selected_recipient == user.id %}selected{% endif %}>
+                            {{ user.get_full_name|default:user.username }} ({{ user.get_role_display|default:"Member" }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.3rem;">Subject</label>
+                    <input type="text" name="subject" value="{{ subject|default:'' }}" placeholder="Optional subject..." style="width:100%;padding:0.65rem 1rem;border:1.5px solid rgba(71,24,32,0.12);border-radius:8px;font-family:var(--font-sans);font-size:0.88rem;">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.3rem;">Message</label>
+                    <textarea name="body" required rows="5" placeholder="Type your message..." style="width:100%;padding:0.65rem 1rem;border:1.5px solid rgba(71,24,32,0.12);border-radius:8px;font-family:var(--font-sans);font-size:0.88rem;resize:vertical;">{{ body|default:'' }}</textarea>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:0.75rem;">
+                    <a href="{% url 'messaging:inbox' %}" style="padding:0.6rem 1.25rem;border-radius:8px;font-weight:600;font-size:0.85rem;text-decoration:none;color:var(--text-secondary);border:1.5px solid rgba(71,24,32,0.12);">Cancel</a>
+                    <button type="submit" style="padding:0.6rem 1.5rem;background:var(--brand-700);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer;">Send ➤</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

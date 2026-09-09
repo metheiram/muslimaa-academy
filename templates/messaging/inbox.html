@@ -1,25 +1,70 @@
 {% extends 'messaging/base_messaging.html' %}
 
-{% block msg_content %}
-<div class="card">
-    {% if messages_list %}
-    <ul class="msg-list">
-        {% for msg in messages_list %}
-        <a href="{% url 'messaging:view_message' msg.id %}" class="msg-item {% if not msg.is_read %}unread{% endif %}">
-            <div class="msg-avatar">{{ msg.sender.first_name|first|upper }}{{ msg.sender.last_name|first|upper }}</div>
-            <div class="msg-content">
-                <div class="msg-top">
-                    <div class="msg-subject">{{ msg.subject }}</div>
-                    <div class="msg-time">{{ msg.created_at|date:"M d" }}</div>
-                </div>
-                <div class="msg-preview">From {{ msg.sender.get_full_name }} — {{ msg.body|truncatewords:15 }}</div>
+{% block chat_content %}
+<div class="chat-sidebar">
+    <div class="sidebar-header">
+        <div style="display:flex;align-items:center;">
+            <h2>💬 Messages</h2>
+            {% if unread_count %}<span class="unread-badge">{{ unread_count }}</span>{% endif %}
+        </div>
+        <div class="sidebar-actions">
+            <a href="{% url 'messaging:compose' %}" title="New Message">✏️</a>
+        </div>
+    </div>
+    <div class="sidebar-search">
+        <input type="text" id="searchContacts" placeholder="Search conversations..." oninput="filterContacts()">
+    </div>
+    <div class="sidebar-tabs">
+        <a href="{% url 'messaging:inbox' %}" class="sidebar-tab active">Inbox</a>
+        <a href="{% url 'messaging:sent' %}" class="sidebar-tab">Sent</a>
+    </div>
+    <div class="contact-list" id="contactList">
+        {% for conv in conversations %}
+        <a href="{% url 'messaging:view_message' conv.latest_message.id %}" class="contact-item {% if conv.latest_message.id == selected_id %}active{% endif %}" data-name="{{ conv.other_user.get_full_name|lower }} {{ conv.other_user.username|lower }}">
+            <div class="contact-avatar">
+                {% if conv.other_user.get_initials %}{{ conv.other_user.get_initials }}{% else %}{{ conv.other_user.username|truncatechars:2 }}{% endif %}
+                {% if conv.other_user.is_online %}<span class="online-dot"></span>{% endif %}
             </div>
-            {% if not msg.is_read %}<div class="unread-dot"></div>{% endif %}
+            <div class="contact-info">
+                <div class="contact-top">
+                    <span class="contact-name">{{ conv.other_user.get_full_name|default:conv.other_user.username }}</span>
+                    <span class="contact-time">{{ conv.latest_message.created_at|timesince_short }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="contact-preview">{% if conv.latest_message.sender == request.user %}You: {% endif %}{{ conv.latest_message.body|truncatechars:50 }}</span>
+                    {% if conv.unread_count %}<span class="contact-unread">{{ conv.unread_count }}</span>{% endif %}
+                </div>
+            </div>
         </a>
+        {% empty %}
+        <div style="padding:3rem 1.5rem;text-align:center;color:var(--text-muted);">
+            <div style="font-size:2.5rem;margin-bottom:0.75rem;opacity:0.3;">💬</div>
+            <h3 style="font-family:var(--font-serif);font-size:1rem;color:var(--brand-700);margin-bottom:0.4rem;">No Messages Yet</h3>
+            <p style="font-size:0.82rem;margin-bottom:1rem;">Start a conversation with your teachers and students.</p>
+            <a href="{% url 'messaging:compose' %}" style="display:inline-block;background:var(--brand-700);color:#fff;padding:0.6rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.85rem;">New Message ✏️</a>
+        </div>
         {% endfor %}
-    </ul>
-    {% else %}
-    <p class="empty-msg">No messages yet.</p>
-    {% endif %}
+    </div>
 </div>
+
+<div class="chat-area">
+    <div class="chat-empty">
+        <div class="chat-empty-icon">💬</div>
+        <h3>Muslimaa Academy Messages</h3>
+        <p>Select a conversation or start a new one</p>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function filterContacts() {
+    var input = document.getElementById('searchContacts').value.toLowerCase();
+    var items = document.querySelectorAll('.contact-item');
+    items.forEach(function(item) {
+        var name = item.getAttribute('data-name') || '';
+        item.style.display = name.includes(input) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}
 {% endblock %}
