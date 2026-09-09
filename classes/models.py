@@ -25,7 +25,7 @@ class Meeting(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='meetings')
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='meetings_taught')
     meeting_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='live')
-    meet_link = models.URLField(help_text='Google Meet / Zoom link')
+    meet_link = models.TextField(help_text='Google Meet / Zoom link')
     scheduled_at = models.DateTimeField()
     duration_minutes = models.IntegerField(default=60, help_text='Duration in minutes')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')
