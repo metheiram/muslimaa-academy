@@ -105,6 +105,17 @@
         text-align: center;
         transition: transform 0.2s ease;
     }
+    .sidebar-nav li a .notif-badge {
+        background: var(--accent-gold);
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.15rem 0.45rem;
+        border-radius: 50px;
+        margin-left: auto;
+        min-width: 18px;
+        text-align: center;
+    }
     .sidebar-nav .section-label {
         padding: 1.25rem 1.5rem 0.4rem;
         font-size: 0.65rem;
@@ -238,6 +249,7 @@
             <li><a href="{% url 'messaging:inbox' %}" class="{% if active_page == 'messages' %}active{% endif %}" onclick="closeMobile()"><span class="icon">✉️</span> Messages</a></li>
             <li><a href="{% url 'workshops:workshop_list' %}" class="{% if active_page == 'workshops' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🎓</span> Workshops</a></li>
             <div class="section-label">Account</div>
+            <li><a href="{% url 'accounts:student_notifications' %}" class="{% if active_page == 'notifications' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🔔</span> Notifications{% if unread_count %}<span class="notif-badge">{{ unread_count }}</span>{% endif %}</a></li>
             <li><a href="{% url 'accounts:edit_profile' %}" class="{% if active_page == 'profile' %}active{% endif %}" onclick="closeMobile()"><span class="icon">👤</span> My Profile</a></li>
         </ul>
         <div class="sidebar-footer">

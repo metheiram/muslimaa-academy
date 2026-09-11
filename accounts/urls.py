@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import views
+from .notification_views import student_notifications
 
 app_name = 'accounts'
 
@@ -14,4 +15,5 @@ urlpatterns = [
     path('password/forgot/', views.forgot_password, name='forgot_password'),
     path('reset/<str:uidb64>/<str:token>/', views.reset_password, name='reset_password'),
     path('dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('notifications/', student_notifications, name='student_notifications'),
 ]

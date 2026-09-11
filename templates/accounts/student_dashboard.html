@@ -53,6 +53,14 @@
     @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .actions-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .actions-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px) { .actions-grid { grid-template-columns: 1fr; } }
+    .notification-item { padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .notification-item:last-child { border-bottom: none; }
+    .notification-item.unread { background: rgba(212,165,116,0.08); margin: 0 -1.5rem; padding: 0.75rem 1.5rem; border-bottom: 1px solid rgba(212,165,116,0.1); }
+    .notification-title { font-size: 0.9rem; font-weight: 700; color: var(--brand-700); }
+    .notification-msg { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .notification-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .notification-dot { width: 8px; height: 8px; background: var(--accent-gold); border-radius: 50%; display: inline-block; margin-left: 0.5rem; }
+    .notification-empty { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
 </style>
 {% endblock %}
 
@@ -66,6 +74,26 @@
 {% for message in messages %}
 <div style="padding:1rem 1.25rem; border-radius:10px; margin-bottom:1rem; font-size:0.9rem; font-weight:600; border-left:4px solid; {% if message.tags == 'success' %}background:rgba(212,165,116,0.12); color:#471820; border-color:#d4a574;{% elif message.tags == 'error' %}background:rgba(220,20,60,0.1); color:#dc143c; border-color:#dc143c;{% else %}background:rgba(255,165,0,0.1); color:#e67e00; border-color:#e67e00;{% endif %}">{{ message }}</div>
 {% endfor %}
+{% endif %}
+
+{% if notifications %}
+<div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-header">
+        <h3>Notifications <span style="background:var(--accent-gold); color:#fff; font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:50px; margin-left:0.5rem;">{{ unread_count }}</span></h3>
+        <a href="{% url 'accounts:student_notifications' %}" style="font-size:0.8rem; color:var(--brand-700); font-weight:600; text-decoration:none;">View All →</a>
+    </div>
+    <div class="card-body">
+        {% for notif in notifications %}
+        <div class="notification-item {% if not notif.is_read %}unread{% endif %}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="notification-title">{{ notif.title }}{% if not notif.is_read %}<span class="notification-dot"></span>{% endif %}</div>
+                <span class="notification-time">{{ notif.created_at|timesince }} ago</span>
+            </div>
+            <div class="notification-msg">{{ notif.message }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endif %}
 
 <div class="stats-row">

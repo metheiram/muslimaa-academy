@@ -134,6 +134,11 @@ def student_dashboard(request):
     absent_count = Attendance.objects.filter(student=user, status='absent').count()
     attendance_pct = round((present_count / total_attendance * 100), 1) if total_attendance > 0 else 0
 
+    # Notifications
+    from notifications.models import Notification
+    notifications = Notification.objects.filter(user=user)[:10]
+    unread_count = Notification.objects.filter(user=user, is_read=False).count()
+
     context = {
         'enrollments': enrollments,
         'approved_enrollments': approved_enrollments,
@@ -150,6 +155,8 @@ def student_dashboard(request):
         'absent_count': absent_count,
         'attendance_pct': attendance_pct,
         'active_page': 'dashboard',
+        'notifications': notifications,
+        'unread_count': unread_count,
     }
     return render(request, 'accounts/student_dashboard.html', context)
 

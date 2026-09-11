@@ -1,0 +1,87 @@
+{% extends 'base/base_student.html' %}
+
+{% block title %}Notifications | Muslimaa Academy{% endblock %}
+
+{% block student_extra_head %}
+<style>
+    .notif-list { list-style: none; padding: 0; margin: 0; }
+    .notif-item { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(71,24,32,0.06); display: flex; align-items: flex-start; gap: 0.75rem; transition: background 0.2s; }
+    .notif-item:hover { background: rgba(71,24,32,0.02); }
+    .notif-item.unread { background: rgba(212,165,116,0.08); border-left: 3px solid var(--accent-gold); }
+    .notif-item .notif-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .notif-item .notif-body { flex: 1; }
+    .notif-item .notif-title { font-size: 0.9rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.2rem; }
+    .notif-item .notif-msg { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+    .notif-item .notif-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .notif-item .notif-actions { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+    .notif-item .notif-actions button, .notif-item .notif-actions a {
+        font-size: 0.72rem; padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid rgba(71,24,32,0.15);
+        background: #fff; color: var(--text-secondary); cursor: pointer; text-decoration: none; font-weight: 600;
+        transition: all 0.2s;
+    }
+    .notif-item .notif-actions button:hover, .notif-item .notif-actions a:hover { background: var(--brand-700); color: #fff; border-color: var(--brand-700); }
+    .notif-empty { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .notif-empty .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--brand-700); }
+    .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; }
+    .mark-all-btn { background: transparent; color: var(--brand-700); border: 1px solid var(--brand-700); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .mark-all-btn:hover { background: var(--brand-700); color: #fff; }
+</style>
+{% endblock %}
+
+{% block student_content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <h1 style="font-family:var(--font-serif); font-size:1.4rem; color:var(--brand-700);">Notifications</h1>
+    {% if unread_count %}
+    <form method="post" style="margin:0;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="mark_all_read">
+        <button class="mark-all-btn">✓ Mark All as Read</button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="card">
+    {% if notifications %}
+    <ul class="notif-list">
+        {% for notif in notifications %}
+        <li class="notif-item {% if not notif.is_read %}unread{% endif %}">
+            <span class="notif-icon">
+                {% if notif.notification_type == 'fee_reminder' %}💰
+                {% elif notif.notification_type == 'enrollment' %}📚
+                {% elif notif.notification_type == 'payment' %}✅
+                {% else %}🔔{% endif %}
+            </span>
+            <div class="notif-body">
+                <div class="notif-title">{{ notif.title }}</div>
+                <div class="notif-msg">{{ notif.message }}</div>
+                <div class="notif-time">{{ notif.created_at|timesince }} ago</div>
+                <div class="notif-actions">
+                    {% if not notif.is_read %}
+                    <form method="post" style="margin:0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="mark_read">
+                        <input type="hidden" name="notif_id" value="{{ notif.id }}">
+                        <button type="submit">✓ Mark Read</button>
+                    </form>
+                    {% endif %}
+                    <form method="post" style="margin:0;" onsubmit="return confirm('Delete this notification?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="notif_id" value="{{ notif.id }}">
+                        <button type="submit" style="color:#dc3545;">✕ Delete</button>
+                    </form>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="notif-empty">
+        <div class="icon">🔔</div>
+        <p>No notifications yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
