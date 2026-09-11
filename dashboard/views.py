@@ -552,7 +552,9 @@ def admin_fees(request):
         elif action == 'send_reminder':
             enrollment_id = request.POST.get('enrollment_id')
             enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-            phone = getattr(enrollment.student.profile, 'phone', '') or ''
+            phone = ''
+            if hasattr(enrollment.student, 'profile'):
+                phone = getattr(enrollment.student.profile, 'phone', '') or ''
             msg = build_fee_reminder_message(enrollment)
             wurl = build_whatsapp_url(phone, msg)
             if wurl:
@@ -562,11 +564,16 @@ def admin_fees(request):
             return redirect('dashboard:admin_fees')
 
         elif action == 'send_all_reminders':
+            from payments.models import Payment
+            approved_enrs = Enrollment.objects.filter(status='approved').select_related('student', 'course')
+            all_payments = Payment.objects.filter(status='paid')
             all_unpaid = []
-            for enr in approved:
-                has_payment = payments.filter(enrollment=enr).exists()
+            for enr in approved_enrs:
+                has_payment = all_payments.filter(enrollment=enr).exists()
                 if enr.course.price and enr.course.price > 0 and not has_payment:
-                    phone = getattr(enr.student.profile, 'phone', '') or ''
+                    phone = ''
+                    if hasattr(enr.student, 'profile'):
+                        phone = getattr(enr.student.profile, 'phone', '') or ''
                     if phone:
                         all_unpaid.append(enr)
             if all_unpaid:
