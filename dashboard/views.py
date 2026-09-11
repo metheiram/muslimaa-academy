@@ -556,30 +556,78 @@ def admin_fees(request):
             if hasattr(enrollment.student, 'profile'):
                 phone = getattr(enrollment.student.profile, 'phone', '') or ''
             msg = build_fee_reminder_message(enrollment)
-            wurl = build_whatsapp_url(phone, msg)
-            if wurl:
-                messages.success(request, f'Reminder ready for {enrollment.student.get_full_name()}! WhatsApp opened.')
+            payment_info = get_payment_info_text()
+            if phone:
+                wurl = build_whatsapp_url(phone, msg)
             else:
-                messages.warning(request, f'No phone number for {enrollment.student.get_full_name()}. Add phone to send WhatsApp reminder.')
+                wurl = ''
+            email_msg = (
+                f"Assalam-o-Alaikum {enrollment.student.first_name},\n\n"
+                f"This is your monthly fee reminder.\n\n"
+                f"Course: {enrollment.course.title}\n"
+                f"Fee: Rs. {int(enrollment.course.price)}\n"
+                f"Enrolled on: {enrollment.enrolled_at.strftime('%d %b, %Y')}\n\n"
+                f"Please send your payment to any of the following accounts:\n\n"
+                f"{payment_info}\n"
+                f"After sending payment, send the screenshot on WhatsApp:\n"
+                f"📱 WhatsApp: {wurl}\n\n"
+                f"Or upload it directly from your dashboard.\n\n"
+                f"JazakAllah Khair!\n"
+                f"Muslimaa Academy Team"
+            )
+            email_sent = send_email_notification(
+                f'Monthly Fee Reminder — {enrollment.course.title} | Muslimaa Academy',
+                email_msg,
+                enrollment.student.email,
+            )
+            if email_sent:
+                messages.success(request, f'Reminder sent to {enrollment.student.get_full_name()} via email!')
+            else:
+                messages.warning(request, f'Email failed for {enrollment.student.get_full_name()}.')
             return redirect('dashboard:admin_fees')
 
         elif action == 'send_all_reminders':
             from payments.models import Payment
             approved_enrs = Enrollment.objects.filter(status='approved').select_related('student', 'course')
             all_payments = Payment.objects.filter(status='paid')
-            all_unpaid = []
+            payment_info = get_payment_info_text()
+            sent_count = 0
             for enr in approved_enrs:
                 has_payment = all_payments.filter(enrollment=enr).exists()
                 if enr.course.price and enr.course.price > 0 and not has_payment:
                     phone = ''
                     if hasattr(enr.student, 'profile'):
                         phone = getattr(enr.student.profile, 'phone', '') or ''
+                    msg = build_fee_reminder_message(enr)
                     if phone:
-                        all_unpaid.append(enr)
-            if all_unpaid:
-                messages.success(request, f'Reminders ready for {len(all_unpaid)} unpaid student(s)! WhatsApp links generated below.')
+                        wurl = build_whatsapp_url(phone, msg)
+                    else:
+                        wurl = ''
+                    email_msg = (
+                        f"Assalam-o-Alaikum {enr.student.first_name},\n\n"
+                        f"This is your monthly fee reminder.\n\n"
+                        f"Course: {enr.course.title}\n"
+                        f"Fee: Rs. {int(enr.course.price)}\n"
+                        f"Enrolled on: {enr.enrolled_at.strftime('%d %b, %Y')}\n\n"
+                        f"Please send your payment to any of the following accounts:\n\n"
+                        f"{payment_info}\n"
+                        f"After sending payment, send the screenshot on WhatsApp:\n"
+                        f"📱 WhatsApp: {wurl}\n\n"
+                        f"Or upload it directly from your dashboard.\n\n"
+                        f"JazakAllah Khair!\n"
+                        f"Muslimaa Academy Team"
+                    )
+                    email_sent = send_email_notification(
+                        f'Monthly Fee Reminder — {enr.course.title} | Muslimaa Academy',
+                        email_msg,
+                        enr.student.email,
+                    )
+                    if email_sent:
+                        sent_count += 1
+            if sent_count:
+                messages.success(request, f'Fee reminders sent to {sent_count} student(s) via email!')
             else:
-                messages.info(request, 'No unpaid students found.')
+                messages.info(request, 'No unpaid students found or emails failed.')
             return redirect('dashboard:admin_fees')
 
     approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
