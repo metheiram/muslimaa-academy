@@ -117,9 +117,9 @@
         {% endif %}
 
         <div class="tabs">
-            <button class="tab active" onclick="showTab('pending')">Pending ({{ pending_enrollments.count }})</button>
-            <button class="tab" onclick="showTab('approved')">Approved ({{ approved_enrollments.count }})</button>
-            <button class="tab" onclick="showTab('rejected')">Rejected ({{ rejected_enrollments.count }})</button>
+            <button class="tab active" onclick="showTab('pending', this)">Pending ({{ pending_enrollments.count }})</button>
+            <button class="tab" onclick="showTab('approved', this)">Approved ({{ approved_enrollments.count }})</button>
+            <button class="tab" onclick="showTab('rejected', this)">Rejected ({{ rejected_enrollments.count }})</button>
         </div>
 
         <div id="pending" class="tab-content active">
@@ -241,15 +241,17 @@
 </div>
 {% endblock %}
 
+{% block extra_scripts %}
 <script>
-function showTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
-    document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('active'); });
+function showTab(tabId, el) {
+    document.querySelectorAll('.tab-content').forEach(function(e) { e.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(e) { e.classList.remove('active'); });
     document.getElementById(tabId).classList.add('active');
-    event.target.classList.add('active');
+    el.classList.add('active');
 }
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('active');
 }
 </script>
+{% endblock %}

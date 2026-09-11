@@ -115,11 +115,11 @@
         .chat-sidebar { width: 100%; height: 100%; }
         .chat-sidebar.hidden { display: none; }
         .chat-area.hidden { display: none; }
-        .chat-sidebar .back-btn { display: flex; }
+        .chat-area .back-btn { display: flex; }
         .msg-bubble { max-width: 85%; }
     }
     @media (min-width: 769px) {
-        .chat-sidebar .back-btn { display: none; }
+        .chat-area .back-btn { display: none; }
     }
 </style>
 {% endblock %}
@@ -136,4 +136,56 @@ setTimeout(function() {
 }, 4000);
 </script>
 {% endif %}
+
+<script>
+(function() {
+    var isMobile = function() { return window.innerWidth <= 768; };
+
+    // On mobile, clicking a contact hides sidebar and shows chat area
+    document.querySelectorAll('.contact-item').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            if (isMobile()) {
+                var sidebar = document.querySelector('.chat-sidebar');
+                var chatArea = document.querySelector('.chat-area');
+                if (sidebar) sidebar.classList.add('hidden');
+                if (chatArea) chatArea.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Back button: hide chat, show sidebar
+    document.querySelectorAll('.back-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            if (isMobile()) {
+                e.preventDefault();
+                var sidebar = document.querySelector('.chat-sidebar');
+                var chatArea = document.querySelector('.chat-area');
+                if (sidebar) sidebar.classList.remove('hidden');
+                if (chatArea) chatArea.classList.add('hidden');
+                window.location.href = btn.href;
+            }
+        });
+    });
+
+    // On mobile, if chat area has messages (view_message page) or compose form, hide sidebar immediately
+    function initMobileState() {
+        if (!isMobile()) return;
+        var chatMsgs = document.querySelector('.chat-messages');
+        var composeForm = document.querySelector('.chat-messages form');
+        var sidebar = document.querySelector('.chat-sidebar');
+        var chatArea = document.querySelector('.chat-area');
+        if (sidebar && chatArea) {
+            if (chatMsgs || composeForm) {
+                // view_message or compose page - show chat, hide sidebar
+                sidebar.classList.add('hidden');
+                chatArea.classList.remove('hidden');
+            }
+        }
+    }
+    initMobileState();
+    window.addEventListener('resize', initMobileState);
+})();
+</script>
+
+{% block extra_js %}{% endblock %}
 {% endblock %}
