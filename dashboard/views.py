@@ -6,7 +6,7 @@ from django.db.models import Count, Sum, Q, F
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
-from datetime import timedelta
+from datetime import timedelta, date
 import urllib.parse
 
 
@@ -82,6 +82,27 @@ def build_payment_received_message(payment):
         f"💳 *Method:* {payment.get_method_display()}\n"
         f"📅 *Date:* {payment.created_at.strftime('%d %b, %Y')}\n\n"
         f"Your payment has been verified. Course access is now active!\n\n"
+        f"JazakAllah Khair! 🤲\n"
+        f"Muslimaa Academy Team"
+    )
+
+
+def build_fee_reminder_message(enrollment):
+    """Build WhatsApp fee reminder message for a student (anniversary-based)."""
+    payment_info = get_payment_info_text()
+    price = enrollment.course.price
+    price_text = f"Rs. {int(price)}" if price and price > 0 else "Free"
+    enrolled_date = enrollment.enrolled_at.strftime('%d %b, %Y')
+    return (
+        f"Assalam-o-Alaikum {enrollment.student.first_name}! 🌙\n\n"
+        f"📅 *Monthly Fee Reminder — Muslimaa Academy*\n\n"
+        f"Your monthly fee is due for this course:\n\n"
+        f"📋 *Course:* {enrollment.course.title}\n"
+        f"💰 *Fee:* {price_text}\n"
+        f"📅 *Enrolled on:* {enrolled_date}\n\n"
+        f"💳 *Payment Details:*\n"
+        f"{payment_info}\n\n"
+        f"📸 After sending payment, please send the screenshot here on WhatsApp.\n\n"
         f"JazakAllah Khair! 🤲\n"
         f"Muslimaa Academy Team"
     )
@@ -528,6 +549,34 @@ def admin_fees(request):
             messages.success(request, f'{enrollment.course.title} marked as free for {enrollment.student.get_full_name()}. Email sent.')
             return redirect('dashboard:admin_fees')
 
+        elif action == 'send_reminder':
+            enrollment_id = request.POST.get('enrollment_id')
+            enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+            phone = getattr(enrollment.student.profile, 'phone', '') or ''
+            msg = build_fee_reminder_message(enrollment)
+            wurl = build_whatsapp_url(phone, msg)
+            if wurl:
+                messages.success(request, f'Reminder ready for {enrollment.student.get_full_name()}! WhatsApp opened.')
+            else:
+                messages.warning(request, f'No phone number for {enrollment.student.get_full_name()}. Add phone to send WhatsApp reminder.')
+            return redirect('dashboard:admin_fees')
+
+        elif action == 'send_all_reminders':
+            today = date.today()
+            anniversary_enrs = []
+            for enr in approved:
+                has_payment = payments.filter(enrollment=enr).exists()
+                if enr.enrolled_at and enr.enrolled_at.day == today.day and enr.enrolled_at.month != today.month:
+                    if enr.course.price and enr.course.price > 0 and not has_payment:
+                        phone = getattr(enr.student.profile, 'phone', '') or ''
+                        if phone:
+                            anniversary_enrs.append(enr)
+            if anniversary_enrs:
+                messages.success(request, f'Reminders ready for {len(anniversary_enrs)} student(s)! WhatsApp links generated.')
+            else:
+                messages.info(request, 'No students have their enrollment anniversary today.')
+            return redirect('dashboard:admin_fees')
+
     approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
     payments = Payment.objects.select_related('student', 'course', 'enrollment')
     payment_methods = PaymentMethod.objects.filter(is_active=True)
@@ -562,6 +611,23 @@ def admin_fees(request):
         wurl = build_whatsapp_url(phone, msg)
         approved_with_whatsapp.append({'enrollment': enr, 'whatsapp_url': wurl})
 
+    # Anniversary reminders - students whose enrollment date matches today
+    today = date.today()
+    anniversary_enrollments = []
+    for enr in approved:
+        has_payment = payments.filter(enrollment=enr).exists()
+        if (enr.enrolled_at and enr.enrolled_at.day == today.day and enr.enrolled_at.month != today.month
+                and enr.course.price and enr.course.price > 0 and not has_payment):
+            phone = getattr(enr.student.profile, 'phone', '') or ''
+            reminder_msg = build_fee_reminder_message(enr)
+            wurl_reminder = build_whatsapp_url(phone, reminder_msg)
+            anniversary_enrollments.append({
+                'enrollment': enr,
+                'days_since': (today.year - enr.enrolled_at.year) * 12 + today.month - enr.enrolled_at.month,
+                'whatsapp_url': wurl_reminder,
+                'has_phone': bool(phone),
+            })
+
     context = {
         'active_tab': 'fees',
         'approved_enrollments': approved,
@@ -574,6 +640,8 @@ def admin_fees(request):
         'this_month_collected': this_month_collected,
         'this_month_count': this_month_count,
         'unpaid_enrollments': unpaid_enrollments,
+        'anniversary_enrollments': anniversary_enrollments,
+        'today': today,
     }
     return render(request, 'dashboard/fees.html', context)
 

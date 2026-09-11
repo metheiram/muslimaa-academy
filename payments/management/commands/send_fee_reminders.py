@@ -15,7 +15,8 @@ def get_payment_info_text():
         return "Contact admin for payment details."
     lines = []
     for pm in methods:
-        lines.append(f"{pm.get_method_display()}: {pm.account_number}")
+        lines.append(f"*{pm.get_method_display()}*")
+        lines.append(f"  Number: {pm.account_number}")
         if pm.account_title:
             lines.append(f"  Title: {pm.account_title}")
         if pm.instructions:
@@ -36,136 +37,72 @@ def build_whatsapp_link(student_name, course_name, amount):
     return f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded}"
 
 
-REMINDER_TEMPLATES = {
-    1: {
-        'subject': 'Fee Reminder — Payment Due | Muslimaa Academy',
-        'greeting': 'Assalam-o-Alaikum',
-        'message': (
-            '{greeting} {first_name},\n\n'
-            'This is a friendly reminder that your course fee is due.\n\n'
-            'Course: {course}\n'
-            'Fee: Rs. {amount}\n\n'
-            'Please send your payment to any of the following accounts:\n\n'
-            '{payment_info}\n'
-            'After sending payment, send the screenshot on WhatsApp:\n'
-            '📱 WhatsApp: {whatsapp_link}\n\n'
-            'Or upload it directly from your dashboard.\n\n'
-            'JazakAllah Khair!\n'
-            'Muslimaa Academy Team'
-        ),
-        'tag': 'first',
-    },
-    3: {
-        'subject': 'Fee Reminder (2nd) — Payment Due Soon | Muslimaa Academy',
-        'greeting': 'Assalam-o-Alaikum',
-        'message': (
-            '{greeting} {first_name},\n\n'
-            'This is your second reminder. Your course fee is still pending.\n\n'
-            'Course: {course}\n'
-            'Fee: Rs. {amount}\n\n'
-            'Please send your payment to any of the following accounts:\n\n'
-            '{payment_info}\n'
-            'After sending payment, send the screenshot on WhatsApp:\n'
-            '📱 WhatsApp: {whatsapp_link}\n\n'
-            'Or upload it directly from your dashboard.\n\n'
-            'Please complete the payment soon to avoid any disruption.\n\n'
-            'JazakAllah Khair!\n'
-            'Muslimaa Academy Team'
-        ),
-        'tag': 'second',
-    },
-    5: {
-        'subject': 'URGENT: Fee Payment Last Date Today | Muslimaa Academy',
-        'greeting': 'Assalam-o-Alaikum',
-        'message': (
-            '{greeting} {first_name},\n\n'
-            '⚠️ This is your FINAL reminder. Today is the last date to pay your course fee.\n\n'
-            'Course: {course}\n'
-            'Fee: Rs. {amount}\n\n'
-            'Please send your payment IMMEDIATELY to any of the following accounts:\n\n'
-            '{payment_info}\n'
-            'After sending payment, send the screenshot on WhatsApp:\n'
-            '📱 WhatsApp: {whatsapp_link}\n\n'
-            'Or upload it directly from your dashboard.\n\n'
-            'If payment is not received today, your course access may be affected.\n\n'
-            'JazakAllah Khair!\n'
-            'Muslimaa Academy Team'
-        ),
-        'tag': 'final',
-    },
-}
-
-
 class Command(BaseCommand):
-    help = 'Send fee reminders to students with pending payments on 1st, 3rd, and 5th of each month'
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--force-day',
-            type=int,
-            choices=[1, 3, 5],
-            help='Force send reminder for a specific day (1, 3, or 5) regardless of today\'s date',
-        )
+    help = 'Send monthly fee reminders to students on their enrollment anniversary date'
 
     def handle(self, *args, **options):
         from courses.enrollment_models import Enrollment
         from payments.models import Payment
-        from django.db.models import Sum
 
         today = date.today()
-        day = options.get('force_day') or today.day
-
-        if day not in [1, 3, 5]:
-            self.stdout.write(self.style.WARNING(f'Today is day {day}. Reminders only sent on 1st, 3rd, and 5th.'))
-            return
-
-        template = REMINDER_TEMPLATES[day]
         payment_info = get_payment_info_text()
 
         approved = Enrollment.objects.filter(status='approved').select_related('student', 'course')
         payments = Payment.objects.filter(status='paid')
 
-        unpaid_students = []
+        anniversary_students = []
         for enr in approved:
             has_payment = payments.filter(enrollment=enr).exists()
-            if not has_payment and enr.course.price and enr.course.price > 0:
-                unpaid_students.append(enr)
+            if (enr.enrolled_at
+                    and enr.enrolled_at.day == today.day
+                    and enr.enrolled_at.month != today.month
+                    and enr.course.price and enr.course.price > 0
+                    and not has_payment):
+                anniversary_students.append(enr)
 
-        if not unpaid_students:
-            self.stdout.write(self.style.SUCCESS(f'No unpaid students found for day {day} reminder.'))
+        if not anniversary_students:
+            self.stdout.write(self.style.SUCCESS(f'No students have their enrollment anniversary on {today.strftime("%B %d")}.'))
             return
 
         sent_count = 0
-        for enr in unpaid_students:
+        for enr in anniversary_students:
             student = enr.student
             course = enr.course
             amount = course.price
             first_name = student.first_name or student.username
+            enrolled_date = enr.enrolled_at.strftime('%d %b, %Y')
+            months_ago = (today.year - enr.enrolled_at.year) * 12 + today.month - enr.enrolled_at.month
 
             whatsapp_link = build_whatsapp_link(student.get_full_name(), course.title, amount)
 
-            email_msg = template['message'].format(
-                greeting=template['greeting'],
-                first_name=first_name,
-                course=course.title,
-                amount=int(amount),
-                payment_info=payment_info,
-                whatsapp_link=whatsapp_link,
+            email_msg = (
+                f"Assalam-o-Alaikum {first_name},\n\n"
+                f"This is your monthly fee reminder. Today marks {months_ago} month{'s' if months_ago > 1 else ''} since you enrolled.\n\n"
+                f"Course: {course.title}\n"
+                f"Fee: Rs. {int(amount)}\n"
+                f"Enrolled on: {enrolled_date}\n\n"
+                f"Please send your payment to any of the following accounts:\n\n"
+                f"{payment_info}\n"
+                f"After sending payment, send the screenshot on WhatsApp:\n"
+                f"📱 WhatsApp: {whatsapp_link}\n\n"
+                f"Or upload it directly from your dashboard.\n\n"
+                f"JazakAllah Khair!\n"
+                f"Muslimaa Academy Team"
             )
 
             try:
                 send_mail(
-                    template['subject'],
+                    f'Monthly Fee Reminder — {course.title} | Muslimaa Academy',
                     email_msg,
                     settings.DEFAULT_FROM_EMAIL,
                     [student.email],
                     fail_silently=True,
                 )
                 sent_count += 1
-                self.stdout.write(f'  Sent to {student.get_full_name()} ({student.email}) — {course.title}')
+                self.stdout.write(f'  Sent to {student.get_full_name()} ({student.email}) — {course.title} — {months_ago} month(s) ago')
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'  Failed to send to {student.email}: {e}'))
 
         self.stdout.write(self.style.SUCCESS(
-            f'\nDone! {sent_count} reminder(s) sent (day {day} — {template["tag"]}).'
+            f'\nDone! {sent_count} reminder(s) sent on {today.strftime("%B %d")}.'
         ))

@@ -31,24 +31,35 @@
     .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
 
     .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
-    .stat-card { background: #ffffff; border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); }
+    .stat-card { background: #ffffff; border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); text-align: center; }
     .stat-card h3 { font-size: 1.8rem; font-weight: 800; color: var(--brand-700); margin-bottom: 0.25rem; }
     .stat-card p { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
     .stat-card.accent h3 { color: var(--accent-gold); }
     .stat-card.danger h3 { color: #dc143c; }
 
-    .overdue-list { list-style: none; padding: 0; margin: 0; }
-    .overdue-item { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
-    .overdue-item:last-child { border-bottom: none; }
-    .overdue-info { flex: 1; }
-    .overdue-name { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
-    .overdue-course { font-size: 0.78rem; color: var(--text-muted); }
-    .overdue-days { background: rgba(220,20,60,0.1); color: #dc143c; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
-
     .card { background: #ffffff; border-radius: 12px; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); overflow: hidden; margin-bottom: 1.5rem; }
     .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
     .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
     .card-body { padding: 1.25rem 1.5rem; }
+
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .tab { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; background: rgba(71,24,32,0.06); color: var(--text-muted); transition: all 0.3s; }
+    .tab.active { background: var(--brand-700); color: #ffffff; }
+    .tab:hover:not(.active) { background: rgba(71,24,32,0.1); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .reminder-banner { background: linear-gradient(135deg, rgba(37,211,102,0.08) 0%, rgba(37,211,102,0.02) 100%); border: 1px solid rgba(37,211,102,0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .reminder-banner h3 { font-family: var(--font-serif); color: #128c7e; font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .reminder-banner p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+    .reminder-list { list-style: none; padding: 0; margin: 0; }
+    .reminder-item { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); gap: 1rem; flex-wrap: wrap; }
+    .reminder-item:last-child { border-bottom: none; }
+    .reminder-info { flex: 1; min-width: 200px; }
+    .reminder-name { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
+    .reminder-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .reminder-badge { background: rgba(37,211,102,0.1); color: #128c7e; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; }
 
     .data-table { width: 100%; border-collapse: collapse; }
     .data-table th { text-align: left; padding: 0.75rem 0; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid rgba(71,24,32,0.06); }
@@ -59,20 +70,24 @@
     .status-paid { background: rgba(34,139,34,0.1); color: #228b22; }
     .status-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
     .status-free { background: rgba(138,43,226,0.1); color: #8a2be2; }
-    .status-waived { background: rgba(100,149,237,0.1); color: #6495ed; }
 
     .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
     .btn-primary { background: var(--brand-700); color: #ffffff; }
     .btn-primary:hover { background: var(--brand-800); transform: translateY(-1px); }
-    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: all 0.3s; }
     .btn-mark { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .btn-mark:hover { background: #228b22; color: #fff; }
     .btn-record { background: rgba(71,24,32,0.08); color: var(--brand-700); border: 1px solid rgba(71,24,32,0.15); }
     .btn-record:hover { background: var(--brand-700); color: #fff; }
     .btn-whatsapp { background: rgba(37,211,102,0.1); color: #25d366; border: 1px solid rgba(37,211,102,0.2); }
     .btn-whatsapp:hover { background: #25d366; color: #fff; }
+    .btn-reminder { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
+    .btn-reminder:hover { background: #e67e00; color: #fff; }
+    .btn-send-all { background: #128c7e; color: #fff; padding: 0.5rem 1.25rem; font-size: 0.85rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .btn-send-all:hover { background: #0e7a6e; transform: translateY(-1px); }
+    .btn-no-phone { background: rgba(150,150,150,0.1); color: #999; border: 1px solid rgba(150,150,150,0.2); cursor: not-allowed; }
 
-    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.9rem; }
 
     .methods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.25rem; }
     .method-card { background: linear-gradient(135deg, #ffffff 0%, #fdf8f5 100%); border-radius: 16px; padding: 1.5rem; border: 1.5px solid rgba(71,24,32,0.08); box-shadow: 0 4px 15px rgba(71,24,32,0.06); position: relative; transition: all 0.3s ease; }
@@ -98,6 +113,7 @@
     .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
     .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
     .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
+    .alert-info { background: rgba(37,211,102,0.1); color: #128c7e; border: 1px solid rgba(37,211,102,0.2); }
 
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
     .modal-overlay.active { display: flex; }
@@ -112,7 +128,7 @@
     .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--brand-700); }
     .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(71,24,32,0.06); display: flex; justify-content: flex-end; gap: 0.75rem; }
 
-    @media (max-width: 768px) { .mobile-header { display: flex; } .sidebar { transform: translateX(-100%); z-index: 200; } .sidebar.open { transform: translateX(0); } .overlay.active { display: block; } .main-content { margin-left: 0; padding: 72px 1rem 1rem; } .stats-row { grid-template-columns: repeat(2, 1fr); } .data-table { display: block; overflow-x: auto; } .card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; } .overdue-item { flex-wrap: wrap; } }
+    @media (max-width: 768px) { .mobile-header { display: flex; } .sidebar { transform: translateX(-100%); z-index: 200; } .sidebar.open { transform: translateX(0); } .overlay.active { display: block; } .main-content { margin-left: 0; padding: 72px 1rem 1rem; } .stats-row { grid-template-columns: repeat(2, 1fr); } .data-table { display: block; overflow-x: auto; } .card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; } .reminder-item { flex-direction: column; align-items: flex-start; } }
     @media (max-width: 480px) { .main-content { padding: 68px 0.75rem 0.75rem; } .stats-row { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
@@ -178,160 +194,233 @@
             </div>
         </div>
 
-        {% if unpaid_enrollments %}
-        <div class="card" style="margin-bottom: 1.5rem; border-left: 3px solid #dc143c;">
-            <div class="card-header">
-                <h3 style="color: #dc143c;">Pending Payments (Overdue)</h3>
-            </div>
-            <div class="card-body">
-                <ul class="overdue-list">
-                    {% for item in unpaid_enrollments %}
-                    <li class="overdue-item">
-                        <div class="overdue-info">
-                            <div class="overdue-name">{{ item.enrollment.student.get_full_name }}</div>
-                            <div class="overdue-course">{{ item.enrollment.course.title }} — Rs. {{ item.enrollment.course.price|floatformat:0 }}</div>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('reminders', this)">📅 Reminders ({{ anniversary_enrollments|length }})</button>
+            <button class="tab" onclick="showTab('overdue', this)">⚠️ Overdue ({{ unpaid_enrollments|length }})</button>
+            <button class="tab" onclick="showTab('students', this)">👥 All Students ({{ approved_with_whatsapp|length }})</button>
+            <button class="tab" onclick="showTab('history', this)">📜 Payment History</button>
+            <button class="tab" onclick="showTab('methods', this)">💳 Payment Methods</button>
+        </div>
+
+        <!-- REMINDERS TAB -->
+        <div id="reminders" class="tab-content active">
+            {% if anniversary_enrollments %}
+            <div class="reminder-banner">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h3>📅 Monthly Fee Reminders — {{ today|date:"F j" }}</h3>
+                        <p>These students enrolled on this date. Send them their monthly fee reminder via WhatsApp.</p>
+                    </div>
+                    <form method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="send_all_reminders">
+                        <button type="submit" class="btn-send-all">📱 Send All Reminders</button>
+                    </form>
+                </div>
+                <ul class="reminder-list" style="margin-top: 1rem;">
+                    {% for item in anniversary_enrollments %}
+                    <li class="reminder-item">
+                        <div class="reminder-info">
+                            <div class="reminder-name">{{ item.enrollment.student.get_full_name }}</div>
+                            <div class="reminder-meta">{{ item.enrollment.course.title }} — Rs. {{ item.enrollment.course.price|floatformat:0 }} · Enrolled {{ item.enrollment.enrolled_at|date:"M d, Y" }} · {{ item.days_since }} month{{ item.days_since|pluralize }} ago</div>
                         </div>
-                        <div class="overdue-days">{{ item.days_pending }} days pending</div>
+                        <span class="reminder-badge">{{ item.days_since }} month{{ item.days_since|pluralize }}</span>
+                        {% if item.whatsapp_url %}
+                        <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp">📱 Send Reminder</a>
+                        {% elif item.has_phone %}
+                        <form method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="send_reminder">
+                            <input type="hidden" name="enrollment_id" value="{{ item.enrollment.id }}">
+                            <button type="submit" class="btn-sm btn-reminder">📤 Send</button>
+                        </form>
+                        {% else %}
+                        <span class="btn-sm btn-no-phone">No Phone</span>
+                        {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
             </div>
-        </div>
-        {% endif %}
-
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <div class="card-header">
-                <h3>Payment Methods (Your Account Details)</h3>
-                <button class="btn btn-primary btn-sm" onclick="document.getElementById('addMethodModal').classList.add('active')">+ Add Method</button>
-            </div>
-            <div class="card-body">
-                {% if payment_methods %}
-                <div class="methods-grid">
-                    {% for pm in payment_methods %}
-                    <div class="method-card">
-                        <form method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="delete_payment_method">
-                            <input type="hidden" name="method_id" value="{{ pm.id }}">
-                            <button type="submit" class="method-delete" onclick="return confirm('Delete this payment method?')">✕</button>
-                        </form>
-                        <div class="method-icon {{ pm.method }}">
-                            {% if pm.method == 'jazzcash' %}💳{% elif pm.method == 'sadapay' %}💜{% elif pm.method == 'easypaisa' %}💚{% else %}🏦{% endif %}
-                        </div>
-                        <h4>{{ pm.get_method_display }}</h4>
-                        <div class="method-account">
-                            <div class="label">Account Number</div>
-                            <div class="number">{{ pm.account_number }}</div>
-                        </div>
-                        {% if pm.account_title %}<div class="method-title"><strong>Title:</strong> {{ pm.account_title }}</div>{% endif %}
-                        {% if pm.instructions %}<div class="method-note">{{ pm.instructions }}</div>{% endif %}
-                    </div>
-                    {% endfor %}
-                    <div class="method-card add-method-card" onclick="document.getElementById('addMethodModal').classList.add('active')">
-                        <div class="plus">+</div>
-                        Add New Method
+            {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="empty-msg">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.3;">📅</div>
+                        <h3 style="font-family: var(--font-serif); font-size: 1rem; color: var(--brand-700); margin-bottom: 0.25rem;">No Reminders Today</h3>
+                        <p>No students have their enrollment anniversary on {{ today|date:"F j" }}. Reminders are automatically prepared on each student's enrollment date every month.</p>
                     </div>
                 </div>
-                {% else %}
-                <p class="empty-msg">No payment methods added yet. Add your JazzCash, SadaPay, etc. account details so students know where to send fees.</p>
-                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- OVERDUE TAB -->
+        <div id="overdue" class="tab-content">
+            {% if unpaid_enrollments %}
+            <div class="card" style="border-left: 3px solid #dc143c;">
+                <div class="card-header">
+                    <h3 style="color: #dc143c;">Pending Payments (Overdue)</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="reminder-list">
+                        {% for item in unpaid_enrollments %}
+                        <li class="reminder-item">
+                            <div class="reminder-info">
+                                <div class="reminder-name">{{ item.enrollment.student.get_full_name }}</div>
+                                <div class="reminder-meta">{{ item.enrollment.course.title }} — Rs. {{ item.enrollment.course.price|floatformat:0 }}</div>
+                            </div>
+                            <span style="background: rgba(220,20,60,0.1); color: #dc143c; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">{{ item.days_pending }} days pending</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% else %}
+            <div class="card"><div class="card-body"><div class="empty-msg">No pending payments. All students are up to date!</div></div></div>
+            {% endif %}
+        </div>
+
+        <!-- ALL STUDENTS TAB -->
+        <div id="students" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Enrolled Students — Fee Status</h3>
+                </div>
+                <div class="card-body">
+                    {% if approved_with_whatsapp %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Screenshot</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in approved_with_whatsapp %}
+                            <tr>
+                                <td><strong>{{ item.enrollment.student.get_full_name }}</strong></td>
+                                <td>{{ item.enrollment.course.title }}</td>
+                                <td>{% for payment in payments %}{% if payment.enrollment.id == item.enrollment.id %}Rs. {{ payment.amount }}{% endif %}{% empty %}-{% endfor %}</td>
+                                <td>
+                                    {% for payment in payments %}{% if payment.enrollment.id == item.enrollment.id %}
+                                    <span class="status-badge status-{{ payment.status }}">{{ payment.get_status_display }}</span>
+                                    {% endif %}{% empty %}
+                                    <span class="status-badge status-pending">Unpaid</span>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% if item.enrollment.payment_screenshot %}
+                                    <a href="{{ item.enrollment.payment_screenshot.url }}" target="_blank" class="btn-sm btn-record" style="text-decoration:none;">View Screenshot</a>
+                                    {% else %}
+                                    <span style="font-size:0.78rem; color:var(--text-muted);">-</span>
+                                    {% endif %}
+                                </td>
+                                <td style="white-space: nowrap;">
+                                    <button class="btn-sm btn-record" onclick="openPaymentModal('{{ item.enrollment.id }}', '{{ item.enrollment.student.get_full_name }}', '{{ item.enrollment.course.title }}')">Record Payment</button>
+                                    <form method="POST" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="enrollment_id" value="{{ item.enrollment.id }}">
+                                        <button type="submit" name="action" value="mark_free" class="btn-sm btn-mark">Mark Free</button>
+                                    </form>
+                                    {% if item.whatsapp_url %}
+                                    <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp" title="Send receipt on WhatsApp">📱</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="empty-msg">No approved enrollments yet.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h3>Enrolled Students — Fee Status</h3>
+        <!-- PAYMENT HISTORY TAB -->
+        <div id="history" class="tab-content">
+            {% if payments %}
+            <div class="card">
+                <div class="card-header"><h3>Payment History</h3></div>
+                <div class="card-body">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr>
+                                <td><strong>{{ payment.student.get_full_name }}</strong></td>
+                                <td>{{ payment.course.title }}</td>
+                                <td>Rs. {{ payment.amount }}</td>
+                                <td>{{ payment.get_method_display }}</td>
+                                <td><span class="status-badge status-{{ payment.status }}">{{ payment.get_status_display }}</span></td>
+                                <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="card-body">
-                {% if approved_with_whatsapp %}
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Student</th>
-                            <th>Course</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Screenshot</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in approved_with_whatsapp %}
-                        <tr>
-                            <td><strong>{{ item.enrollment.student.get_full_name }}</strong></td>
-                            <td>{{ item.enrollment.course.title }}</td>
-                            <td>{% for payment in payments %}{% if payment.enrollment.id == item.enrollment.id %}Rs. {{ payment.amount }}{% endif %}{% empty %}-{% endfor %}</td>
-                            <td>
-                                {% for payment in payments %}{% if payment.enrollment.id == item.enrollment.id %}
-                                <span class="status-badge status-{{ payment.status }}">{{ payment.get_status_display }}</span>
-                                {% endif %}{% empty %}
-                                <span class="status-badge status-pending">Unpaid</span>
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% if item.enrollment.payment_screenshot %}
-                                <a href="{{ item.enrollment.payment_screenshot.url }}" target="_blank" class="btn-sm btn-record" style="text-decoration:none;">View Screenshot</a>
-                                {% else %}
-                                <span style="font-size:0.78rem; color:var(--text-muted);">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <button class="btn-sm btn-record" onclick="openPaymentModal('{{ item.enrollment.id }}', '{{ item.enrollment.student.get_full_name }}', '{{ item.enrollment.course.title }}')">Record Payment</button>
-                                <form method="POST" style="display:inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="enrollment_id" value="{{ item.enrollment.id }}">
-                                    <button type="submit" name="action" value="mark_free" class="btn-sm btn-mark">Mark Free</button>
-                                </form>
-                                {% if item.whatsapp_url %}
-                                <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp" title="Send receipt on WhatsApp">📱</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <p class="empty-msg">No approved enrollments yet.</p>
-                {% endif %}
-            </div>
+            {% else %}
+            <div class="card"><div class="card-body"><div class="empty-msg">No payment history yet.</div></div></div>
+            {% endif %}
         </div>
 
-        {% if payments %}
-        <div class="card">
-            <div class="card-header">
-                <h3>Payment History</h3>
-            </div>
-            <div class="card-body">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Student</th>
-                            <th>Course</th>
-                            <th>Amount</th>
-                            <th>Method</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in payments %}
-                        <tr>
-                            <td><strong>{{ payment.student.get_full_name }}</strong></td>
-                            <td>{{ payment.course.title }}</td>
-                            <td>Rs. {{ payment.amount }}</td>
-                            <td>{{ payment.get_method_display }}</td>
-                            <td><span class="status-badge status-{{ payment.status }}">{{ payment.get_status_display }}</span></td>
-                            <td>{{ payment.created_at|date:"M d, Y" }}</td>
-                        </tr>
+        <!-- PAYMENT METHODS TAB -->
+        <div id="methods" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Payment Methods (Your Account Details)</h3>
+                    <button class="btn btn-primary btn-sm" onclick="document.getElementById('addMethodModal').classList.add('active')">+ Add Method</button>
+                </div>
+                <div class="card-body">
+                    {% if payment_methods %}
+                    <div class="methods-grid">
+                        {% for pm in payment_methods %}
+                        <div class="method-card">
+                            <form method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_payment_method">
+                                <input type="hidden" name="method_id" value="{{ pm.id }}">
+                                <button type="submit" class="method-delete" onclick="return confirm('Delete this payment method?')">✕</button>
+                            </form>
+                            <div class="method-icon {{ pm.method }}">
+                                {% if pm.method == 'jazzcash' %}💳{% elif pm.method == 'sadapay' %}💜{% elif pm.method == 'easypaisa' %}💚{% else %}🏦{% endif %}
+                            </div>
+                            <h4>{{ pm.get_method_display }}</h4>
+                            <div class="method-account">
+                                <div class="label">Account Number</div>
+                                <div class="number">{{ pm.account_number }}</div>
+                            </div>
+                            {% if pm.account_title %}<div class="method-title"><strong>Title:</strong> {{ pm.account_title }}</div>{% endif %}
+                            {% if pm.instructions %}<div class="method-note">{{ pm.instructions }}</div>{% endif %}
+                        </div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                        <div class="method-card add-method-card" onclick="document.getElementById('addMethodModal').classList.add('active')">
+                            <div class="plus">+</div>
+                            Add New Method
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="empty-msg">No payment methods added yet. Add your JazzCash, SadaPay, etc. account details so students know where to send fees.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% endif %}
     </main>
 </div>
-{% endblock %}
 
 <!-- RECORD PAYMENT MODAL -->
 <div class="modal-overlay" id="paymentModal">
@@ -425,16 +514,23 @@
     </div>
 </div>
 
+{% block extra_scripts %}
 <script>
+function showTab(tabId, el) {
+    document.querySelectorAll('.tab-content').forEach(function(e) { e.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(e) { e.classList.remove('active'); });
+    document.getElementById(tabId).classList.add('active');
+    el.classList.add('active');
+}
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+}
 function openPaymentModal(enrollmentId, studentName, courseTitle) {
     document.getElementById('modal_enrollment_id').value = enrollmentId;
     document.getElementById('modal_student_info').textContent = studentName + ' — ' + courseTitle;
     document.getElementById('paymentModal').classList.add('active');
 }
 </script>
-<script>
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('active');
-}
-</script>
+{% endblock %}
+{% endblock %}
