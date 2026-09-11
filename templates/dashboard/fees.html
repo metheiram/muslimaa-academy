@@ -195,7 +195,7 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="showTab('reminders', this)">📅 Reminders ({{ anniversary_enrollments|length }})</button>
+            <button class="tab active" onclick="showTab('reminders', this)">📅 Reminders ({{ reminder_enrollments|length }})</button>
             <button class="tab" onclick="showTab('overdue', this)">⚠️ Overdue ({{ unpaid_enrollments|length }})</button>
             <button class="tab" onclick="showTab('students', this)">👥 All Students ({{ approved_with_whatsapp|length }})</button>
             <button class="tab" onclick="showTab('history', this)">📜 Payment History</button>
@@ -204,27 +204,32 @@
 
         <!-- REMINDERS TAB -->
         <div id="reminders" class="tab-content active">
-            {% if anniversary_enrollments %}
             <div class="reminder-banner">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h3>📅 Monthly Fee Reminders — {{ today|date:"F j" }}</h3>
-                        <p>These students enrolled on this date. Send them their monthly fee reminder via WhatsApp.</p>
+                        <h3>📅 Monthly Fee Reminders</h3>
+                        <p>Students who haven't paid yet. Send reminders via WhatsApp — each student gets reminded on their enrollment date every month.</p>
                     </div>
+                    {% if reminder_enrollments %}
                     <form method="POST" style="display:inline;">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="send_all_reminders">
                         <button type="submit" class="btn-send-all">📱 Send All Reminders</button>
                     </form>
+                    {% endif %}
                 </div>
+                {% if reminder_enrollments %}
                 <ul class="reminder-list" style="margin-top: 1rem;">
-                    {% for item in anniversary_enrollments %}
-                    <li class="reminder-item">
+                    {% for item in reminder_enrollments %}
+                    <li class="reminder-item" {% if item.is_today %}style="background: rgba(37,211,102,0.06); margin: 0 -1.5rem; padding: 0.85rem 1.5rem; border-radius: 8px;"{% endif %}>
                         <div class="reminder-info">
-                            <div class="reminder-name">{{ item.enrollment.student.get_full_name }}</div>
-                            <div class="reminder-meta">{{ item.enrollment.course.title }} — Rs. {{ item.enrollment.course.price|floatformat:0 }} · Enrolled {{ item.enrollment.enrolled_at|date:"M d, Y" }} · {{ item.days_since }} month{{ item.days_since|pluralize }} ago</div>
+                            <div class="reminder-name">
+                                {{ item.enrollment.student.get_full_name }}
+                                {% if item.is_today %}<span style="background: #128c7e; color: #fff; padding: 0.15rem 0.5rem; border-radius: 50px; font-size: 0.65rem; font-weight: 700; margin-left: 0.5rem;">TODAY</span>{% endif %}
+                            </div>
+                            <div class="reminder-meta">{{ item.enrollment.course.title }} — Rs. {{ item.enrollment.course.price|floatformat:0 }} · Enrolled {{ item.enrollment.enrolled_at|date:"M d, Y" }} · Reminder: every month on the {{ item.reminder_day }}</div>
                         </div>
-                        <span class="reminder-badge">{{ item.days_since }} month{{ item.days_since|pluralize }}</span>
+                        <span class="reminder-badge">{{ item.months_since }} mo ago</span>
                         {% if item.whatsapp_url %}
                         <a href="{{ item.whatsapp_url }}" target="_blank" class="btn-sm btn-whatsapp">📱 Send Reminder</a>
                         {% elif item.has_phone %}
@@ -240,18 +245,14 @@
                     </li>
                     {% endfor %}
                 </ul>
-            </div>
-            {% else %}
-            <div class="card">
-                <div class="card-body">
-                    <div class="empty-msg">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.3;">📅</div>
-                        <h3 style="font-family: var(--font-serif); font-size: 1rem; color: var(--brand-700); margin-bottom: 0.25rem;">No Reminders Today</h3>
-                        <p>No students have their enrollment anniversary on {{ today|date:"F j" }}. Reminders are automatically prepared on each student's enrollment date every month.</p>
-                    </div>
+                {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;">✅</div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1rem; color: var(--brand-700); margin-bottom: 0.25rem;">All Caught Up!</h3>
+                    <p>No unpaid students. Everyone has paid their fees.</p>
                 </div>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
 
         <!-- OVERDUE TAB -->
