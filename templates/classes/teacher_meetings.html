@@ -60,9 +60,7 @@
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="dashboard-wrapper">
-    <main class="main-content">
+{% block teacher_content %}
         <div class="page-header">
             <h1>Meetings</h1>
             <button class="btn btn-primary" onclick="document.getElementById('createModal').classList.add('active')">+ New Meeting</button>
@@ -110,14 +108,13 @@
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                {% else %}
-                <p class="empty-msg">No meetings created yet.</p>
-                {% endif %}
+        {% endfor %}
+        {% else %}
+        <p class="empty-msg">No meetings created yet.</p>
+        {% endif %}
             </div>
         </div>
-    </main>
-</div>
+{% endblock %}
 
 <!-- Create Meeting Modal -->
 <div class="modal-overlay" id="createModal">
@@ -171,6 +168,7 @@
         </form>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_scripts %}
 <script>
@@ -183,5 +181,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-{% endblock %}
 {% endblock %}
