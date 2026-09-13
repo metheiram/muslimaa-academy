@@ -3,13 +3,9 @@
 
 {% block title %}My Meetings | Muslimaa Academy{% endblock %}
 
-{% block extra_head %}
+{% block student_extra_head %}
 <style>
     :root { --brand-700: #471820; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; --font-serif: 'Playfair Display', Georgia, serif; --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-sans); background: #f5f0eb; color: #2d0d0f; }
-    .dashboard-wrapper { display: flex; min-height: 100vh; }
-    .main-content { flex: 1; padding: 2rem; }
     .page-header { margin-bottom: 2rem; }
     .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
     .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; font-size: 0.88rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
@@ -33,7 +29,6 @@
     .time-past { background: rgba(150,150,150,0.1); color: #999; }
     .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
     .section-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--brand-700); margin-bottom: 1rem; }
-    @media (max-width: 768px) { .main-content { padding: 72px 1rem 1rem; } .page-header h1 { font-size: 1.4rem; } }
 </style>
 {% endblock %}
 
