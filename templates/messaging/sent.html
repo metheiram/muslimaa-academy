@@ -22,7 +22,7 @@
         {% for msg in messages %}
         <a href="{% url 'messaging:view_message' msg.id %}" class="contact-item" data-name="{{ msg.recipient.get_full_name|lower }} {{ msg.recipient.username|lower }}">
             <div class="contact-avatar">
-                {% if msg.recipient.get_initials %}{{ msg.recipient.get_initials }}{% else %}{{ msg.recipient.username|truncatechars:2 }}{% endif %}
+                {% if msg.recipient|get_initials %}{{ msg.recipient|get_initials }}{% else %}{{ msg.recipient.username|truncatechars:2 }}{% endif %}
             </div>
             <div class="contact-info">
                 <div class="contact-top">

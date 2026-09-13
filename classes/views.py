@@ -78,7 +78,10 @@ def manage_schedule(request):
 
         elif action == 'delete':
             schedule_id = request.POST.get('schedule_id')
-            Schedule.objects.filter(id=schedule_id).delete()
+            if user.is_superuser:
+                Schedule.objects.filter(id=schedule_id).delete()
+            else:
+                Schedule.objects.filter(id=schedule_id, teacher=user).delete()
             messages.success(request, 'Schedule entry deleted.')
             return redirect('classes:manage_schedule')
 
@@ -215,7 +218,10 @@ def teacher_meetings(request):
 
         elif action == 'delete':
             meeting_id = request.POST.get('meeting_id')
-            Meeting.objects.filter(id=meeting_id).delete()
+            if user.is_superuser:
+                Meeting.objects.filter(id=meeting_id).delete()
+            else:
+                Meeting.objects.filter(id=meeting_id, teacher=user).delete()
             messages.success(request, 'Meeting deleted.')
             return redirect('classes:teacher_meetings')
 

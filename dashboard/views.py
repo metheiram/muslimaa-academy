@@ -215,6 +215,16 @@ def admin_students(request):
             elif User.objects.filter(email=email).exists():
                 messages.error(request, 'Email already exists.')
             else:
+                # Password validation
+                from django.contrib.auth.password_validation import validate_password
+                from django.core.exceptions import ValidationError as DjangoValidationError
+                try:
+                    validate_password(password)
+                except DjangoValidationError as e:
+                    for error in e.messages:
+                        messages.error(request, error)
+                    return redirect('dashboard:admin_students')
+                
                 user = User.objects.create_user(
                     username=username,
                     email=email,
@@ -232,7 +242,14 @@ def admin_students(request):
             user = get_object_or_404(User, id=user_id)
             user.first_name = request.POST.get('first_name', user.first_name).strip()
             user.last_name = request.POST.get('last_name', user.last_name).strip()
-            user.email = request.POST.get('email', user.email).strip()
+            new_email = request.POST.get('email', user.email).strip()
+            
+            # Email uniqueness check
+            if new_email != user.email and User.objects.filter(email=new_email).exists():
+                messages.error(request, 'Email already exists.')
+                return redirect('dashboard:admin_students')
+            
+            user.email = new_email
 
             new_password = request.POST.get('password', '').strip()
             if new_password:
@@ -241,8 +258,9 @@ def admin_students(request):
             user.save()
 
             phone = request.POST.get('phone', '').strip()
-            user.profile.phone = phone
-            user.profile.save()
+            if hasattr(user, 'profile'):
+                user.profile.phone = phone
+                user.profile.save()
 
             messages.success(request, f'Student "{user.get_full_name()}" updated successfully!')
             return redirect('dashboard:admin_students')
@@ -281,6 +299,16 @@ def admin_teachers(request):
             elif User.objects.filter(email=email).exists():
                 messages.error(request, 'Email already exists.')
             else:
+                # Password validation
+                from django.contrib.auth.password_validation import validate_password
+                from django.core.exceptions import ValidationError as DjangoValidationError
+                try:
+                    validate_password(password)
+                except DjangoValidationError as e:
+                    for error in e.messages:
+                        messages.error(request, error)
+                    return redirect('dashboard:admin_teachers')
+                
                 user = User.objects.create_user(
                     username=username,
                     email=email,
@@ -301,16 +329,24 @@ def admin_teachers(request):
             user = get_object_or_404(User, id=user_id)
             user.first_name = request.POST.get('first_name', user.first_name).strip()
             user.last_name = request.POST.get('last_name', user.last_name).strip()
-            user.email = request.POST.get('email', user.email).strip()
+            new_email = request.POST.get('email', user.email).strip()
             subject = request.POST.get('subject', '').strip()
+            
+            # Email uniqueness check
+            if new_email != user.email and User.objects.filter(email=new_email).exists():
+                messages.error(request, 'Email already exists.')
+                return redirect('dashboard:admin_teachers')
+            
+            user.email = new_email
             
             new_password = request.POST.get('password', '').strip()
             if new_password:
                 user.set_password(new_password)
             
             user.save()
-            user.profile.subject = subject
-            user.profile.save()
+            if hasattr(user, 'profile'):
+                user.profile.subject = subject
+                user.profile.save()
             messages.success(request, f'Teacher "{user.get_full_name()}" updated successfully!')
             return redirect('dashboard:admin_teachers')
 
@@ -589,7 +625,8 @@ def admin_fees(request):
     payment_methods = PaymentMethod.objects.filter(is_active=True)
 
     total_collected = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
-    total_pending = approved.count() - payments.count()
+    paid_enrollment_ids = payments.filter(status='paid').values_list('enrollment_id', flat=True).distinct()
+    total_pending = approved.exclude(id__in=paid_enrollment_ids).count()
     total_free = payments.filter(status='free').count()
 
     from django.utils import timezone

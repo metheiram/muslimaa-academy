@@ -116,7 +116,20 @@ def upload_screenshot(request, enrollment_id):
     enrollment = get_object_or_404(Enrollment, id=enrollment_id, student=request.user)
 
     if request.method == 'POST' and request.FILES.get('payment_screenshot'):
-        enrollment.payment_screenshot = request.FILES['payment_screenshot']
+        file = request.FILES['payment_screenshot']
+        
+        # File validation
+        allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        max_size = 5 * 1024 * 1024  # 5MB
+        
+        if file.content_type not in allowed_types:
+            messages.error(request, 'Only JPG, PNG, GIF, and WebP images are allowed.')
+            return redirect('courses:my_enrollments')
+        if file.size > max_size:
+            messages.error(request, 'File size must be less than 5MB.')
+            return redirect('courses:my_enrollments')
+        
+        enrollment.payment_screenshot = file
         enrollment.save()
         messages.success(request, f'Payment screenshot uploaded for {enrollment.course.title}.')
     else:

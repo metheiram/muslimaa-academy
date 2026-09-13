@@ -169,7 +169,7 @@ def view_message_by_user(request, user_id):
     unread_msgs.update(is_read=True)
 
     thread = _get_thread(request.user, user_id)
-    latest_msg = thread.first() if thread else None
+    latest_msg = thread.first() if thread.exists() else None
 
     conversations = _get_conversations(request.user)
     unread_count = Message.objects.filter(recipient=request.user, is_read=False).count()

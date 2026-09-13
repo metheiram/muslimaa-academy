@@ -48,6 +48,15 @@ def register(request):
             errors.append('Username already exists.')
         if User.objects.filter(email=email).exists():
             errors.append('Email already registered.')
+        
+        # Password validation
+        from django.contrib.auth.password_validation import validate_password
+        from django.core.exceptions import ValidationError as DjangoValidationError
+        try:
+            validate_password(password)
+        except DjangoValidationError as e:
+            for error in e.messages:
+                errors.append(error)
 
         if errors:
             for e in errors:
@@ -84,7 +93,7 @@ class CustomLoginView(LoginView):
     
     def get_success_url(self):
         next_url = self.request.GET.get('next') or self.request.POST.get('next')
-        if next_url:
+        if next_url and next_url.startswith('/') and '//' not in next_url:
             return next_url
         if self.request.user.is_superuser:
             return '/dashboard/'
@@ -197,6 +206,10 @@ def teacher_dashboard(request):
         homework__teacher=user,
         grade__isnull=True
     ).select_related('student', 'homework')[:5]
+    total_pending_submissions = HomeworkSubmission.objects.filter(
+        homework__teacher=user,
+        grade__isnull=True
+    ).count()
 
     # Recent attendance
     from attendance.models import Attendance
@@ -213,6 +226,7 @@ def teacher_dashboard(request):
         'total_pending': total_pending,
         'upcoming_meetings': upcoming_meetings,
         'pending_submissions': pending_submissions,
+        'total_pending_submissions': total_pending_submissions,
         'recent_attendance': recent_attendance,
         'active_page': 'dashboard',
     }
@@ -295,6 +309,7 @@ def forgot_password(request):
     """Password reset via email."""
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
+        # Always show same message to prevent user enumeration
         if User.objects.filter(email=email).exists():
             from django.contrib.auth.tokens import default_token_generator
             from django.utils.http import urlsafe_base64_encode
@@ -321,13 +336,12 @@ def forgot_password(request):
                     [email],
                     fail_silently=True,
                 )
-                messages.success(request, 'Password reset link sent to your email! Check your inbox.')
             except Exception:
-                messages.error(request, 'Failed to send email. Please try again.')
-
-            return redirect('accounts:login')
-        else:
-            messages.error(request, 'No account found with this email.')
+                pass
+        
+        # Always show same message regardless of email existence
+        messages.success(request, 'If an account exists with this email, a password reset link has been sent.')
+        return redirect('accounts:login')
 
     return render(request, 'accounts/forgot_password.html')
 
@@ -354,6 +368,16 @@ def reset_password(request, uidb64, token):
             elif password != password2:
                 messages.error(request, 'Passwords do not match.')
             else:
+                # Password validation
+                from django.contrib.auth.password_validation import validate_password
+                from django.core.exceptions import ValidationError as DjangoValidationError
+                try:
+                    validate_password(password, user)
+                except DjangoValidationError as e:
+                    for error in e.messages:
+                        messages.error(request, error)
+                    return render(request, 'accounts/reset_password.html', {'valid': True})
+                
                 user.set_password(password)
                 user.save()
                 messages.success(request, 'Password reset successful! You can now login.')
