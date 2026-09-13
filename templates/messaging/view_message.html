@@ -23,7 +23,7 @@
         {% for conv in conversations %}
         <a href="{% url 'messaging:view_message' conv.latest_message.id %}" class="contact-item {% if conv.other_user == other_user %}active{% endif %}" data-name="{{ conv.other_user.get_full_name|lower }} {{ conv.other_user.username|lower }}">
             <div class="contact-avatar">
-                {% if conv.other_user.get_initials %}{{ conv.other_user.get_initials }}{% else %}{{ conv.other_user.username|truncatechars:2 }}{% endif %}
+                {% if conv.other_user|get_initials %}{{ conv.other_user|get_initials }}{% else %}{{ conv.other_user.username|truncatechars:2 }}{% endif %}
             </div>
             <div class="contact-info">
                 <div class="contact-top">
@@ -44,19 +44,23 @@
     <div class="chat-header">
         <a href="{% url 'messaging:inbox' %}" class="back-btn" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted);">←</a>
         <div class="chat-header-avatar">
-            {% if other_user.get_initials %}{{ other_user.get_initials }}{% else %}{{ other_user.username|truncatechars:2 }}{% endif %}
+            {% if other_user|get_initials %}{{ other_user|get_initials }}{% else %}{{ other_user.username|truncatechars:2 }}{% endif %}
         </div>
         <div class="chat-header-info">
             <div class="chat-header-name">{{ other_user.get_full_name|default:other_user.username }}</div>
             <div class="chat-header-status">{{ other_user.get_role_display|default:"Member" }}</div>
         </div>
         <div class="chat-header-actions">
+            {% if message %}
             <a href="{% url 'messaging:delete_message' message.id %}" title="Delete" onclick="return confirm('Delete this conversation?')">🗑️</a>
+            {% endif %}
         </div>
     </div>
 
     <div class="chat-messages" id="chatMessages">
+        {% if message %}
         <div class="chat-date-divider"><span>{{ message.created_at|date:"F j, Y" }}</span></div>
+        {% endif %}
 
         {% for msg in thread %}
         <div class="msg-bubble {% if msg.sender == request.user %}msg-sent{% else %}msg-received{% endif %}">
@@ -75,11 +79,22 @@
         {% endfor %}
     </div>
 
+    {% if message %}
     <form method="post" action="{% url 'messaging:reply' message.id %}" class="chat-compose" id="replyForm">
         {% csrf_token %}
         <textarea name="body" placeholder="Type a message..." rows="1" required id="msgInput" onkeydown="handleKey(event)"></textarea>
         <button type="submit">➤</button>
     </form>
+    {% else %}
+    <div class="chat-compose" style="justify-content:center; color:var(--text-muted); font-size:0.85rem;">
+        Start a conversation by sending a message below.
+    </div>
+    <form method="post" action="{% url 'messaging:compose_to' other_user.id %}" class="chat-compose" id="replyForm" style="display:flex;">
+        {% csrf_token %}
+        <textarea name="body" placeholder="Type a message..." rows="1" required id="msgInput" onkeydown="handleKey(event)"></textarea>
+        <button type="submit">➤</button>
+    </form>
+    {% endif %}
 </div>
 
 {% block extra_js %}

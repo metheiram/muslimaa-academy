@@ -23,7 +23,7 @@
         {% for conv in conversations %}
         <a href="{% url 'messaging:view_message' conv.latest_message.id %}" class="contact-item {% if conv.latest_message.id == selected_id %}active{% endif %}" data-name="{{ conv.other_user.get_full_name|lower }} {{ conv.other_user.username|lower }}">
             <div class="contact-avatar">
-                {% if conv.other_user.get_initials %}{{ conv.other_user.get_initials }}{% else %}{{ conv.other_user.username|truncatechars:2 }}{% endif %}
+                {% if conv.other_user|get_initials %}{{ conv.other_user|get_initials }}{% else %}{{ conv.other_user.username|truncatechars:2 }}{% endif %}
                 {% if conv.other_user.is_online %}<span class="online-dot"></span>{% endif %}
             </div>
             <div class="contact-info">

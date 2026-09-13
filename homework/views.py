@@ -84,7 +84,10 @@ def teacher_homework(request):
 
         elif action == 'delete':
             hw_id = request.POST.get('homework_id')
-            Homework.objects.filter(id=hw_id).delete()
+            if user.is_superuser:
+                Homework.objects.filter(id=hw_id).delete()
+            else:
+                Homework.objects.filter(id=hw_id, teacher=user).delete()
             messages.success(request, 'Homework deleted.')
             return redirect('homework:teacher_homework')
 
@@ -116,6 +119,12 @@ def grade_submission(request, submission_id):
         return redirect('homework:teacher_homework')
 
     submission = get_object_or_404(HomeworkSubmission, id=submission_id)
+    
+    # Ownership check - teacher can only grade their own homework submissions
+    if not request.user.is_superuser and submission.homework.teacher != request.user:
+        messages.error(request, 'You can only grade submissions for your own homework.')
+        return redirect('homework:teacher_homework')
+    
     grade = request.POST.get('grade', '')
     feedback = request.POST.get('feedback', '').strip()
 
@@ -185,6 +194,15 @@ def submit_homework(request, homework_id):
     """Submit homework (student only)."""
     homework = get_object_or_404(Homework, id=homework_id, is_active=True)
 
+    # Check if student is enrolled in the course
+    from courses.enrollment_models import Enrollment
+    is_enrolled = Enrollment.objects.filter(
+        student=request.user, course=homework.course, status='approved'
+    ).exists()
+    if not is_enrolled:
+        messages.error(request, 'You are not enrolled in this course.')
+        return redirect('homework:student_homework')
+
     existing = HomeworkSubmission.objects.filter(
         homework=homework, student=request.user
     ).first()
@@ -201,6 +219,20 @@ def submit_homework(request, homework_id):
         if not submission_text and not file:
             messages.error(request, 'Please provide text or upload a file.')
             return redirect('homework:student_homework')
+
+        # File validation
+        if file:
+            allowed_types = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif',
+                           'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                           'text/plain']
+            max_size = 10 * 1024 * 1024  # 10MB
+            
+            if file.content_type not in allowed_types:
+                messages.error(request, 'Only PDF, Images (JPG/PNG/GIF), Word docs, and Text files are allowed.')
+                return redirect('homework:student_homework')
+            if file.size > max_size:
+                messages.error(request, 'File size must be less than 10MB.')
+                return redirect('homework:student_homework')
 
         if existing:
             existing.submission_text = submission_text

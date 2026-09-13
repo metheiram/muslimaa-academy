@@ -165,8 +165,14 @@ def attendance_report(request):
     from datetime import date
     import calendar
 
-    month = int(request.GET.get('month', date.today().month))
-    year = int(request.GET.get('year', date.today().year))
+    try:
+        month = int(request.GET.get('month', date.today().month))
+    except (ValueError, TypeError):
+        month = date.today().month
+    try:
+        year = int(request.GET.get('year', date.today().year))
+    except (ValueError, TypeError):
+        year = date.today().year
     course_id = request.GET.get('course')
 
     month = max(1, min(12, month))
@@ -182,7 +188,10 @@ def attendance_report(request):
 
     course_filter = None
     if course_id:
-        course_filter = int(course_id)
+        try:
+            course_filter = int(course_id)
+        except (ValueError, TypeError):
+            course_filter = None
         attendances = Attendance.objects.filter(
             student=user, date__gte=start_date, date__lte=end_date, course_id=course_id
         ).select_related('course')
@@ -230,6 +239,7 @@ def attendance_report(request):
 def self_attendance(request):
     """Student marks their own attendance for enrolled courses."""
     from courses.enrollment_models import Enrollment
+    from courses.models import Course
     from datetime import date
 
     user = request.user
