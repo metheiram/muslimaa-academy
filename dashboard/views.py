@@ -197,7 +197,7 @@ def admin_dashboard(request):
 
 @admin_required
 def admin_students(request):
-    """Manage students - list, add, edit, delete."""
+    """Manage students - list, add, edit, delete with search/filter."""
     if request.method == 'POST':
         action = request.POST.get('action')
 
@@ -273,8 +273,20 @@ def admin_students(request):
             messages.success(request, f'Student "{name}" deleted successfully!')
             return redirect('dashboard:admin_students')
 
+    # Search and filter
+    query = request.GET.get('q', '').strip()
     students = User.objects.filter(is_superuser=False, is_staff=False).select_related('profile').order_by('-date_joined')
-    context = {'students': students, 'active_tab': 'students'}
+    
+    if query:
+        students = students.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(username__icontains=query) |
+            Q(profile__phone__icontains=query)
+        )
+    
+    context = {'students': students, 'query': query, 'active_tab': 'students'}
     return render(request, 'dashboard/students.html', context)
 
 
@@ -371,12 +383,25 @@ def admin_teachers(request):
             return redirect('dashboard:admin_teachers')
 
     teachers = User.objects.filter(is_staff=True, is_superuser=False).select_related('profile').order_by('-date_joined')
+    
+    # Search teachers
+    query = request.GET.get('q', '').strip()
+    if query:
+        teachers = teachers.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(username__icontains=query) |
+            Q(profile__subject__icontains=query)
+        )
+    
     from courses.enrollment_models import Enrollment
     from courses.models import Course
     approved_enrollments = Enrollment.objects.filter(status='approved').select_related('student', 'course', 'teacher')
     context = {
         'teachers': teachers,
         'approved_enrollments': approved_enrollments,
+        'query': query,
         'active_tab': 'teachers',
     }
     return render(request, 'dashboard/teachers.html', context)
@@ -455,6 +480,28 @@ def admin_enrollments(request):
     approved = Enrollment.objects.filter(status='approved').select_related('student', 'course', 'teacher')
     rejected = Enrollment.objects.filter(status='rejected').select_related('student', 'course')
 
+    # Search enrollments
+    query = request.GET.get('q', '').strip()
+    if query:
+        pending = pending.filter(
+            Q(student__first_name__icontains=query) |
+            Q(student__last_name__icontains=query) |
+            Q(student__email__icontains=query) |
+            Q(course__title__icontains=query)
+        )
+        approved = approved.filter(
+            Q(student__first_name__icontains=query) |
+            Q(student__last_name__icontains=query) |
+            Q(student__email__icontains=query) |
+            Q(course__title__icontains=query)
+        )
+        rejected = rejected.filter(
+            Q(student__first_name__icontains=query) |
+            Q(student__last_name__icontains=query) |
+            Q(student__email__icontains=query) |
+            Q(course__title__icontains=query)
+        )
+
     # Build WhatsApp URLs for all approved enrollments
     approved_with_whatsapp = []
     for enr in approved:
@@ -474,6 +521,7 @@ def admin_enrollments(request):
         'rejected_enrollments': rejected,
         'whatsapp_url': whatsapp_url,
         'teachers': teachers,
+        'query': query,
     }
     return render(request, 'dashboard/enrollments.html', context)
 
@@ -624,6 +672,22 @@ def admin_fees(request):
     payments = Payment.objects.select_related('student', 'course', 'enrollment')
     payment_methods = PaymentMethod.objects.filter(is_active=True)
 
+    # Search fees
+    query = request.GET.get('q', '').strip()
+    if query:
+        approved = approved.filter(
+            Q(student__first_name__icontains=query) |
+            Q(student__last_name__icontains=query) |
+            Q(student__email__icontains=query) |
+            Q(course__title__icontains=query)
+        )
+        payments = payments.filter(
+            Q(student__first_name__icontains=query) |
+            Q(student__last_name__icontains=query) |
+            Q(student__email__icontains=query) |
+            Q(course__title__icontains=query)
+        )
+
     total_collected = payments.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
     paid_enrollment_ids = payments.filter(status='paid').values_list('enrollment_id', flat=True).distinct()
     total_pending = approved.exclude(id__in=paid_enrollment_ids).count()
@@ -690,6 +754,7 @@ def admin_fees(request):
         'unpaid_enrollments': unpaid_enrollments,
         'reminder_enrollments': reminder_enrollments,
         'today': today,
+        'query': query,
     }
     return render(request, 'dashboard/fees.html', context)
 
@@ -787,10 +852,21 @@ def admin_courses(request):
             return redirect('dashboard:admin_courses')
 
     courses = Course.objects.select_related('instructor').order_by('-created_at')
+    
+    # Search courses
+    query = request.GET.get('q', '').strip()
+    if query:
+        courses = courses.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__icontains=query)
+        )
+    
     teachers = User.objects.filter(is_staff=True, is_superuser=False)
     context = {
         'courses': courses,
         'teachers': teachers,
+        'query': query,
         'active_tab': 'courses',
     }
     return render(request, 'dashboard/courses.html', context)
