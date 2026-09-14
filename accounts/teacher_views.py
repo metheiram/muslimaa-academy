@@ -12,7 +12,7 @@ from .models import Profile, TeacherSubscription, SubscriptionPayment
 def teacher_register(request):
     """Teacher registration with subscription plan selection."""
     if request.user.is_authenticated and request.user.is_staff:
-        return redirect('teacher_dashboard')
+        return redirect('accounts:teacher_dashboard')
     
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
@@ -81,7 +81,7 @@ def teacher_register(request):
         # Auto-login
         login(request, user)
         messages.success(request, f'Welcome {first_name}! Please complete your subscription payment to activate your account.')
-        return redirect('teacher_subscription')
+        return redirect('accounts:teacher_subscription')
     
     return render(request, 'accounts/teacher_register.html', {
         'plans': TeacherSubscription.PLAN_CHOICES,
@@ -92,7 +92,7 @@ def teacher_register(request):
 def teacher_login(request):
     """Teacher login."""
     if request.user.is_authenticated and request.user.is_staff:
-        return redirect('teacher_dashboard')
+        return redirect('accounts:teacher_dashboard')
     
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
@@ -121,7 +121,7 @@ def teacher_login(request):
 def teacher_logout(request):
     """Teacher logout."""
     logout(request)
-    return redirect('teacher_login')
+    return redirect('accounts:teacher_login')
 
 
 @login_required
@@ -254,9 +254,9 @@ def teacher_payment_submit(request):
         )
         
         messages.success(request, 'Payment submitted! It will be verified shortly.')
-        return redirect('teacher_subscription')
+        return redirect('accounts:teacher_subscription')
     
-    return redirect('teacher_subscription')
+    return redirect('accounts:teacher_subscription')
 
 
 @login_required
@@ -303,7 +303,7 @@ def teacher_add_student(request):
     
     if not subscription.can_add_student:
         messages.error(request, f'Student limit reached ({subscription.max_students} students). Please upgrade your plan.')
-        return redirect('teacher_students')
+        return redirect('accounts:teacher_students')
     
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
@@ -363,7 +363,7 @@ def teacher_add_student(request):
         subscription.save()
         
         messages.success(request, f'Student {first_name} {last_name} added successfully!')
-        return redirect('teacher_students')
+        return redirect('accounts:teacher_students')
     
     return render(request, 'accounts/teacher_add_student.html')
 
@@ -380,7 +380,7 @@ def teacher_edit_student(request, student_id):
     from courses.models import Enrollment
     if not Enrollment.objects.filter(student=student, teacher=request.user, status='approved').exists():
         messages.error(request, 'You do not have permission to edit this student.')
-        return redirect('teacher_students')
+        return redirect('accounts:teacher_students')
     
     if request.method == 'POST':
         student.first_name = request.POST.get('first_name', '').strip()
@@ -391,7 +391,7 @@ def teacher_edit_student(request, student_id):
         student.profile.save()
         
         messages.success(request, f'Student {student.first_name} updated successfully!')
-        return redirect('teacher_students')
+        return redirect('accounts:teacher_students')
     
     return render(request, 'accounts/teacher_edit_student.html', {'student': student})
 
@@ -426,4 +426,4 @@ def teacher_remove_student(request, student_id):
         
         messages.success(request, f'Student {student.get_full_name()} removed.')
     
-    return redirect('teacher_students')
+    return redirect('accounts:teacher_students')

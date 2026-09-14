@@ -14,7 +14,7 @@ def student_portal_login(request):
         if request.user.is_superuser:
             return redirect('dashboard:admin_dashboard')
         elif request.user.is_staff:
-            return redirect('teacher_dashboard')
+            return redirect('accounts:teacher_dashboard')
         else:
             return redirect('student_portal_dashboard')
     
@@ -28,7 +28,7 @@ def student_portal_login(request):
             if user.is_superuser:
                 return redirect('dashboard:admin_dashboard')
             elif user.is_staff:
-                return redirect('teacher_dashboard')
+                return redirect('accounts:teacher_dashboard')
             else:
                 next_url = request.GET.get('next', 'student_portal_dashboard')
                 return redirect(next_url)

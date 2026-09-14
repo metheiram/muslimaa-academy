@@ -200,7 +200,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{% url 'teacher_payment_submit' %}">
+    <form method="POST" action="{% url 'accounts:teacher_payment_submit' %}">
         {% csrf_token %}
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">

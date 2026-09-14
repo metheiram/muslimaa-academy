@@ -116,7 +116,7 @@ def register(request):
 
         if role == 'teacher':
             messages.success(request, f'Welcome {user.first_name}! Please complete your subscription payment to activate your account.')
-            return redirect('teacher_subscription')
+            return redirect('accounts:teacher_subscription')
         else:
             messages.success(request, f'Welcome {user.first_name}! 🎉 Browse our courses and enroll to start your learning journey.')
             return redirect('student_dashboard')
@@ -278,7 +278,7 @@ def profile(request):
     if user.is_superuser:
         return redirect('dashboard:admin_dashboard')
     elif user.is_staff:
-        return redirect('teacher_dashboard')
+        return redirect('accounts:teacher_dashboard')
     else:
         return redirect('student_dashboard')
 

@@ -144,12 +144,12 @@
 </div>
 
 <!-- Subscription Status -->
-{% if subscription.status == 'pending' %}
+        {% if subscription.status == 'pending' %}
 <div class="sub-status pending">
     <span class="icon">⏳</span>
     <div class="info">
         <h4>Subscription Pending</h4>
-        <p>Please complete your payment to activate your account. <a href="{% url 'teacher_subscription' %}" style="color: var(--brand-700); font-weight: 600;">Pay Now →</a></p>
+        <p>Please complete your payment to activate your account. <a href="{% url 'accounts:teacher_subscription' %}" style="color: var(--brand-700); font-weight: 600;">Pay Now →</a></p>
     </div>
 </div>
 {% elif subscription.status == 'expired' %}
@@ -157,7 +157,7 @@
     <span class="icon">⚠️</span>
     <div class="info">
         <h4>Subscription Expired</h4>
-        <p>Your subscription has expired. Please renew to continue. <a href="{% url 'teacher_subscription' %}" style="color: var(--brand-700); font-weight: 600;">Renew Now →</a></p>
+        <p>Your subscription has expired. Please renew to continue. <a href="{% url 'accounts:teacher_subscription' %}" style="color: var(--brand-700); font-weight: 600;">Renew Now →</a></p>
     </div>
 </div>
 {% elif subscription.is_active %}
@@ -197,9 +197,9 @@
     </div>
     <div class="card-body" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
         {% if subscription.can_add_student %}
-        <a href="{% url 'teacher_add_student' %}" class="btn btn-primary">+ Add Student</a>
+        <a href="{% url 'accounts:teacher_add_student' %}" class="btn btn-primary">+ Add Student</a>
         {% endif %}
-        <a href="{% url 'teacher_students' %}" class="btn btn-outline">👩‍🎓 View Students</a>
+        <a href="{% url 'accounts:teacher_students' %}" class="btn btn-outline">👩‍🎓 View Students</a>
         <a href="{% url 'classes:schedule' %}" class="btn btn-outline">📅 Manage Schedule</a>
         <a href="{% url 'homework:teacher_homework' %}" class="btn btn-outline">📝 Assign Homework</a>
     </div>
