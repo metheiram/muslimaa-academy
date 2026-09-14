@@ -63,7 +63,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand"><h2>Muslimaa Academy</h2><p>{% if user.is_superuser %}Admin{% else %}Teacher{% endif %} Dashboard</p></div>
         <ul class="sidebar-nav">
-            <li><a href="{% if user.is_superuser %}{% url 'dashboard:admin_dashboard' %}{% else %}{% url 'teacher_dashboard' %}{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="{% if user.is_superuser %}{% url 'dashboard:admin_dashboard' %}{% else %}{% url 'accounts:teacher_dashboard' %}{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
             <div class="section-label">Content</div>
             <li><a href="{% url 'announcements:announcement_list' %}" class="active"><span class="icon">📢</span> Announcements</a></li>
         </ul>

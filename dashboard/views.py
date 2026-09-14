@@ -921,7 +921,7 @@ def admin_teachers_saas(request):
 def admin_teacher_detail(request, teacher_id):
     """View teacher details and manage subscription."""
     from accounts.models import TeacherSubscription, SubscriptionPayment
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     
     teacher = get_object_or_404(User, id=teacher_id, is_staff=True)
     subscription, created = TeacherSubscription.objects.get_or_create(

@@ -147,7 +147,7 @@ def teacher_dashboard(request):
     subscription.check_expiry()
     
     # Get students
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     students = User.objects.filter(
         enrollments__teacher=user,
         enrollments__status='approved'
@@ -268,7 +268,7 @@ def teacher_students(request):
     subscription = request.user.subscription
     
     # Get students
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     students = User.objects.filter(
         enrollments__teacher=request.user,
         enrollments__status='approved'
@@ -343,7 +343,8 @@ def teacher_add_student(request):
         student.profile.save()
         
         # Enroll in teacher's course (if any)
-        from courses.models import Course, Enrollment
+        from courses.models import Course
+        from courses.enrollment_models import Enrollment
         course = Course.objects.filter(instructor=request.user).first()
         if course:
             Enrollment.objects.create(
@@ -377,7 +378,7 @@ def teacher_edit_student(request, student_id):
     student = User.objects.get(id=student_id)
     
     # Verify teacher owns this student
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     if not Enrollment.objects.filter(student=student, teacher=request.user, status='approved').exists():
         messages.error(request, 'You do not have permission to edit this student.')
         return redirect('accounts:teacher_students')
@@ -405,7 +406,7 @@ def teacher_remove_student(request, student_id):
     student = User.objects.get(id=student_id)
     
     # Verify teacher owns this student
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     enrollment = Enrollment.objects.filter(
         student=student,
         teacher=request.user,

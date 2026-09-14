@@ -44,7 +44,7 @@ def student_portal_dashboard(request):
     user = request.user
     
     # Get student's teacher
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     enrollments = Enrollment.objects.filter(
         student=user,
         status='approved'
@@ -61,7 +61,7 @@ def student_portal_dashboard(request):
     # Recent notifications
     from notifications.models import Notification
     notifications = Notification.objects.filter(user=user)[:5]
-    unread_count = notifications.filter(is_read=False).count()
+    unread_count = Notification.objects.filter(user=user, is_read=False).count()
     
     # Upcoming meetings
     from classes.models import Meeting
@@ -106,7 +106,7 @@ def student_portal_courses(request):
     """Student's enrolled courses."""
     user = request.user
     
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     enrollments = Enrollment.objects.filter(
         student=user,
         status='approved'
@@ -125,7 +125,7 @@ def student_portal_meetings(request):
     user = request.user
     
     from classes.models import Meeting
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     
     enrolled_courses = Enrollment.objects.filter(
         student=user,
@@ -157,7 +157,7 @@ def student_portal_homework(request):
     user = request.user
     
     from homework.models import Homework, HomeworkSubmission
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     
     enrolled_courses = Enrollment.objects.filter(
         student=user,
@@ -189,7 +189,7 @@ def student_portal_attendance(request):
     user = request.user
     
     from attendance.models import Attendance
-    from courses.models import Enrollment
+    from courses.enrollment_models import Enrollment
     
     enrolled_courses = Enrollment.objects.filter(
         student=user,
