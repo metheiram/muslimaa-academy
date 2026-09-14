@@ -29,7 +29,9 @@ class RegisterForm(forms.ModelForm):
 
 
 def register(request):
-    """Handle user registration with phone/WhatsApp."""
+    """Unified registration - student or teacher."""
+    role = request.GET.get('role', 'student')
+    
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
@@ -38,6 +40,11 @@ def register(request):
         phone = request.POST.get('phone', '').strip()
         password = request.POST.get('password', '')
         password2 = request.POST.get('password2', '')
+        role = request.POST.get('role', 'student')
+        
+        # Teacher-specific fields
+        academy_name = request.POST.get('academy_name', '').strip()
+        plan = request.POST.get('plan', 'basic')
 
         errors = []
         if not all([first_name, email, username, password]):
@@ -62,7 +69,8 @@ def register(request):
             for e in errors:
                 messages.error(request, e)
             return render(request, 'accounts/register.html', {
-                'form_data': request.POST
+                'form_data': request.POST,
+                'role': role,
             })
 
         user = User.objects.create_user(
@@ -76,14 +84,44 @@ def register(request):
             user.profile.phone = phone
             user.profile.save()
 
-        # Auto-login after registration
+        # If teacher, set staff status and create subscription
+        if role == 'teacher':
+            user.is_staff = True
+            user.save()
+            
+            if academy_name:
+                user.profile.subject = academy_name
+                user.profile.save()
+            
+            from .models import TeacherSubscription
+            max_students = 10
+            monthly_price = 5000
+            if plan == 'standard':
+                max_students = 20
+                monthly_price = 6000
+            elif plan == 'premium':
+                max_students = 50
+                monthly_price = 10000
+            
+            TeacherSubscription.objects.create(
+                teacher=user,
+                plan=plan,
+                status='pending',
+                max_students=max_students,
+                monthly_price=monthly_price,
+            )
+
         from django.contrib.auth import login
         login(request, user)
 
-        messages.success(request, f'Welcome {user.first_name}! 🎉 Browse our courses and enroll to start your learning journey.')
-        return redirect('student_dashboard')
+        if role == 'teacher':
+            messages.success(request, f'Welcome {user.first_name}! Please complete your subscription payment to activate your account.')
+            return redirect('teacher_subscription')
+        else:
+            messages.success(request, f'Welcome {user.first_name}! 🎉 Browse our courses and enroll to start your learning journey.')
+            return redirect('student_dashboard')
 
-    context = {'form_data': {}}
+    context = {'form_data': {}, 'role': role}
     return render(request, 'accounts/register.html', context)
 
 
