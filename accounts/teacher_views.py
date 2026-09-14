@@ -253,6 +253,18 @@ def teacher_payment_submit(request):
             status='pending',
         )
         
+        # Notify all superusers (admin)
+        from notifications.models import Notification
+        from django.contrib.auth.models import User
+        admins = User.objects.filter(is_superuser=True)
+        for admin in admins:
+            Notification.objects.create(
+                user=admin,
+                title=f'💳 New Subscription Payment',
+                message=f'{request.user.get_full_name()} submitted Rs. {int(amount)} payment via {method}. Plan: {subscription.get_plan_display()}. Please review and approve.',
+                notification_type='payment',
+            )
+        
         messages.success(request, 'Payment submitted! It will be verified shortly.')
         return redirect('accounts:teacher_subscription')
     

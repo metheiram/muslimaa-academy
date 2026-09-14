@@ -110,6 +110,18 @@ def register(request):
                 max_students=max_students,
                 monthly_price=monthly_price,
             )
+            
+            # Notify admin about new teacher registration
+            from notifications.models import Notification
+            from django.contrib.auth.models import User as UserModel
+            admins = UserModel.objects.filter(is_superuser=True)
+            for admin in admins:
+                Notification.objects.create(
+                    user=admin,
+                    title='👩‍🏫 New Teacher Registered',
+                    message=f'{user.get_full_name()} ({user.email}) registered as a teacher on {plan} plan. Academy: {academy_name or "N/A"}. Payment pending.',
+                    notification_type='enrollment',
+                )
 
         from django.contrib.auth import login
         login(request, user)

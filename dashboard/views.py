@@ -179,6 +179,12 @@ def admin_dashboard(request):
 
     total_revenue = Payment.objects.filter(status='paid').aggregate(total=Sum('amount'))['total'] or 0
 
+    # Admin notifications
+    from notifications.models import Notification
+    admin_notifications = Notification.objects.filter(user=request.user)
+    unread_notifications = admin_notifications.filter(is_read=False).count()
+    pending_payments_count = SubscriptionPayment.objects.filter(status='pending').count()
+
     context = {
         'total_students': total_students,
         'total_courses': total_courses,
@@ -191,6 +197,8 @@ def admin_dashboard(request):
         'chart_labels': chart_labels,
         'chart_revenue': chart_revenue,
         'chart_enrollments': chart_enrollments,
+        'unread_notifications': unread_notifications,
+        'pending_payments_count': pending_payments_count,
     }
     return render(request, 'dashboard/admin.html', context)
 
