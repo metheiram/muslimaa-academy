@@ -1,6 +1,8 @@
 {% extends 'base/base_dashboard.html' %}
 {% load static %}
 
+{% block title %}Teacher Dashboard | Muslimaa Academy{% endblock %}
+
 {% block extra_head %}
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -47,11 +49,6 @@
         font-size: 1.5rem;
         margin: 0 auto 0.75rem;
         box-shadow: 0 0 20px rgba(212,165,116,0.15);
-        transition: all 0.3s ease;
-    }
-    .sidebar-brand:hover .sidebar-avatar {
-        border-color: var(--accent-gold);
-        box-shadow: 0 0 25px rgba(212,165,116,0.25);
     }
     .sidebar-brand h2 {
         font-family: var(--font-serif);
@@ -83,7 +80,6 @@
         font-weight: 500;
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
-        position: relative;
     }
     .sidebar-nav li a:hover {
         background: rgba(255,255,255,0.06);
@@ -96,14 +92,10 @@
         border-left-color: var(--accent-gold);
         font-weight: 600;
     }
-    .sidebar-nav li a.active .icon {
-        transform: scale(1.1);
-    }
     .sidebar-nav li a .icon {
         font-size: 1rem;
         width: 20px;
         text-align: center;
-        transition: transform 0.2s ease;
     }
     .sidebar-nav .section-label {
         padding: 1.25rem 1.5rem 0.4rem;
@@ -113,6 +105,19 @@
         letter-spacing: 0.12em;
         color: rgba(255,255,255,0.3);
     }
+
+    /* Subscription Badge */
+    .sub-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    .sub-active { background: rgba(34,139,34,0.2); color: #90ee90; }
+    .sub-pending { background: rgba(255,165,0,0.2); color: #ffd700; }
+    .sub-expired { background: rgba(220,53,69,0.2); color: #ff6b6b; }
 
     /* Footer */
     .sidebar-footer {
@@ -170,7 +175,6 @@
         background: #fff;
         border-radius: 2px;
         transition: all 0.3s ease;
-        transform-origin: center;
     }
     .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
@@ -193,6 +197,13 @@
         backdrop-filter: blur(2px);
     }
 
+    /* Alert */
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .alert-error { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
+    .alert-info { background: rgba(0,123,255,0.1); color: #007bff; border: 1px solid rgba(0,123,255,0.2); }
+
     /* Mobile */
     @media (max-width: 768px) {
         .mobile-header { display: flex; }
@@ -203,7 +214,6 @@
     }
     @media (max-width: 480px) {
         .main-content { padding: 68px 0.75rem 0.75rem; }
-        .sidebar { width: 260px; }
     }
 </style>
 {% block teacher_extra_head %}{% endblock %}
@@ -223,29 +233,36 @@
         <div class="sidebar-brand">
             <div class="sidebar-avatar">👩‍🏫</div>
             <h2>{{ user.get_full_name|default:user.username }}</h2>
-            <p>Teacher · {{ user.profile.subject|default:"" }}</p>
+            <p>Teacher</p>
+            {% if subscription %}
+            <span class="sub-badge sub-{{ subscription.status }}">{{ subscription.get_plan_display }}</span>
+            {% endif %}
         </div>
         <ul class="sidebar-nav">
             <li><a href="{% url 'teacher_dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📊</span> Dashboard</a></li>
-            <div class="section-label">Teaching</div>
-            <li><a href="{% url 'teacher_dashboard' %}#courses" onclick="closeMobile()"><span class="icon">📚</span> My Courses</a></li>
-            <li><a href="{% url 'teacher_dashboard' %}#students" onclick="closeMobile()"><span class="icon">👩‍🎓</span> My Students</a></li>
+            <div class="section-label">Management</div>
+            <li><a href="{% url 'teacher_students' %}" class="{% if active_page == 'students' %}active{% endif %}" onclick="closeMobile()"><span class="icon">👩‍🎓</span> My Students</a></li>
+            <li><a href="{% url 'teacher_subscription' %}" class="{% if active_page == 'subscription' %}active{% endif %}" onclick="closeMobile()"><span class="icon">💳</span> Subscription</a></li>
             <div class="section-label">Academics</div>
-            <li><a href="{% url 'attendance:attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}" onclick="closeMobile()"><span class="icon">✅</span> Attendance</a></li>
-            <li><a href="{% url 'classes:schedule' %}" class="{% if active_page == 'schedule' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📅</span> Schedule</a></li>
-            <li><a href="{% url 'classes:teacher_meetings' %}" class="{% if active_page == 'meetings' %}active{% endif %}" onclick="closeMobile()"><span class="icon">🎥</span> Meetings</a></li>
-            <li><a href="{% url 'homework:teacher_homework' %}" class="{% if active_page == 'homework' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📝</span> Homework</a></li>
-            <li><a href="{% url 'messaging:inbox' %}" class="{% if active_page == 'messages' %}active{% endif %}" onclick="closeMobile()"><span class="icon">✉️</span> Messages</a></li>
-            <div class="section-label">Account</div>
-            <li><a href="{% url 'accounts:edit_profile' %}" class="{% if active_page == 'profile' %}active{% endif %}" onclick="closeMobile()"><span class="icon">👤</span> My Profile</a></li>
+            <li><a href="{% url 'classes:schedule' %}" onclick="closeMobile()"><span class="icon">📅</span> Schedule</a></li>
+            <li><a href="{% url 'classes:teacher_meetings' %}" onclick="closeMobile()"><span class="icon">🎥</span> Meetings</a></li>
+            <li><a href="{% url 'homework:teacher_homework' %}" onclick="closeMobile()"><span class="icon">📝</span> Homework</a></li>
+            <li><a href="{% url 'attendance:attendance_report' %}" onclick="closeMobile()"><span class="icon">✅</span> Attendance</a></li>
+            <li><a href="{% url 'messaging:inbox' %}" onclick="closeMobile()"><span class="icon">✉️</span> Messages</a></li>
         </ul>
         <div class="sidebar-footer">
             <a href="{% url 'home' %}">🏠 Back to Site</a>
-            <a href="{% url 'accounts:logout' %}">🚪 Logout</a>
+            <a href="{% url 'teacher_logout' %}">🚪 Logout</a>
         </div>
     </aside>
 
     <main class="main-content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
         {% block teacher_content %}{% endblock %}
     </main>
 </div>

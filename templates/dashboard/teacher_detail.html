@@ -1,0 +1,261 @@
+{% extends 'base/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ teacher.get_full_name }} | Teacher Detail{% endblock %}
+
+{% block extra_head %}
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+
+    .teacher-info {
+        background: linear-gradient(135deg, #471820 0%, #3d1319 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .teacher-info .details h2 { font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .teacher-info .details p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+    .teacher-info .stats { display: flex; gap: 2rem; }
+    .teacher-info .stat { text-align: center; }
+    .teacher-info .stat .value { font-size: 1.5rem; font-weight: 800; color: var(--accent-gold); }
+    .teacher-info .stat .label { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+
+    .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); margin-bottom: 1.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.5rem; }
+
+    .plan-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .plan-card { border: 2px solid rgba(71,24,32,0.1); border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s; }
+    .plan-card.current { border-color: var(--accent-gold); background: rgba(212,165,116,0.05); }
+    .plan-card h4 { font-size: 0.9rem; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .plan-card .price { font-size: 1.1rem; font-weight: 800; color: var(--brand-700); }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: rgba(71,24,32,0.02); }
+    .data-table td { padding: 0.75rem 1.5rem; font-size: 0.85rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
+
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-active { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .badge-approved { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-rejected { background: rgba(220,53,69,0.1); color: #dc3545; }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+    .btn-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-success:hover { background: #228b22; color: #fff; }
+    .btn-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .btn-danger:hover { background: #dc3545; color: #fff; }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1px solid rgba(71,24,32,0.2); }
+
+    .student-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .student-item:last-child { border-bottom: none; }
+    .student-avatar { width: 32px; height: 32px; background: rgba(212,165,116,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--brand-700); }
+
+    .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="mobile-header">
+        <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+        <h2>Muslimaa Academy</h2>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><h2>Muslimaa Academy</h2><p>Admin Dashboard</p></div>
+        <ul class="sidebar-nav">
+            <li><a href="{% url 'dashboard:admin_dashboard' %}"><span class="icon">📊</span> Dashboard</a></li>
+            <div class="section-label">Management</div>
+            <li><a href="{% url 'dashboard:admin_students' %}"><span class="icon">👩‍🎓</span> Students</a></li>
+            <li><a href="{% url 'dashboard:admin_teachers' %}"><span class="icon">👩‍🏫</span> Teachers</a></li>
+            <li><a href="{% url 'dashboard:admin_teachers_saas' %}" class="active"><span class="icon">💼</span> SaaS Teachers</a></li>
+            <li><a href="{% url 'dashboard:admin_enrollments' %}"><span class="icon">📋</span> Enrollments</a></li>
+            <li><a href="{% url 'dashboard:admin_fees' %}"><span class="icon">💰</span> Fee Tracking</a></li>
+            <div class="section-label">Content</div>
+            <li><a href="{% url 'dashboard:admin_courses' %}"><span class="icon">📚</span> Courses</a></li>
+            <li><a href="{% url 'workshops:workshop_list' %}"><span class="icon">🎓</span> Workshops</a></li>
+            <li><a href="{% url 'admin:index' %}"><span class="icon">⚙️</span> Django Admin</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Teacher Detail</h1>
+            <a href="{% url 'dashboard:admin_teachers_saas' %}" class="btn btn-outline">← Back to Teachers</a>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Teacher Info -->
+        <div class="teacher-info">
+            <div class="details">
+                <h2>{{ teacher.get_full_name }}</h2>
+                <p>@{{ teacher.username }} • {{ teacher.email }}</p>
+                <p style="margin-top: 0.5rem;">Joined: {{ teacher.date_joined|date:"M d, Y" }}</p>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="value">{{ student_count }}</div>
+                    <div class="label">Students</div>
+                </div>
+                <div class="stat">
+                    <div class="value">{{ subscription.max_students }}</div>
+                    <div class="label">Max</div>
+                </div>
+                <div class="stat">
+                    <div class="value">Rs. {{ subscription.monthly_price|floatformat:0 }}</div>
+                    <div class="label">Monthly</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Plan -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Subscription Plan</h3>
+                <span class="badge badge-{{ subscription.status }}">{{ subscription.get_status_display }}</span>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'dashboard:admin_change_plan' teacher.id %}">
+                    {% csrf_token %}
+                    <div class="plan-cards">
+                        <label class="plan-card {% if subscription.plan == 'basic' %}current{% endif %}">
+                            <input type="radio" name="plan" value="basic" {% if subscription.plan == 'basic' %}checked{% endif %} onchange="this.form.submit()">
+                            <h4>Basic</h4>
+                            <div class="price">Rs. 5,000</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">1-10 students</div>
+                        </label>
+                        <label class="plan-card {% if subscription.plan == 'standard' %}current{% endif %}">
+                            <input type="radio" name="plan" value="standard" {% if subscription.plan == 'standard' %}checked{% endif %} onchange="this.form.submit()">
+                            <h4>Standard</h4>
+                            <div class="price">Rs. 6,000</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">11-20 students</div>
+                        </label>
+                        <label class="plan-card {% if subscription.plan == 'premium' %}current{% endif %}">
+                            <input type="radio" name="plan" value="premium" {% if subscription.plan == 'premium' %}checked{% endif %} onchange="this.form.submit()">
+                            <h4>Premium</h4>
+                            <div class="price">Rs. 10,000</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">21-50 students</div>
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Pending Payments -->
+        {% if pending_payments %}
+        <div class="card">
+            <div class="card-header">
+                <h3>Pending Payments ({{ pending_payments.count }})</h3>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in pending_payments %}
+                    <tr>
+                        <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                        <td>Rs. {{ payment.amount }}</td>
+                        <td>{{ payment.get_method_display }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'dashboard:admin_approve_subscription' payment.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">✓ Approve</button>
+                            </form>
+                            <form method="POST" action="{% url 'dashboard:admin_reject_subscription' payment.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">✕ Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Students -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Students ({{ student_count }})</h3>
+            </div>
+            <div class="card-body">
+                {% if students %}
+                {% for student in students %}
+                <div class="student-item">
+                    <div class="student-avatar">{{ student.first_name|first }}</div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--brand-700);">{{ student.get_full_name }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ student.email }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="empty-msg">No students yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Payment History</h3>
+            </div>
+            {% if payments %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                        <td>Rs. {{ payment.amount }}</td>
+                        <td>{{ payment.get_method_display }}</td>
+                        <td><span class="badge badge-{{ payment.status }}">{{ payment.get_status_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="empty-msg">No payment history.</p>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+}
+</script>
+{% endblock %}

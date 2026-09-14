@@ -1,0 +1,109 @@
+{% extends 'base/base_teacher.html' %}
+{% load static %}
+
+{% block title %}Add Student | Muslimaa Academy{% endblock %}
+
+{% block teacher_extra_head %}
+<style>
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+
+    .card {
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid rgba(71,24,32,0.06);
+        box-shadow: 0 2px 8px rgba(71,24,32,0.04);
+        max-width: 600px;
+    }
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(71,24,32,0.06);
+    }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.5rem; }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .form-group input {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border: 1.5px solid rgba(71,24,32,0.15);
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+    }
+    .form-group input:focus { outline: none; border-color: var(--brand-700); }
+    .form-group .help { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.5rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1.5px solid rgba(71,24,32,0.2); }
+
+    .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block teacher_content %}
+<div class="page-header">
+    <h1>Add New Student</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Student Details</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" name="email" required>
+                <div class="help">Student will use this email to login</div>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" name="phone" placeholder="+92 3XX XXXXXXX">
+            </div>
+
+            <div class="form-group">
+                <label>Password *</label>
+                <input type="password" name="password" minlength="8" required>
+                <div class="help">Minimum 8 characters</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">+ Add Student</button>
+                <a href="{% url 'teacher_students' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import views
+from . import teacher_views
 from .notification_views import student_notifications
 
 app_name = 'accounts'
@@ -16,4 +17,16 @@ urlpatterns = [
     path('reset/<str:uidb64>/<str:token>/', views.reset_password, name='reset_password'),
     path('dashboard/', views.student_dashboard, name='student_dashboard'),
     path('notifications/', student_notifications, name='student_notifications'),
+    
+    # Teacher SaaS URLs
+    path('teacher/register/', teacher_views.teacher_register, name='teacher_register'),
+    path('teacher/login/', teacher_views.teacher_login, name='teacher_login'),
+    path('teacher/logout/', teacher_views.teacher_logout, name='teacher_logout'),
+    path('teacher/dashboard/', teacher_views.teacher_dashboard, name='teacher_dashboard'),
+    path('teacher/subscription/', teacher_views.teacher_subscription, name='teacher_subscription'),
+    path('teacher/payment/', teacher_views.teacher_payment_submit, name='teacher_payment_submit'),
+    path('teacher/students/', teacher_views.teacher_students, name='teacher_students'),
+    path('teacher/students/add/', teacher_views.teacher_add_student, name='teacher_add_student'),
+    path('teacher/students/<int:student_id>/edit/', teacher_views.teacher_edit_student, name='teacher_edit_student'),
+    path('teacher/students/<int:student_id>/remove/', teacher_views.teacher_remove_student, name='teacher_remove_student'),
 ]

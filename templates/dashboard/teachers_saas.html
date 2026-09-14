@@ -1,0 +1,183 @@
+{% extends 'base/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}SaaS Teachers | Muslimaa Academy Admin{% endblock %}
+
+{% block extra_head %}
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 1.25rem 1.5rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); }
+    .stat-card h3 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
+    .stat-card p { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .stat-card.accent { background: linear-gradient(135deg, #471820 0%, #3d1319 100%); color: #fff; }
+    .stat-card.accent h3 { color: var(--accent-gold); }
+    .stat-card.accent p { color: rgba(255,255,255,0.7); }
+
+    .search-bar { background: #fff; border-radius: 12px; padding: 1rem 1.5rem; border: 1px solid rgba(71,24,32,0.06); margin-bottom: 1.5rem; }
+    .search-bar form { display: flex; gap: 0.75rem; align-items: center; }
+    .search-bar input { flex: 1; padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem; }
+
+    .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); overflow: hidden; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: rgba(71,24,32,0.02); }
+    .data-table td { padding: 0.75rem 1.5rem; font-size: 0.85rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .data-table tr:hover { background: rgba(71,24,32,0.02); }
+
+    .teacher-cell { display: flex; align-items: center; gap: 0.75rem; }
+    .teacher-avatar { width: 36px; height: 36px; background: rgba(212,165,116,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: var(--brand-700); }
+
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-active { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .badge-expired { background: rgba(220,53,69,0.1); color: #dc3545; }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1px solid rgba(71,24,32,0.2); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="mobile-header">
+        <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+        <h2>Muslimaa Academy</h2>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><h2>Muslimaa Academy</h2><p>Admin Dashboard</p></div>
+        <ul class="sidebar-nav">
+            <li><a href="{% url 'dashboard:admin_dashboard' %}"><span class="icon">📊</span> Dashboard</a></li>
+            <div class="section-label">Management</div>
+            <li><a href="{% url 'dashboard:admin_students' %}"><span class="icon">👩‍🎓</span> Students</a></li>
+            <li><a href="{% url 'dashboard:admin_teachers' %}"><span class="icon">👩‍🏫</span> Teachers</a></li>
+            <li><a href="{% url 'dashboard:admin_teachers_saas' %}" class="active"><span class="icon">💼</span> SaaS Teachers</a></li>
+            <li><a href="{% url 'dashboard:admin_enrollments' %}"><span class="icon">📋</span> Enrollments</a></li>
+            <li><a href="{% url 'dashboard:admin_fees' %}"><span class="icon">💰</span> Fee Tracking</a></li>
+            <div class="section-label">Content</div>
+            <li><a href="{% url 'dashboard:admin_courses' %}"><span class="icon">📚</span> Courses</a></li>
+            <li><a href="{% url 'workshops:workshop_list' %}"><span class="icon">🎓</span> Workshops</a></li>
+            <li><a href="{% url 'admin:index' %}"><span class="icon">⚙️</span> Django Admin</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}">🏠 Back to Site</a>
+            <a href="{% url 'accounts:logout' %}" style="margin-top: 0.5rem;">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>SaaS Teachers</h1>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card accent">
+                <h3>{{ total_teachers }}</h3>
+                <p>Total Teachers</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ active_teachers }}</h3>
+                <p>Active</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ pending_teachers }}</h3>
+                <p>Pending</p>
+            </div>
+            <div class="stat-card">
+                <h3>Rs. {{ total_revenue|floatformat:0 }}</h3>
+                <p>Total Revenue</p>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="search-bar">
+            <form method="GET">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search teachers...">
+                <select name="status" style="padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem;">
+                    <option value="">All Status</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+                </select>
+                <button type="submit" class="btn btn-primary">🔍 Search</button>
+                {% if query or status_filter %}<a href="{% url 'dashboard:admin_teachers_saas' %}" class="btn btn-outline">✕ Clear</a>{% endif %}
+            </form>
+        </div>
+
+        <!-- Teachers Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3>All Teachers ({{ total_teachers }})</h3>
+            </div>
+            {% if teachers %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Teacher</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Students</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr>
+                        <td>
+                            <div class="teacher-cell">
+                                <div class="teacher-avatar">{{ teacher.first_name|first }}</div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--brand-700);">{{ teacher.get_full_name }}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">@{{ teacher.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ teacher.email }}</td>
+                        <td>{% if teacher.subscription %}{{ teacher.subscription.get_plan_display }}{% else %}—{% endif %}</td>
+                        <td>{% if teacher.subscription %}{{ teacher.subscription.current_students }}/{{ teacher.subscription.max_students }}{% else %}0/10{% endif %}</td>
+                        <td>
+                            {% if teacher.subscription %}
+                            <span class="badge badge-{{ teacher.subscription.status }}">{{ teacher.subscription.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge badge-pending">No Plan</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'dashboard:admin_teacher_detail' teacher.id %}" class="btn btn-outline btn-sm">👁️ View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="empty-msg">No teachers found.</p>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+}
+</script>
+{% endblock %}

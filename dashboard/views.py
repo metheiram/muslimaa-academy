@@ -870,3 +870,141 @@ def admin_courses(request):
         'active_tab': 'courses',
     }
     return render(request, 'dashboard/courses.html', context)
+
+
+@admin_required
+def admin_teachers_saas(request):
+    """Manage SaaS teachers - list, approve, view subscriptions."""
+    from accounts.models import TeacherSubscription, SubscriptionPayment
+    
+    # Get all teachers with subscriptions
+    teachers = User.objects.filter(
+        is_staff=True,
+        is_superuser=False
+    ).select_related('subscription').order_by('-date_joined')
+    
+    # Search
+    query = request.GET.get('q', '').strip()
+    if query:
+        teachers = teachers.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(username__icontains=query)
+        )
+    
+    # Filter by status
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        teachers = teachers.filter(subscription__status=status_filter)
+    
+    # Stats
+    total_teachers = teachers.count()
+    active_teachers = teachers.filter(subscription__status='active').count()
+    pending_teachers = teachers.filter(subscription__status='pending').count()
+    total_revenue = SubscriptionPayment.objects.filter(status='approved').aggregate(total=Sum('amount'))['total'] or 0
+    
+    context = {
+        'teachers': teachers,
+        'total_teachers': total_teachers,
+        'active_teachers': active_teachers,
+        'pending_teachers': pending_teachers,
+        'total_revenue': total_revenue,
+        'query': query,
+        'status_filter': status_filter,
+        'active_tab': 'teachers_saas',
+    }
+    return render(request, 'dashboard/teachers_saas.html', context)
+
+
+@admin_required
+def admin_teacher_detail(request, teacher_id):
+    """View teacher details and manage subscription."""
+    from accounts.models import TeacherSubscription, SubscriptionPayment
+    from courses.models import Enrollment
+    
+    teacher = get_object_or_404(User, id=teacher_id, is_staff=True)
+    subscription, created = TeacherSubscription.objects.get_or_create(
+        teacher=teacher,
+        defaults={'plan': 'basic', 'status': 'pending', 'max_students': 10, 'monthly_price': 5000}
+    )
+    
+    # Get students
+    students = User.objects.filter(
+        enrollments__teacher=teacher,
+        enrollments__status='approved'
+    ).distinct()
+    
+    # Payment history
+    payments = SubscriptionPayment.objects.filter(teacher=teacher).order_by('-created_at')
+    
+    # Pending payments
+    pending_payments = payments.filter(status='pending')
+    
+    context = {
+        'teacher': teacher,
+        'subscription': subscription,
+        'students': students,
+        'student_count': students.count(),
+        'payments': payments,
+        'pending_payments': pending_payments,
+    }
+    return render(request, 'dashboard/teacher_detail.html', context)
+
+
+@admin_required
+def admin_approve_subscription(request, payment_id):
+    """Approve a subscription payment."""
+    from accounts.models import SubscriptionPayment
+    
+    if request.method == 'POST':
+        payment = get_object_or_404(SubscriptionPayment, id=payment_id)
+        payment.status = 'approved'
+        payment.approved_by = request.user
+        payment.approved_at = timezone.now()
+        payment.save()
+        
+        # Activate/extend subscription
+        subscription = payment.subscription
+        if subscription.status == 'active':
+            subscription.extend(months=1)
+        else:
+            subscription.activate(months=1)
+        
+        messages.success(request, f'Payment approved! {payment.teacher.get_full_name()} subscription activated.')
+    
+    return redirect('dashboard:admin_teacher_detail', teacher_id=payment.teacher.id)
+
+
+@admin_required
+def admin_reject_subscription(request, payment_id):
+    """Reject a subscription payment."""
+    from accounts.models import SubscriptionPayment
+    
+    if request.method == 'POST':
+        payment = get_object_or_404(SubscriptionPayment, id=payment_id)
+        payment.status = 'rejected'
+        payment.approved_by = request.user
+        payment.approved_at = timezone.now()
+        payment.save()
+        
+        messages.warning(request, f'Payment rejected for {payment.teacher.get_full_name()}.')
+    
+    return redirect('dashboard:admin_teacher_detail', teacher_id=payment.teacher.id)
+
+
+@admin_required
+def admin_change_plan(request, teacher_id):
+    """Change teacher's subscription plan."""
+    from accounts.models import TeacherSubscription
+    
+    if request.method == 'POST':
+        subscription = get_object_or_404(TeacherSubscription, teacher_id=teacher_id)
+        new_plan = request.POST.get('plan', 'basic')
+        
+        subscription.plan = new_plan
+        subscription.save()  # save() auto-updates max_students and monthly_price
+        
+        messages.success(request, f'Plan changed to {subscription.get_plan_display()} for {subscription.teacher.get_full_name()}.')
+    
+    return redirect('dashboard:admin_teacher_detail', teacher_id=teacher_id)

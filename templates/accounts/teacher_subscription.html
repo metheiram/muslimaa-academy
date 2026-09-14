@@ -1,0 +1,258 @@
+{% extends 'base/base_teacher.html' %}
+{% load static %}
+
+{% block title %}Subscription | Muslimaa Academy{% endblock %}
+
+{% block teacher_extra_head %}
+<style>
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+
+    .current-plan {
+        background: linear-gradient(135deg, #471820 0%, #3d1319 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+    }
+    .current-plan h3 { font-family: var(--font-serif); font-size: 1.2rem; color: var(--accent-gold); margin-bottom: 0.5rem; }
+    .current-plan .plan-name { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .current-plan .plan-stats { display: flex; gap: 2rem; margin-top: 1rem; }
+    .current-plan .stat { text-align: center; }
+    .current-plan .stat .value { font-size: 1.5rem; font-weight: 800; color: var(--accent-gold); }
+    .current-plan .stat .label { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+
+    .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .plan-card {
+        background: #fff;
+        border-radius: 14px;
+        border: 2px solid rgba(71,24,32,0.08);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    .plan-card.current { border-color: var(--accent-gold); background: rgba(212,165,116,0.03); }
+    .plan-card h4 { font-family: var(--font-serif); font-size: 1.1rem; color: var(--brand-700); margin-bottom: 0.5rem; }
+    .plan-card .price { font-size: 1.8rem; font-weight: 800; color: var(--brand-700); margin-bottom: 0.5rem; }
+    .plan-card .price span { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
+    .plan-card .features { list-style: none; padding: 0; margin: 1rem 0; text-align: left; }
+    .plan-card .features li { font-size: 0.85rem; color: var(--text-secondary); padding: 0.4rem 0; }
+    .plan-card .features li::before { content: "✓ "; color: #228b22; font-weight: 700; }
+
+    .payment-section {
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid rgba(71,24,32,0.06);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .payment-section h3 { font-family: var(--font-serif); font-size: 1.2rem; color: var(--brand-700); margin-bottom: 1rem; }
+
+    .payment-methods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .payment-method {
+        border: 2px solid rgba(71,24,32,0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+    }
+    .payment-method h4 { font-size: 0.9rem; color: var(--brand-700); margin-bottom: 0.25rem; }
+    .payment-method .number { font-size: 1.1rem; font-weight: 800; color: var(--brand-700); font-family: monospace; }
+    .payment-method .title { font-size: 0.78rem; color: var(--text-muted); }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border: 1.5px solid rgba(71,24,32,0.15);
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--brand-700); }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.5rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-primary:hover { background: var(--brand-800); }
+
+    .payment-history {
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid rgba(71,24,32,0.06);
+        overflow: hidden;
+    }
+    .payment-history .header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(71,24,32,0.06);
+    }
+    .payment-history .header h3 { font-family: var(--font-serif); font-size: 1rem; color: var(--brand-700); }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: rgba(71,24,32,0.02); }
+    .data-table td { padding: 0.75rem 1.5rem; font-size: 0.85rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .badge-approved { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-rejected { background: rgba(220,53,69,0.1); color: #dc3545; }
+
+    .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block teacher_content %}
+<div class="page-header">
+    <h1>Subscription</h1>
+</div>
+
+<!-- Current Plan -->
+<div class="current-plan">
+    <h3>Current Plan</h3>
+    <div class="plan-name">{{ subscription.get_plan_display }}</div>
+    <p style="color: rgba(255,255,255,0.7);">Status: <strong style="color: {% if subscription.is_active %}#90ee90{% elif subscription.status == 'pending' %}#ffd700{% else %}#ff6b6b{% endif %};">{{ subscription.get_status_display }}</strong></p>
+    <div class="plan-stats">
+        <div class="stat">
+            <div class="value">{{ subscription.current_students }}/{{ subscription.max_students }}</div>
+            <div class="label">Students</div>
+        </div>
+        <div class="stat">
+            <div class="value">Rs. {{ subscription.monthly_price|floatformat:0 }}</div>
+            <div class="label">Monthly</div>
+        </div>
+        {% if subscription.end_date %}
+        <div class="stat">
+            <div class="value">{{ subscription.days_until_expiry }}</div>
+            <div class="label">Days Left</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Available Plans -->
+<div class="plans-grid">
+    <div class="plan-card {% if subscription.plan == 'basic' %}current{% endif %}">
+        <h4>Basic</h4>
+        <div class="price">Rs. 5,000<span>/month</span></div>
+        <ul class="features">
+            <li>Up to 10 students</li>
+            <li>Student management</li>
+            <li>Attendance tracking</li>
+            <li>Homework portal</li>
+        </ul>
+    </div>
+    <div class="plan-card {% if subscription.plan == 'standard' %}current{% endif %}">
+        <h4>Standard</h4>
+        <div class="price">Rs. 6,000<span>/month</span></div>
+        <ul class="features">
+            <li>Up to 20 students</li>
+            <li>All Basic features</li>
+            <li>Meetings scheduler</li>
+            <li>Priority support</li>
+        </ul>
+    </div>
+    <div class="plan-card {% if subscription.plan == 'premium' %}current{% endif %}">
+        <h4>Premium</h4>
+        <div class="price">Rs. 10,000<span>/month</span></div>
+        <ul class="features">
+            <li>Up to 50 students</li>
+            <li>All Standard features</li>
+            <li>Custom branding</li>
+            <li>Dedicated support</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Payment Section -->
+<div class="payment-section">
+    <h3>Make Payment</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Send payment to any of these accounts, then submit the form below.</p>
+    
+    <div class="payment-methods">
+        <div class="payment-method">
+            <h4>JazzCash</h4>
+            <div class="number">03294629629</div>
+            <div class="title">Title: Iram</div>
+        </div>
+        <div class="payment-method">
+            <h4>SadaPay</h4>
+            <div class="number">0318-4439418</div>
+            <div class="title">Title: Iram</div>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'teacher_payment_submit' %}">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select name="method" required>
+                    <option value="jazzcash">JazzCash</option>
+                    <option value="sadapay">SadaPay</option>
+                    <option value="easypaisa">EasyPaisa</option>
+                    <option value="bank">Bank Transfer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Transaction ID (optional)</label>
+                <input type="text" name="transaction_id" placeholder="TRX ID">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Payment Screenshot</label>
+            <input type="file" name="screenshot" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Payment</button>
+    </form>
+</div>
+
+<!-- Payment History -->
+<div class="payment-history">
+    <div class="header">
+        <h3>Payment History</h3>
+    </div>
+    {% if payments %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                <td>Rs. {{ payment.amount }}</td>
+                <td>{{ payment.get_method_display }}</td>
+                <td><span class="badge badge-{{ payment.status }}">{{ payment.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-msg">No payment history yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
