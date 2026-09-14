@@ -1,0 +1,43 @@
+{% extends 'base/base_student_portal.html' %}
+
+{% block title %}My Courses | Student Portal{% endblock %}
+
+{% block student_portal_extra_head %}
+<style>
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .course-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .course-item:last-child { border-bottom: none; }
+    .course-info .title { font-size: 0.95rem; font-weight: 600; color: var(--brand-700); }
+    .course-info .meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-approved { background: rgba(34,139,34,0.1); color: #228b22; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block student_portal_content %}
+<div class="page-header">
+    <h1>My Courses</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Enrolled Courses ({{ enrollments|length }})</h3>
+    </div>
+    {% for enr in enrollments %}
+    <div class="course-item">
+        <div class="course-info">
+            <div class="title">{{ enr.course.title }}</div>
+            <div class="meta">👩‍🏫 {{ enr.teacher.get_full_name }} • {{ enr.course.category }} • {{ enr.course.level }}</div>
+        </div>
+        <span class="badge badge-approved">Active</span>
+    </div>
+    {% empty %}
+    <p class="empty-msg">You are not enrolled in any courses yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

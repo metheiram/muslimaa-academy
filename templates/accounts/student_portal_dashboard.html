@@ -1,0 +1,152 @@
+{% extends 'base/base_student_portal.html' %}
+{% load static %}
+
+{% block title %}Dashboard | Student Portal{% endblock %}
+
+{% block student_portal_extra_head %}
+<style>
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .page-header p { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 1.25rem 1.5rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); }
+    .stat-card h3 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
+    .stat-card p { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .stat-card.accent { background: linear-gradient(135deg, #471820 0%, #3d1319 100%); color: #fff; }
+    .stat-card.accent h3 { color: var(--accent-gold); }
+    .stat-card.accent p { color: rgba(255,255,255,0.7); }
+
+    .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); margin-bottom: 1.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .card-body { padding: 1.25rem 1.5rem; }
+
+    .meeting-item, .homework-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .meeting-item:last-child, .homework-item:last-child { border-bottom: none; }
+    .item-info .title { font-size: 0.88rem; font-weight: 600; color: var(--brand-700); }
+    .item-info .meta { font-size: 0.78rem; color: var(--text-muted); }
+
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; }
+    .btn-primary { background: var(--brand-700); color: #fff; }
+    .btn-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1px solid rgba(71,24,32,0.2); }
+
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-live { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-doubt { background: rgba(0,123,255,0.1); color: #007bff; }
+
+    .attendance-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: var(--brand-700); border: 4px solid rgba(71,24,32,0.1); }
+
+    .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block student_portal_content %}
+<div class="page-header">
+    <h1>Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+    <p>Your learning dashboard</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card accent">
+        <h3>{{ courses|length }}</h3>
+        <p>Enrolled Courses</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ attendance_pct }}%</h3>
+        <p>Attendance</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ pending_homework|length }}</h3>
+        <p>Pending Homework</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ upcoming_meetings|length }}</h3>
+        <p>Upcoming Meetings</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <!-- My Teachers -->
+    <div class="card">
+        <div class="card-header">
+            <h3>My Teachers</h3>
+        </div>
+        <div class="card-body">
+            {% for teacher in teachers %}
+            <div class="meeting-item">
+                <div class="item-info">
+                    <div class="title">{{ teacher.get_full_name }}</div>
+                    <div class="meta">{{ teacher.email }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="empty-msg">No teachers assigned yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Upcoming Meetings -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Upcoming Meetings</h3>
+            <a href="{% url 'student_portal_meetings' %}" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">View All</a>
+        </div>
+        <div class="card-body">
+            {% for meeting in upcoming_meetings %}
+            <div class="meeting-item">
+                <div class="item-info">
+                    <div class="title">{{ meeting.title }}</div>
+                    <div class="meta">{{ meeting.scheduled_at|date:"M d, h:i A" }} • {{ meeting.course.title }}</div>
+                </div>
+                <span class="badge badge-{{ meeting.meeting_type }}">{{ meeting.get_meeting_type_display }}</span>
+            </div>
+            {% empty %}
+            <p class="empty-msg">No upcoming meetings.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Pending Homework -->
+<div class="card">
+    <div class="card-header">
+        <h3>Pending Homework</h3>
+        <a href="{% url 'student_portal_homework' %}" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">View All</a>
+    </div>
+    <div class="card-body">
+        {% for hw in pending_homework %}
+        <div class="homework-item">
+            <div class="item-info">
+                <div class="title">{{ hw.title }}</div>
+                <div class="meta">{{ hw.course.title }} • Due: {{ hw.due_date|date:"M d, Y" }}</div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="empty-msg">No pending homework. Great job!</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Recent Notifications -->
+{% if notifications %}
+<div class="card">
+    <div class="card-header">
+        <h3>Recent Notifications</h3>
+        <a href="{% url 'student_portal_notifications' %}" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">View All</a>
+    </div>
+    <div class="card-body">
+        {% for notif in notifications %}
+        <div class="meeting-item" style="{% if not notif.is_read %}background: rgba(212,165,116,0.05); padding: 0.75rem; border-radius: 8px;{% endif %}">
+            <div class="item-info">
+                <div class="title">{{ notif.title }}</div>
+                <div class="meta">{{ notif.message|truncatewords:20 }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

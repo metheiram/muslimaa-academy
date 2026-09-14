@@ -1,0 +1,65 @@
+{% extends 'base/base_student_portal.html' %}
+
+{% block title %}Notifications | Student Portal{% endblock %}
+
+{% block student_portal_extra_head %}
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); overflow: hidden; }
+    .notif-item { padding: 1rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.04); display: flex; justify-content: space-between; align-items: flex-start; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread { background: rgba(212,165,116,0.04); }
+    .notif-info .title { font-size: 0.9rem; font-weight: 600; color: var(--brand-700); }
+    .notif-info .message { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .notif-info .time { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .notif-actions { display: flex; gap: 0.5rem; }
+    .btn { padding: 0.35rem 0.7rem; font-size: 0.75rem; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; }
+    .btn-outline { background: transparent; color: var(--brand-700); border: 1px solid rgba(71,24,32,0.2); }
+    .btn-danger { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block student_portal_content %}
+<div class="page-header">
+    <h1>Notifications</h1>
+    {% if notifications %}
+    <form method="POST" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="mark_all_read">
+        <button type="submit" class="btn btn-outline">✓ Mark All Read</button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="card">
+    {% for notif in notifications %}
+    <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
+        <div class="notif-info">
+            <div class="title">{{ notif.title }}</div>
+            <div class="message">{{ notif.message }}</div>
+            <div class="time">{{ notif.created_at|timesince }} ago</div>
+        </div>
+        <div class="notif-actions">
+            {% if not notif.is_read %}
+            <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="mark_read">
+                <input type="hidden" name="notification_id" value="{{ notif.id }}">
+                <button type="submit" class="btn btn-outline">✓ Read</button>
+            </form>
+            {% endif %}
+            <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="notification_id" value="{{ notif.id }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this notification?')">✕</button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+    <p class="empty-msg">No notifications yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

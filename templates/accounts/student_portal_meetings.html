@@ -1,0 +1,59 @@
+{% extends 'base/base_student_portal.html' %}
+
+{% block title %}Meetings | Student Portal{% endblock %}
+
+{% block student_portal_extra_head %}
+<style>
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .meeting-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .meeting-item:last-child { border-bottom: none; }
+    .meeting-info .title { font-size: 0.95rem; font-weight: 600; color: var(--brand-700); }
+    .meeting-info .meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 600; border-radius: 8px; border: none; text-decoration: none; }
+    .btn-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-live { background: rgba(34,139,34,0.1); color: #228b22; }
+    .badge-past { background: rgba(150,150,150,0.1); color: #999; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block student_portal_content %}
+<div class="page-header">
+    <h1>Meetings</h1>
+</div>
+
+<div class="card">
+    <div class="card-header"><h3>Upcoming Meetings</h3></div>
+    {% for meeting in upcoming_meetings %}
+    <div class="meeting-item">
+        <div class="meeting-info">
+            <div class="title">{{ meeting.title }}</div>
+            <div class="meta">{{ meeting.scheduled_at|date:"M d, Y — h:i A" }} • {{ meeting.course.title }} • {{ meeting.duration_minutes }}min</div>
+        </div>
+        <a href="{{ meeting.meet_link }}" target="_blank" class="btn btn-success">🔗 Join</a>
+    </div>
+    {% empty %}
+    <p class="empty-msg">No upcoming meetings.</p>
+    {% endfor %}
+</div>
+
+{% if past_meetings %}
+<div class="card">
+    <div class="card-header"><h3>Past Meetings</h3></div>
+    {% for meeting in past_meetings %}
+    <div class="meeting-item" style="opacity: 0.6;">
+        <div class="meeting-info">
+            <div class="title">{{ meeting.title }}</div>
+            <div class="meta">{{ meeting.scheduled_at|date:"M d, Y — h:i A" }} • {{ meeting.course.title }}</div>
+        </div>
+        <span class="badge badge-past">Past</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

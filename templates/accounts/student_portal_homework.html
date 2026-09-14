@@ -1,0 +1,63 @@
+{% extends 'base/base_student_portal.html' %}
+
+{% block title %}Homework | Student Portal{% endblock %}
+
+{% block student_portal_extra_head %}
+<style>
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
+    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
+    .hw-item { padding: 1rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
+    .hw-item:last-child { border-bottom: none; }
+    .hw-item .title { font-size: 0.95rem; font-weight: 600; color: var(--brand-700); }
+    .hw-item .meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .badge-pending { background: rgba(255,165,0,0.1); color: #e67e00; }
+    .badge-submitted { background: rgba(34,139,34,0.1); color: #228b22; }
+    .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block student_portal_content %}
+<div class="page-header">
+    <h1>Homework</h1>
+</div>
+
+<div class="card">
+    <div class="card-header"><h3>Pending Homework</h3></div>
+    {% for hw in pending_homework %}
+    <div class="hw-item">
+        <div class="title">{{ hw.title }}</div>
+        <div class="meta">{{ hw.course.title }} • Due: {{ hw.due_date|date:"M d, Y" }}</div>
+    </div>
+    {% empty %}
+    <p class="empty-msg">No pending homework. Great job!</p>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <div class="card-header"><h3>Submitted Homework</h3></div>
+    {% for sub in submitted_homework %}
+    <div class="hw-item">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="title">{{ sub.homework.title }}</div>
+                <div class="meta">{{ sub.homework.course.title }} • Submitted: {{ sub.submitted_at|date:"M d, Y" }}</div>
+            </div>
+            {% if sub.grade %}
+            <span class="badge badge-submitted">Grade: {{ sub.grade }}</span>
+            {% else %}
+            <span class="badge badge-pending">Not Graded</span>
+            {% endif %}
+        </div>
+        {% if sub.feedback %}
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Feedback: {{ sub.feedback }}</div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p class="empty-msg">No submissions yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
