@@ -109,7 +109,7 @@ def teacher_login(request):
             except TeacherSubscription.DoesNotExist:
                 pass
             
-            next_url = request.GET.get('next', 'teacher_dashboard')
+            next_url = request.GET.get('next', 'accounts:teacher_dashboard')
             return redirect(next_url)
         else:
             messages.error(request, 'Invalid credentials or not a teacher account.')

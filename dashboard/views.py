@@ -181,6 +181,7 @@ def admin_dashboard(request):
 
     # Admin notifications
     from notifications.models import Notification
+    from accounts.models import SubscriptionPayment
     admin_notifications = Notification.objects.filter(user=request.user)
     unread_notifications = admin_notifications.filter(is_read=False).count()
     pending_payments_count = SubscriptionPayment.objects.filter(status='pending').count()
@@ -980,8 +981,9 @@ def admin_approve_subscription(request, payment_id):
             subscription.activate(months=1)
         
         messages.success(request, f'Payment approved! {payment.teacher.get_full_name()} subscription activated.')
+        return redirect('dashboard:admin_teacher_detail', teacher_id=payment.teacher.id)
     
-    return redirect('dashboard:admin_teacher_detail', teacher_id=payment.teacher.id)
+    return redirect('dashboard:admin_teachers_saas')
 
 
 @admin_required
@@ -997,8 +999,9 @@ def admin_reject_subscription(request, payment_id):
         payment.save()
         
         messages.warning(request, f'Payment rejected for {payment.teacher.get_full_name()}.')
+        return redirect('dashboard:admin_teacher_detail', teacher_id=payment.teacher.id)
     
-    return redirect('dashboard:admin_teacher_detail', teacher_id=payment.teacher.id)
+    return redirect('dashboard:admin_teachers_saas')
 
 
 @admin_required

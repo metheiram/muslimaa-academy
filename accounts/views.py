@@ -148,7 +148,7 @@ class CustomLoginView(LoginView):
         if self.request.user.is_superuser:
             return '/dashboard/'
         elif self.request.user.is_staff:
-            return '/teacher/dashboard/'
+            return '/accounts/teacher/dashboard/'
         return '/student/dashboard/'
 
 
