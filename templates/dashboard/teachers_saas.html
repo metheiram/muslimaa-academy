@@ -119,13 +119,13 @@
         <div class="sidebar-brand"><h2>Muslimaa Academy</h2><p>Admin Dashboard</p></div>
         <ul class="sidebar-nav">
             <li><a href="{% url 'dashboard:admin_dashboard' %}"><span class="icon">📊</span> Dashboard</a></li>
-            <div class="section-label">Management</div>
+            <li class="section-label">Management</li>
             <li><a href="{% url 'dashboard:admin_students' %}"><span class="icon">👩‍🎓</span> Students</a></li>
             <li><a href="{% url 'dashboard:admin_teachers' %}"><span class="icon">👩‍🏫</span> Teachers</a></li>
             <li><a href="{% url 'dashboard:admin_teachers_saas' %}" class="active"><span class="icon">💼</span> SaaS Teachers</a></li>
             <li><a href="{% url 'dashboard:admin_enrollments' %}"><span class="icon">📋</span> Enrollments</a></li>
             <li><a href="{% url 'dashboard:admin_fees' %}"><span class="icon">💰</span> Fee Tracking</a></li>
-            <div class="section-label">Content</div>
+            <li class="section-label">Content</li>
             <li><a href="{% url 'dashboard:admin_courses' %}"><span class="icon">📚</span> Courses</a></li>
             <li><a href="{% url 'workshops:workshop_list' %}"><span class="icon">🎓</span> Workshops</a></li>
             <li><a href="{% url 'admin:index' %}"><span class="icon">⚙️</span> Django Admin</a></li>

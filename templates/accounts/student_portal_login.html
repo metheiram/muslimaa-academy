@@ -35,6 +35,9 @@
         transition: all 0.3s ease; background: #faf6f1;
     }
     .form-group input:focus { outline: none; border-color: #471820; background: #fff; box-shadow: 0 0 0 3px rgba(71,24,32,0.08); }
+    .pwd-wrap { position: relative; }
+    .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--text-muted); padding: 0.25rem; }
+    .pwd-toggle:hover { color: var(--brand-700); }
     .btn-primary {
         width: 100%; padding: 0.85rem;
         background: linear-gradient(135deg, #471820 0%, #3d1319 100%);
@@ -88,7 +91,10 @@
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" required>
+                <div class="pwd-wrap">
+                    <input type="password" name="password" required>
+                    <button type="button" class="pwd-toggle" tabindex="-1">👁️</button>
+                </div>
             </div>
             <button type="submit" class="btn-primary">Login</button>
         </form>
@@ -106,4 +112,21 @@
         </div>
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.pwd-toggle').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const input = this.previousElementSibling;
+        if (input.type === 'password') { input.type = 'text'; this.textContent = '🙈'; }
+        else { input.type = 'password'; this.textContent = '👁️'; }
+    });
+});
+
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function() {
+        const btn = this.querySelector('button[type="submit"]');
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; btn.style.cursor = 'wait'; }
+    });
+});
+</script>
 {% endblock %}

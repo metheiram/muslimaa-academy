@@ -123,6 +123,31 @@ def register(request):
                     notification_type='enrollment',
                 )
 
+            # Send welcome email to teacher
+            try:
+                from django.core.mail import send_mail
+                from django.conf import settings
+                send_mail(
+                    'Welcome to Muslimaa Academy - Teacher Registration',
+                    f'Assalam-o-Alaikum {first_name}!\n\n'
+                    f'Welcome to Muslimaa Academy! Your teacher account has been created successfully.\n\n'
+                    f'📋 Account Details:\n'
+                    f'   Username: {username}\n'
+                    f'   Email: {email}\n'
+                    f'   Plan: {plan.title()} (Up to {max_students} students)\n'
+                    f'   Monthly Fee: Rs. {monthly_price:,}\n\n'
+                    f'💳 Next Steps:\n'
+                    f'Please complete your subscription payment to activate your account.\n'
+                    f'Login at: {request.scheme}://{request.get_host()}/accounts/teacher/login/\n\n'
+                    f'JazakAllah Khair!\n'
+                    f'Muslimaa Academy Team',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
+
         from django.contrib.auth import login
         login(request, user)
 

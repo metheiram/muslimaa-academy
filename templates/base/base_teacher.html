@@ -240,10 +240,10 @@
         </div>
         <ul class="sidebar-nav">
             <li><a href="{% url 'accounts:teacher_dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}" onclick="closeMobile()"><span class="icon">📊</span> Dashboard</a></li>
-            <div class="section-label">Management</div>
+            <li class="section-label">Management</li>
             <li><a href="{% url 'accounts:teacher_students' %}" class="{% if active_page == 'students' %}active{% endif %}" onclick="closeMobile()"><span class="icon">👩‍🎓</span> My Students</a></li>
             <li><a href="{% url 'accounts:teacher_subscription' %}" class="{% if active_page == 'subscription' %}active{% endif %}" onclick="closeMobile()"><span class="icon">💳</span> Subscription</a></li>
-            <div class="section-label">Academics</div>
+            <li class="section-label">Academics</li>
             <li><a href="{% url 'classes:schedule' %}" onclick="closeMobile()"><span class="icon">📅</span> Schedule</a></li>
             <li><a href="{% url 'classes:teacher_meetings' %}" onclick="closeMobile()"><span class="icon">🎥</span> Meetings</a></li>
             <li><a href="{% url 'homework:teacher_homework' %}" onclick="closeMobile()"><span class="icon">📝</span> Homework</a></li>

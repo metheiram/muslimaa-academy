@@ -1,4 +1,24 @@
 {% extends 'base/base.html' %}
+{% block title %}Page Not Found | Muslimaa Academy{% endblock %}
+{% block extra_head %}
+<style>
+.error-page { display: flex; align-items: center; justify-content: center; min-height: 70vh; padding: 2rem; text-align: center; }
+.error-card { background: #fff; border-radius: 20px; padding: 3rem; max-width: 450px; width: 100%; box-shadow: 0 4px 20px rgba(71,24,32,0.08); }
+.error-code { font-size: 5rem; font-weight: 800; color: #471820; line-height: 1; margin-bottom: 0.5rem; }
+.error-msg { font-size: 1.2rem; color: #5a4a55; margin-bottom: 0.5rem; }
+.error-desc { font-size: 0.9rem; color: #8a7a85; margin-bottom: 2rem; }
+.error-btn { display: inline-block; padding: 0.75rem 2rem; background: #471820; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; transition: background 0.3s; }
+.error-btn:hover { background: #3d1319; }
+@media (max-width: 480px) { .error-card { padding: 2rem 1.5rem; } .error-code { font-size: 3.5rem; } }
+</style>
+{% endblock %}
 {% block content %}
-<h1>Page not found (404)</h1>
+<div class="error-page">
+    <div class="error-card">
+        <div class="error-code">404</div>
+        <div class="error-msg">Page Not Found</div>
+        <p class="error-desc">The page you're looking for doesn't exist or has been moved.</p>
+        <a href="{% url 'home' %}" class="error-btn">← Go Home</a>
+    </div>
+</div>
 {% endblock %}

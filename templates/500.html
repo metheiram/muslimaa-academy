@@ -1,4 +1,28 @@
-{% extends 'base/base.html' %}
-{% block content %}
-<h1>Server error (500)</h1>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Server Error | Muslimaa Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #faf6f1; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+    .error-card { background: #fff; border-radius: 20px; padding: 3rem; max-width: 450px; width: 100%; text-align: center; box-shadow: 0 4px 20px rgba(71,24,32,0.08); }
+    .error-code { font-size: 5rem; font-weight: 800; color: #471820; line-height: 1; margin-bottom: 0.5rem; }
+    .error-msg { font-size: 1.2rem; color: #5a4a55; margin-bottom: 0.5rem; }
+    .error-desc { font-size: 0.9rem; color: #8a7a85; margin-bottom: 2rem; }
+    .error-btn { display: inline-block; padding: 0.75rem 2rem; background: #471820; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; }
+    .error-btn:hover { background: #3d1319; }
+    @media (max-width: 480px) { .error-card { padding: 2rem 1.5rem; } .error-code { font-size: 3.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <div class="error-code">500</div>
+        <div class="error-msg">Something Went Wrong</div>
+        <p class="error-desc">We're experiencing technical difficulties. Please try again later.</p>
+        <a href="/" class="error-btn">← Go Home</a>
+    </div>
+</body>
+</html>

@@ -972,7 +972,32 @@ def admin_approve_subscription(request, payment_id):
         payment.approved_by = request.user
         payment.approved_at = timezone.now()
         payment.save()
-        
+
+        # Send approval email to teacher
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings
+            sub = payment.subscription
+            send_mail(
+                'Subscription Approved - Muslimaa Academy',
+                f'Assalam-o-Alaikum {payment.teacher.first_name}!\n\n'
+                f'Great news! Your subscription payment has been approved.\n\n'
+                f'📋 Subscription Details:\n'
+                f'   Plan: {sub.get_plan_display()}\n'
+                f'   Status: Active\n'
+                f'   Amount Paid: Rs. {payment.amount}\n'
+                f'   Students Allowed: {sub.max_students}\n\n'
+                f'You can now access your teacher dashboard and start managing students.\n'
+                f'Login: {request.scheme}://{request.get_host()}/accounts/teacher/login/\n\n'
+                f'JazakAllah Khair!\n'
+                f'Muslimaa Academy Team',
+                settings.DEFAULT_FROM_EMAIL,
+                [payment.teacher.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
         # Activate/extend subscription
         subscription = payment.subscription
         if subscription.status == 'active':
@@ -997,7 +1022,30 @@ def admin_reject_subscription(request, payment_id):
         payment.approved_by = request.user
         payment.approved_at = timezone.now()
         payment.save()
-        
+
+        # Send rejection email to teacher
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings
+            send_mail(
+                'Payment Update - Muslimaa Academy',
+                f'Assalam-o-Alaikum {payment.teacher.first_name}!\n\n'
+                f'We wanted to inform you that your recent subscription payment could not be verified.\n\n'
+                f'📋 Payment Details:\n'
+                f'   Amount: Rs. {payment.amount}\n'
+                f'   Method: {payment.get_method_display()}\n\n'
+                f'If you believe this is an error, please contact us or submit a new payment.\n'
+                f'You can resubmit payment at:\n'
+                f'{request.scheme}://{request.get_host()}/accounts/teacher/subscription/\n\n'
+                f'JazakAllah Khair!\n'
+                f'Muslimaa Academy Team',
+                settings.DEFAULT_FROM_EMAIL,
+                [payment.teacher.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
         messages.warning(request, f'Payment rejected for {payment.teacher.get_full_name()}.')
         return redirect('dashboard:admin_teacher_detail', teacher_id=payment.teacher.id)
     

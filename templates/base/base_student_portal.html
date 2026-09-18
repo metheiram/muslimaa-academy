@@ -81,12 +81,12 @@
         </div>
         <ul class="sidebar-nav">
             <li><a href="{% url 'accounts:student_portal_dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
-            <div class="section-label">Learning</div>
+            <li class="section-label">Learning</li>
             <li><a href="{% url 'accounts:student_portal_courses' %}" class="{% if active_page == 'courses' %}active{% endif %}"><span class="icon">📚</span> My Courses</a></li>
             <li><a href="{% url 'accounts:student_portal_meetings' %}" class="{% if active_page == 'meetings' %}active{% endif %}"><span class="icon">🎥</span> Meetings</a></li>
             <li><a href="{% url 'accounts:student_portal_homework' %}" class="{% if active_page == 'homework' %}active{% endif %}"><span class="icon">📝</span> Homework</a></li>
             <li><a href="{% url 'accounts:student_portal_attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}"><span class="icon">✅</span> Attendance</a></li>
-            <div class="section-label">Account</div>
+            <li class="section-label">Account</li>
             <li><a href="{% url 'accounts:student_portal_notifications' %}" class="{% if active_page == 'notifications' %}active{% endif %}"><span class="icon">🔔</span> Notifications{% if unread_count %}<span class="notif-badge">{{ unread_count }}</span>{% endif %}</a></li>
         </ul>
         <div class="sidebar-footer">

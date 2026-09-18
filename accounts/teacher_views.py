@@ -264,7 +264,31 @@ def teacher_payment_submit(request):
                 message=f'{request.user.get_full_name()} submitted Rs. {int(amount)} payment via {method}. Plan: {subscription.get_plan_display()}. Please review and approve.',
                 notification_type='payment',
             )
-        
+
+        # Send email to admin about new payment
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings
+            admin_emails = User.objects.filter(is_superuser=True).values_list('email', flat=True)
+            if admin_emails:
+                send_mail(
+                    f'New Subscription Payment - {request.user.get_full_name()}',
+                    f'New subscription payment received!\n\n'
+                    f'Teacher: {request.user.get_full_name()} ({request.user.email})\n'
+                    f'Amount: Rs. {int(amount)}\n'
+                    f'Method: {method}\n'
+                    f'Transaction ID: {transaction_id or "N/A"}\n'
+                    f'Plan: {subscription.get_plan_display()}\n\n'
+                    f'Please review and approve at:\n'
+                    f'{request.scheme}://{request.get_host()}/dashboard/teachers-saas/{request.user.id}/\n\n'
+                    f'Muslimaa Academy Team',
+                    settings.DEFAULT_FROM_EMAIL,
+                    list(admin_emails),
+                    fail_silently=True,
+                )
+        except Exception:
+            pass
+
         messages.success(request, 'Payment submitted! It will be verified shortly.')
         return redirect('accounts:teacher_subscription')
     
