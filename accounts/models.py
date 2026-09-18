@@ -157,3 +157,19 @@ def create_profile(sender, instance, created, **kwargs):
 
 from django.db.models.signals import post_save
 post_save.connect(create_profile, sender=User)
+
+
+class EmailVerification(models.Model):
+    """Email verification token for new registrations."""
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='email_verification')
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"Verification for {self.user.email} ({'verified' if self.is_verified else 'pending'})"
+    
+    @property
+    def is_expired(self):
+        return (timezone.now() - self.created_at).total_seconds() > 86400  # 24 hours

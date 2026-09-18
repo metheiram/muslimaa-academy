@@ -316,11 +316,11 @@
                 </div>
                 <div class="card-body">
                     <div class="stat-card">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number">{{ student_count }}</div>
                         <div class="stat-label">Students Assigned</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number">{{ classes_taken }}</div>
                         <div class="stat-label">Classes Taken</div>
                     </div>
                 </div>
@@ -332,9 +332,21 @@
                     <h3>My Students</h3>
                 </div>
                 <div class="card-body">
-                    <div class="empty-state">
-                        <p>No students assigned yet. Admin will assign students to you.</p>
+                    {% if students %}
+                    {% for student in students %}
+                    <div class="student-item">
+                        <div class="student-avatar">{{ student.first_name|first }}</div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--brand-700);">{{ student.get_full_name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ student.email }}</div>
+                        </div>
                     </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No students assigned yet.</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 

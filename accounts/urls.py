@@ -30,6 +30,7 @@ urlpatterns = [
     path('teacher/students/add/', teacher_views.teacher_add_student, name='teacher_add_student'),
     path('teacher/students/<int:student_id>/edit/', teacher_views.teacher_edit_student, name='teacher_edit_student'),
     path('teacher/students/<int:student_id>/remove/', teacher_views.teacher_remove_student, name='teacher_remove_student'),
+    path('teacher/profile/', teacher_views.teacher_profile, name='teacher_profile'),
     
     # Student Portal (SaaS)
     path('portal/login/', student_portal_views.student_portal_login, name='student_portal_login'),
@@ -40,4 +41,5 @@ urlpatterns = [
     path('portal/attendance/', student_portal_views.student_portal_attendance, name='student_portal_attendance'),
     path('portal/notifications/', student_portal_views.student_portal_notifications, name='student_portal_notifications'),
     path('portal/logout/', student_portal_views.student_portal_logout, name='student_portal_logout'),
+    path('verify-email/<str:token>/', views.verify_email, name='verify_email'),
 ]

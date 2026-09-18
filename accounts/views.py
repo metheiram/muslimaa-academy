@@ -151,6 +151,32 @@ def register(request):
         from django.contrib.auth import login
         login(request, user)
 
+        # Send email verification
+        try:
+            import secrets
+            from .models import EmailVerification
+            from django.core.mail import send_mail
+            from django.conf import settings
+            token = secrets.token_urlsafe(32)
+            EmailVerification.objects.create(user=user, token=token)
+            verify_url = f"{request.scheme}://{request.get_host()}/accounts/verify-email/{token}/"
+            send_mail(
+                'Verify Your Email - Muslimaa Academy',
+                f'Assalam-o-Alaikum {first_name}!\n\n'
+                f'Thank you for registering at Muslimaa Academy.\n\n'
+                f'Please verify your email address by clicking the link below:\n\n'
+                f'{verify_url}\n\n'
+                f'This link will expire in 24 hours.\n\n'
+                f'If you did not create this account, please ignore this email.\n\n'
+                f'JazakAllah Khair!\n'
+                f'Muslimaa Academy Team',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
         if role == 'teacher':
             messages.success(request, f'Welcome {user.first_name}! Please complete your subscription payment to activate your account.')
             return redirect('accounts:teacher_subscription')
@@ -468,3 +494,22 @@ def custom_logout(request):
     """Custom logout view that works with GET request."""
     logout(request)
     return redirect('home')
+
+
+def verify_email(request, token):
+    """Verify user email address."""
+    from .models import EmailVerification
+    try:
+        verification = EmailVerification.objects.get(token=token)
+        if verification.is_expired:
+            messages.error(request, 'Verification link has expired. Please register again.')
+            return redirect('accounts:login')
+        if verification.is_verified:
+            messages.info(request, 'Your email is already verified.')
+            return redirect('accounts:login')
+        verification.is_verified = True
+        verification.save()
+        return render(request, 'accounts/verify_email.html')
+    except EmailVerification.DoesNotExist:
+        messages.error(request, 'Invalid verification link.')
+        return redirect('accounts:login')

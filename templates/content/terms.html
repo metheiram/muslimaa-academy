@@ -1,0 +1,123 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Terms & Conditions | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<style>
+.terms-page { max-width: 800px; margin: 0 auto; padding: 4rem 2rem; }
+.terms-page h1 { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 700; color: var(--brand-700); margin-bottom: 0.5rem; }
+.terms-page .updated { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; }
+.terms-page h2 { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; color: var(--brand-700); margin: 2rem 0 0.75rem; }
+.terms-page p, .terms-page li { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.75rem; }
+.terms-page ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+.terms-page li { margin-bottom: 0.5rem; }
+.terms-page .highlight { background: rgba(212,165,116,0.1); border-left: 3px solid var(--accent-gold); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+.back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--brand-700); text-decoration: none; font-weight: 600; font-size: 0.9rem; margin-bottom: 2rem; transition: color 0.2s; }
+.back-link:hover { color: var(--accent-gold); }
+@media (max-width: 768px) { .terms-page { padding: 2rem 1.25rem; } .terms-page h1 { font-size: 1.6rem; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="terms-page">
+    <a href="{% url 'home' %}" class="back-link">← Back to Home</a>
+    <h1>Terms & Conditions</h1>
+    <p class="updated">Last updated: September 18, 2026</p>
+
+    <p>Welcome to Muslimaa Academy. By accessing or using our platform (muslimaaacademy.com), you agree to be bound by these Terms & Conditions. Please read them carefully.</p>
+
+    <h2>1. Acceptance of Terms</h2>
+    <p>By creating an account, enrolling in courses, or using any part of Muslimaa Academy, you acknowledge that you have read, understood, and agree to comply with these terms. If you do not agree, please do not use our platform.</p>
+
+    <h2>2. Eligibility</h2>
+    <ul>
+        <li>Muslimaa Academy is open to Muslim women and children of all ages.</li>
+        <li>Students under 18 must have parental or guardian consent to register.</li>
+        <li>Teachers must be at least 18 years old and meet our instructor criteria.</li>
+    </ul>
+
+    <h2>3. Account Registration</h2>
+    <ul>
+        <li>You must provide accurate and complete information during registration.</li>
+        <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+        <li>You must notify us immediately of any unauthorized use of your account.</li>
+        <li>One person may not maintain more than one account.</li>
+    </ul>
+
+    <h2>4. Courses & Enrollment</h2>
+    <ul>
+        <li>Course content is for educational purposes only.</li>
+        <li>Enrollment is subject to approval and payment verification.</li>
+        <li>We reserve the right to modify course content, schedules, or instructors at any time.</li>
+        <li>Course fees are non-refundable once classes have commenced, except in exceptional circumstances at our discretion.</li>
+    </ul>
+
+    <h2>5. Teacher Subscriptions (SaaS)</h2>
+    <div class="highlight">
+        <p><strong>For Teachers:</strong> By subscribing to our SaaS plans, you agree to the following:</p>
+    </div>
+    <ul>
+        <li>Subscription plans (Basic, Standard, Premium) have different student limits and monthly fees.</li>
+        <li>Payments must be submitted with valid proof (screenshot) via the platform.</li>
+        <li>Subscriptions are manually verified and approved by our admin team.</li>
+        <li>Monthly fees are due on the anniversary of your subscription start date.</li>
+        <li>Failure to pay within 7 days of the due date may result in account suspension.</li>
+        <li>We reserve the right to change pricing with 30 days' notice.</li>
+    </ul>
+
+    <h2>6. Payment Terms</h2>
+    <ul>
+        <li>All payments are processed manually via JazzCash, SadaPay, EasyPaisa, or bank transfer.</li>
+        <li>Payment screenshots must clearly show the transaction details.</li>
+        <li>Fraudulent payment submissions will result in immediate account termination.</li>
+        <li>Refund requests must be submitted within 7 days of payment.</li>
+    </ul>
+
+    <h2>7. User Conduct</h2>
+    <p>You agree not to:</p>
+    <ul>
+        <li>Use the platform for any illegal or unauthorized purpose.</li>
+        <li>Share course content with unauthorized parties.</li>
+        <li>Harass, abuse, or harm other users.</li>
+        <li>Attempt to gain unauthorized access to any part of the platform.</li>
+        <li>Use automated systems to access the platform without permission.</li>
+    </ul>
+
+    <h2>8. Intellectual Property</h2>
+    <ul>
+        <li>All course content, materials, and branding are the property of Muslimaa Academy.</li>
+        <li>Course materials are for personal learning only and may not be redistributed.</li>
+        <li>Recording of live classes without permission is prohibited.</li>
+    </ul>
+
+    <h2>9. Limitation of Liability</h2>
+    <p>Muslimaa Academy shall not be liable for:</p>
+    <ul>
+        <li>Any interruptions or downtime of the platform.</li>
+        <li>Loss of data due to technical issues.</li>
+        <li>Any damages arising from the use of our platform.</li>
+        <li>Actions of third-party payment processors.</li>
+    </ul>
+
+    <h2>10. Privacy</h2>
+    <p>Your use of our platform is also governed by our Privacy Policy. By using Muslimaa Academy, you consent to the collection and use of your information as described therein.</p>
+
+    <h2>11. Termination</h2>
+    <ul>
+        <li>We reserve the right to suspend or terminate accounts that violate these terms.</li>
+        <li>You may delete your account at any time by contacting us.</li>
+        <li>Upon termination, access to course materials will be revoked.</li>
+    </ul>
+
+    <h2>12. Changes to Terms</h2>
+    <p>We may update these terms from time to time. Continued use of the platform after changes constitutes acceptance of the new terms.</p>
+
+    <h2>13. Contact</h2>
+    <p>For questions about these Terms & Conditions, please contact us:</p>
+    <ul>
+        <li>Email: metheiraam@gmail.com</li>
+        <li>WhatsApp: 0318-4439418</li>
+    </ul>
+</div>
+{% endblock %}

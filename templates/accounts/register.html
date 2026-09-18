@@ -198,6 +198,13 @@
                 </div>
             </div>
 
+            <div style="margin: 1rem 0; display: flex; align-items: flex-start; gap: 0.5rem;">
+                <input type="checkbox" name="agree_terms" id="agree_terms" required style="margin-top: 0.3rem; accent-color: var(--brand-700);">
+                <label for="agree_terms" style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4;">
+                    I agree to the <a href="{% url 'content:terms' %}" target="_blank" style="color: var(--brand-700); font-weight: 600;">Terms & Conditions</a> and <a href="{% url 'content:privacy' %}" target="_blank" style="color: var(--brand-700); font-weight: 600;">Privacy Policy</a>
+                </label>
+            </div>
+
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Create Account</button>
         </form>
 

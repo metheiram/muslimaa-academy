@@ -464,3 +464,44 @@ def teacher_remove_student(request, student_id):
         messages.success(request, f'Student {student.get_full_name()} removed.')
     
     return redirect('accounts:teacher_students')
+
+
+@login_required
+def teacher_profile(request):
+    """Teacher profile page with dynamic stats."""
+    if not request.user.is_staff:
+        return redirect('home')
+    
+    user = request.user
+    
+    # Get subscription
+    subscription = getattr(user, 'subscription', None)
+    
+    # Get student count
+    student_count = User.objects.filter(
+        enrollments__teacher=user,
+        enrollments__status='approved'
+    ).distinct().count()
+    
+    # Get classes taken (completed meetings)
+    from classes.models import Meeting
+    classes_taken = Meeting.objects.filter(
+        teacher=user,
+        status='completed'
+    ).count()
+    
+    # Get assigned students
+    students = User.objects.filter(
+        enrollments__teacher=user,
+        enrollments__status='approved'
+    ).distinct().select_related('profile')[:10]
+    
+    context = {
+        'profile_user': user,
+        'subscription': subscription,
+        'student_count': student_count,
+        'classes_taken': classes_taken,
+        'students': students,
+        'active_page': 'profile',
+    }
+    return render(request, 'accounts/teacher_profile.html', context)
