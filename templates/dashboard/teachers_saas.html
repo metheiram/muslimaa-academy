@@ -214,7 +214,11 @@
                         <td>{% if teacher.subscription %}{{ teacher.subscription.current_students }}/{{ teacher.subscription.max_students }}{% else %}0/10{% endif %}</td>
                         <td>
                             {% if teacher.subscription %}
+                            {% if teacher.subscription.is_trial_active %}
+                            <span class="badge badge-active" style="background: rgba(0,123,255,0.1); color: #007bff;">Trial ({{ teacher.subscription.trial_days_remaining }}d left)</span>
+                            {% else %}
                             <span class="badge badge-{{ teacher.subscription.status }}">{{ teacher.subscription.get_status_display }}</span>
+                            {% endif %}
                             {% else %}
                             <span class="badge badge-pending">No Plan</span>
                             {% endif %}

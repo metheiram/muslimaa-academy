@@ -170,7 +170,7 @@
         <div class="card">
             <div class="card-header">
                 <h3>Subscription Plan</h3>
-                <span class="badge badge-{{ subscription.status }}">{{ subscription.get_status_display }}</span>
+                <span class="badge badge-{{ subscription.status }}">{% if subscription.is_trial_active %}Trial ({{ subscription.trial_days_remaining }}d left){% else %}{{ subscription.get_status_display }}{% endif %}</span>
             </div>
             <div class="card-body">
                 <form method="POST" action="{% url 'dashboard:admin_change_plan' teacher.id %}">

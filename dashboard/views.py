@@ -1000,6 +1000,8 @@ def admin_approve_subscription(request, payment_id):
 
         # Activate/extend subscription
         subscription = payment.subscription
+        subscription.is_trial = False
+        subscription.trial_ends_at = None
         if subscription.status == 'active':
             subscription.extend(months=1)
         else:

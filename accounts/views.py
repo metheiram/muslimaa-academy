@@ -6,6 +6,8 @@ from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
+from django.utils import timezone
+from datetime import timedelta
 
 
 class RegisterForm(forms.ModelForm):
@@ -106,9 +108,13 @@ def register(request):
             TeacherSubscription.objects.create(
                 teacher=user,
                 plan=plan,
-                status='pending',
+                status='active',
                 max_students=max_students,
                 monthly_price=monthly_price,
+                is_trial=True,
+                trial_ends_at=(timezone.now() + timedelta(days=30)).date(),
+                start_date=timezone.now().date(),
+                end_date=(timezone.now() + timedelta(days=30)).date(),
             )
             
             # Notify admin about new teacher registration

@@ -52,6 +52,10 @@ class TeacherSubscription(models.Model):
     last_payment_date = models.DateField(null=True, blank=True)
     last_payment_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
+    # Trial info
+    is_trial = models.BooleanField(default=False, help_text="Whether this is a free trial subscription")
+    trial_ends_at = models.DateField(null=True, blank=True, help_text="When the free trial expires")
+    
     def __str__(self):
         return f"{self.teacher.get_full_name()} - {self.get_plan_display()} ({self.status})"
     
@@ -70,7 +74,24 @@ class TeacherSubscription(models.Model):
     
     @property
     def is_active(self):
+        # Trial is active if within trial period
+        if self.is_trial and self.trial_ends_at:
+            if self.trial_ends_at >= timezone.now().date():
+                return True
         return self.status == 'active' and self.end_date and self.end_date >= timezone.now().date()
+    
+    @property
+    def is_trial_active(self):
+        """Check if trial is still active."""
+        return self.is_trial and self.trial_ends_at and self.trial_ends_at >= timezone.now().date()
+    
+    @property
+    def trial_days_remaining(self):
+        """Days left in trial."""
+        if self.trial_ends_at:
+            delta = self.trial_ends_at - timezone.now().date()
+            return max(0, delta.days)
+        return 0
     
     @property
     def can_add_student(self):
@@ -112,7 +133,21 @@ class TeacherSubscription(models.Model):
             self.status = 'expired'
             self.save()
             return True
+        # Check trial expiry
+        if self.is_trial and self.trial_ends_at and self.trial_ends_at < timezone.now().date():
+            self.is_trial = False
+            self.status = 'expired'
+            self.save()
+            return True
         return False
+    
+    def start_trial(self, days=30):
+        """Start a free trial for given days."""
+        self.is_trial = True
+        self.trial_ends_at = timezone.now().date() + timedelta(days=days)
+        self.status = 'active'
+        self.start_date = timezone.now().date()
+        self.save()
 
 
 class SubscriptionPayment(models.Model):

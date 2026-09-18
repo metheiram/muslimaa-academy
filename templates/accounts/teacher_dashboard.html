@@ -150,7 +150,15 @@
 </div>
 
 <!-- Subscription Status -->
-        {% if subscription.status == 'pending' %}
+        {% if subscription.is_trial_active %}
+<div class="sub-status active" style="background: rgba(0,123,255,0.08); border: 1px solid rgba(0,123,255,0.2);">
+    <span class="icon">🎉</span>
+    <div class="info">
+        <h4 style="color: #007bff;">Free Trial — {{ subscription.get_plan_display }}</h4>
+        <p>Your free trial ends in <strong>{{ subscription.trial_days_remaining }} days</strong> ({{ subscription.trial_ends_at|date:"M d, Y" }}). <a href="{% url 'accounts:teacher_subscription' %}" style="color: var(--brand-700); font-weight: 600;">Subscribe Now →</a></p>
+    </div>
+</div>
+{% elif subscription.status == 'pending' %}
 <div class="sub-status pending">
     <span class="icon">⏳</span>
     <div class="info">

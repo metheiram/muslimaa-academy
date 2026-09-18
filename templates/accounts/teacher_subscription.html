@@ -145,9 +145,14 @@
 
 <!-- Current Plan -->
 <div class="current-plan">
-    <h3>Current Plan</h3>
+    <h3>{% if subscription.is_trial_active %}🎉 Free Trial{% else %}Current Plan{% endif %}</h3>
     <div class="plan-name">{{ subscription.get_plan_display }}</div>
+    {% if subscription.is_trial_active %}
+    <p style="color: rgba(255,255,255,0.9); font-size: 0.95rem;">Free trial ends in <strong style="color: #ffd700;">{{ subscription.trial_days_remaining }} days</strong> ({{ subscription.trial_ends_at|date:"M d, Y" }})</p>
+    <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-top: 0.5rem;">Subscribe now to continue using all features after trial ends.</p>
+    {% else %}
     <p style="color: rgba(255,255,255,0.7);">Status: <strong style="color: {% if subscription.is_active %}#90ee90{% elif subscription.status == 'pending' %}#ffd700{% else %}#ff6b6b{% endif %};">{{ subscription.get_status_display }}</strong></p>
+    {% endif %}
     <div class="plan-stats">
         <div class="stat">
             <div class="value">{{ subscription.current_students }}/{{ subscription.max_students }}</div>
@@ -157,7 +162,12 @@
             <div class="value">Rs. {{ subscription.monthly_price|floatformat:0 }}</div>
             <div class="label">Monthly</div>
         </div>
-        {% if subscription.end_date %}
+        {% if subscription.is_trial_active %}
+        <div class="stat">
+            <div class="value">{{ subscription.trial_days_remaining }}</div>
+            <div class="label">Trial Days Left</div>
+        </div>
+        {% elif subscription.end_date %}
         <div class="stat">
             <div class="value">{{ subscription.days_until_expiry }}</div>
             <div class="label">Days Left</div>
