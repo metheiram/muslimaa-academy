@@ -26,6 +26,9 @@
     .badge-excused { background: rgba(0,123,255,0.1); color: #007bff; }
     .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
     @media (max-width: 768px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) {
+        .stats-row { grid-template-columns: 1fr !important; }
+    }
 </style>
 {% endblock %}
 
@@ -56,6 +59,7 @@
 <div class="card">
     <div class="card-header"><h3>Attendance History ({{ total }} classes)</h3></div>
     {% if attendance %}
+    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
     <table class="data-table">
         <thead><tr><th>Date</th><th>Course</th><th>Status</th></tr></thead>
         <tbody>
@@ -68,6 +72,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     <p class="empty-msg">No attendance records yet.</p>
     {% endif %}

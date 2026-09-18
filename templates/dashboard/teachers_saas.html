@@ -5,32 +5,72 @@
 
 {% block extra_head %}
 <style>
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .page-header h1 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: var(--brand-700); }
+    :root { --brand-700: #471820; --brand-800: #3d1319; --accent-gold: #d4a574; --text-secondary: #5a4a55; --text-muted: #8a7a85; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #faf6f1; color: #2d0d0f; margin: 0; padding: 0; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
 
+    /* Sidebar */
+    .sidebar { width: 260px; background: linear-gradient(180deg, #471820 0%, #3d1319 100%); color: #fff; padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; display: flex; flex-direction: column; }
+    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: center; }
+    .sidebar-brand h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0; color: #fff; }
+    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 0.25rem; }
+    .sidebar-nav { list-style: none; padding: 0.5rem 0; margin: 0; flex: 1; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(255,255,255,0.08); color: #ffffff; border-left-color: var(--accent-gold); }
+    .sidebar-nav .section-label { padding: 1rem 1.5rem 0.4rem; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); }
+    .sidebar-footer { padding: 1rem 1.5rem 2rem; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-footer a { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.82rem; padding: 0.6rem 0; transition: color 0.2s ease; }
+    .sidebar-footer a:hover { color: #fff; }
+
+    /* Mobile Header */
+    .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--brand-700); z-index: 150; align-items: center; padding: 0 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .mobile-header h2 { color: #fff; font-family: 'Playfair Display', serif; font-size: 1rem; margin: 0; }
+    .hamburger { background: none; border: none; cursor: pointer; padding: 0.5rem; display: flex; flex-direction: column; gap: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: all 0.3s ease; }
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+    .overlay.active { display: block; }
+
+    /* Main */
+    .main-content { margin-left: 260px; flex: 1; padding: 2rem; }
+
+    /* Page Header */
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--brand-700); margin: 0; }
+
+    /* Alerts */
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .alert-success { background: rgba(34,139,34,0.1); color: #228b22; border: 1px solid rgba(34,139,34,0.2); }
+    .alert-error { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+    .alert-warning { background: rgba(255,165,0,0.1); color: #e67e00; border: 1px solid rgba(255,165,0,0.2); }
+
+    /* Stats */
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .stat-card { background: #fff; border-radius: 14px; padding: 1.25rem 1.5rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); }
-    .stat-card h3 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
+    .stat-card h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--brand-700); margin: 0; }
     .stat-card p { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem; }
     .stat-card.accent { background: linear-gradient(135deg, #471820 0%, #3d1319 100%); color: #fff; }
     .stat-card.accent h3 { color: var(--accent-gold); }
     .stat-card.accent p { color: rgba(255,255,255,0.7); }
 
+    /* Search */
     .search-bar { background: #fff; border-radius: 12px; padding: 1rem 1.5rem; border: 1px solid rgba(71,24,32,0.06); margin-bottom: 1.5rem; }
-    .search-bar form { display: flex; gap: 0.75rem; align-items: center; }
-    .search-bar input { flex: 1; padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem; }
+    .search-bar form { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .search-bar input, .search-bar select { padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem; }
+    .search-bar input { flex: 1; min-width: 150px; }
 
+    /* Card & Table */
     .card { background: #fff; border-radius: 14px; border: 1px solid rgba(71,24,32,0.06); overflow: hidden; }
     .card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(71,24,32,0.06); }
-    .card-header h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 700; color: var(--brand-700); }
-
-    .data-table { width: 100%; border-collapse: collapse; }
+    .card-header h3 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--brand-700); margin: 0; }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table { width: 100%; border-collapse: collapse; min-width: 600px; }
     .data-table th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: rgba(71,24,32,0.02); }
     .data-table td { padding: 0.75rem 1.5rem; font-size: 0.85rem; border-bottom: 1px solid rgba(71,24,32,0.04); }
     .data-table tr:hover { background: rgba(71,24,32,0.02); }
 
     .teacher-cell { display: flex; align-items: center; gap: 0.75rem; }
-    .teacher-avatar { width: 36px; height: 36px; background: rgba(212,165,116,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: var(--brand-700); }
+    .teacher-avatar { width: 36px; height: 36px; background: rgba(212,165,116,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: var(--brand-700); flex-shrink: 0; }
 
     .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
     .badge-active { background: rgba(34,139,34,0.1); color: #228b22; }
@@ -41,16 +81,37 @@
     .btn-primary { background: var(--brand-700); color: #fff; }
     .btn-primary:hover { background: var(--brand-800); }
     .btn-outline { background: transparent; color: var(--brand-700); border: 1px solid rgba(71,24,32,0.2); }
+    .btn-outline:hover { background: rgba(71,24,32,0.05); }
     .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
 
     .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+        .sidebar.open { transform: translateX(0); z-index: 200; }
+        .mobile-header { display: flex; }
+        .main-content { margin-left: 0; padding: 72px 1.5rem 1.5rem; }
+    }
+    @media (max-width: 768px) {
+        .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+        .search-bar form { flex-direction: column; }
+        .search-bar input, .search-bar select, .search-bar .btn { width: 100%; }
+        .card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    }
+    @media (max-width: 480px) {
+        .main-content { padding: 68px 1rem 1rem; }
+        .stats-row { grid-template-columns: 1fr; }
+        .page-header h1 { font-size: 1.4rem; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-wrapper">
     <div class="mobile-header">
-        <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+        <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu"><span></span><span></span><span></span></button>
         <h2>Muslimaa Academy</h2>
     </div>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -86,7 +147,6 @@
         {% endfor %}
         {% endif %}
 
-        <!-- Stats -->
         <div class="stats-row">
             <div class="stat-card accent">
                 <h3>{{ total_teachers }}</h3>
@@ -106,11 +166,10 @@
             </div>
         </div>
 
-        <!-- Search & Filter -->
         <div class="search-bar">
             <form method="GET">
                 <input type="text" name="q" value="{{ query }}" placeholder="Search teachers...">
-                <select name="status" style="padding: 0.6rem 1rem; border: 1px solid rgba(71,24,32,0.15); border-radius: 8px; font-size: 0.88rem;">
+                <select name="status">
                     <option value="">All Status</option>
                     <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
                     <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
@@ -121,12 +180,12 @@
             </form>
         </div>
 
-        <!-- Teachers Table -->
         <div class="card">
             <div class="card-header">
                 <h3>All Teachers ({{ total_teachers }})</h3>
             </div>
             {% if teachers %}
+            <div class="table-wrap">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -161,12 +220,13 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'dashboard:admin_teacher_detail' teacher.id %}" class="btn btn-outline btn-sm">👁️ View</a>
+                            <a href="{% url 'dashboard:admin_teacher_detail' teacher.id %}" class="btn btn-outline btn-sm">View</a>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
             {% else %}
             <p class="empty-msg">No teachers found.</p>
             {% endif %}

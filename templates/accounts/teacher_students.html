@@ -116,6 +116,9 @@
     @media (max-width: 768px) {
         .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
         .sub-info { flex-wrap: wrap; }
+        .data-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .search-form { flex-direction: column; }
+        .search-form input, .search-form .btn { width: 100%; }
     }
 </style>
 {% endblock %}
@@ -169,6 +172,7 @@
         <h3>All Students ({{ student_count }})</h3>
     </div>
     {% if students %}
+    <div class="data-table-wrap" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
     <table class="data-table">
         <thead>
             <tr>
@@ -200,6 +204,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     <p class="empty-msg">{% if query %}No students found matching "{{ query }}"{% else %}No students yet. Add your first student!{% endif %}</p>
     {% endif %}

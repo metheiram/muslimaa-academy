@@ -9,7 +9,7 @@
     .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212,165,116,0.15) 0%, transparent 70%); border-radius: 50%; }
     .welcome-banner h1 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; position: relative; }
     .welcome-banner p { font-size: 0.9rem; color: rgba(255,255,255,0.8); position: relative; }
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .stat-card { background: #ffffff; border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(71,24,32,0.06); box-shadow: 0 2px 8px rgba(71,24,32,0.04); text-align: center; transition: transform 0.2s; }
     .stat-card:hover { transform: translateY(-2px); }
     .stat-card .stat-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
@@ -34,7 +34,7 @@
     .empty-msg { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
     .empty-msg a { color: var(--brand-700); font-weight: 600; }
     .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .actions-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; }
+    .actions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
     .action-btn { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1.25rem; background: rgba(71,24,32,0.04); border: 1px solid rgba(71,24,32,0.08); border-radius: 12px; color: var(--brand-700); text-decoration: none; font-size: 0.82rem; font-weight: 600; transition: all 0.3s ease; }
     .action-btn:hover { background: var(--brand-700); color: #fff; border-color: var(--brand-700); }
     .action-icon { font-size: 1.5rem; }
