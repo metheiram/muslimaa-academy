@@ -686,12 +686,85 @@
         margin-bottom: var(--space-md);
     }
 
-    .testimonials-cards {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: var(--space-lg);
+    .testimonials-cards-wrapper {
         position: relative;
         z-index: 1;
+    }
+
+    .testimonials-viewport {
+        overflow: hidden;
+    }
+
+    .testimonials-cards {
+        display: flex;
+        gap: var(--space-lg);
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .testimonials-cards .testimonial-card {
+        flex: 0 0 calc((100% - 2 * var(--space-lg)) / 3);
+        min-width: 0;
+    }
+
+    .tslider-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid #d4a574;
+        color: #471820;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 2;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        transition: all var(--duration-brisk) var(--ease-out);
+        padding: 0;
+    }
+
+    .tslider-btn:hover {
+        background: #471820;
+        color: #ffffff;
+        border-color: #471820;
+        transform: translateY(-50%) scale(1.06);
+    }
+
+    .tslider-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        transform: translateY(-50%);
+    }
+
+    .tslider-btn--prev { left: -22px; }
+    .tslider-btn--next { right: -22px; }
+
+    .tslider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: var(--space-md);
+        position: relative;
+        z-index: 1;
+    }
+
+    .tslider-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.35);
+        cursor: pointer;
+        padding: 0;
+        transition: all 0.3s ease;
+    }
+
+    .tslider-dot.active {
+        background: #d4a574;
+        transform: scale(1.25);
     }
 
     .testimonial-card {
@@ -1611,10 +1684,12 @@
             gap: var(--space-lg);
         }
 
-        .testimonials-cards {
-            grid-template-columns: 1fr;
-            gap: var(--space-lg);
+        .testimonials-cards .testimonial-card {
+            flex: 0 0 calc((100% - var(--space-lg)) / 2);
         }
+
+        .tslider-btn--prev { left: -8px; }
+        .tslider-btn--next { right: -8px; }
 
         .timeline {
             grid-template-columns: repeat(2, 1fr);
@@ -1643,6 +1718,13 @@
     }
 
     @media (max-width: 640px) {
+        .testimonials-cards .testimonial-card {
+            flex: 0 0 100%;
+        }
+
+        .tslider-btn--prev { left: -4px; }
+        .tslider-btn--next { right: -4px; }
+
         .hero {
             padding: var(--space-lg) 0 var(--space-xl);
         }
@@ -2005,7 +2087,15 @@
                 </div>
             </header>
 
-            <div class="testimonials-cards">
+            <div class="testimonials-cards-wrapper">
+                <button class="tslider-btn tslider-btn--prev" id="tPrev" aria-label="Previous testimonial">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="tslider-btn tslider-btn--next" id="tNext" aria-label="Next testimonial">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <div class="testimonials-viewport">
+                    <div class="testimonials-cards" id="tTrack">
                 <div class="testimonial-card">
                     <div class="testimonial-avatar">
                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2062,6 +2152,47 @@
                         <strong>Narmeen</strong>
                     </div>
                 </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="20" r="10" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M14 16C14 16 17 11 24 11C31 11 34 16 34 16" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M10 42C10 34.268 16.268 28 24 28C31.732 28 38 34.268 38 42" stroke="#471820" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M20 22C20 22 22 24 24 22C26 20 28 22 28 22" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="testimonial-role">Student</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <blockquote class="testimonial-quote">
+                        "Alhamdulillah, Tajweed ka group bohat faida mand hai. Pehle jo ghaltiyan Quran parhte hue hoti thi, ab ahista ahista theek ho rahi hain. Ustadah ka samjhane ka tareeqa bohat naram aur asan hai. Allah is group ko mazeed taraqqi de aur hum sab ke liye sadqa-e-jariya banaye."
+                    </blockquote>
+                    <div class="testimonial-author">
+                        <strong>Mehwish</strong>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="20" r="10" stroke="#471820" stroke-width="1.8"/>
+                            <path d="M14 16C14 16 17 11 24 11C31 11 34 16 34 16" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M10 42C10 34.268 16.268 28 24 28C31.732 28 38 34.268 38 42" stroke="#471820" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M20 22C20 22 22 24 24 22C26 20 28 22 28 22" stroke="#471820" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="testimonial-role">Student</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <blockquote class="testimonial-quote">
+                        "Alhamdulillah Mera bht Acha experience Raha. Teacher bht achi Hain aur mjhy bht Acha sikha rhi Hain. Academy Ka shukriya....."
+                    </blockquote>
+                    <div class="testimonial-author">
+                        <strong>Anum</strong>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                <div class="tslider-dots" id="tDots"></div>
             </div>
 
             <div class="testimonials-cta">
@@ -2245,14 +2376,110 @@
             if (whyCta) { whyCta.classList.add('animate-fade-in'); observer.observe(whyCta); }
         }
 
-        // Testimonials animations
+        // Testimonials slider + animations
         const testimonialsSection = document.querySelector('.testimonials-section');
         if (testimonialsSection) {
             const testimonialCards = testimonialsSection.querySelectorAll('.testimonial-card');
             testimonialCards.forEach(function(card, i) {
-                card.classList.add('animate-on-scroll', 'stagger-' + (i + 1));
+                card.classList.add('animate-on-scroll', 'stagger-' + ((i % 3) + 1));
                 observer.observe(card);
             });
+
+            const track = document.getElementById('tTrack');
+            const prevBtn = document.getElementById('tPrev');
+            const nextBtn = document.getElementById('tNext');
+            const dotsWrap = document.getElementById('tDots');
+            if (track && prevBtn && nextBtn && dotsWrap) {
+                const total = track.children.length;
+                let index = 0;
+                let autoTimer = null;
+
+                function perView() {
+                    if (window.innerWidth <= 640) return 1;
+                    if (window.innerWidth <= 1024) return 2;
+                    return 3;
+                }
+
+                function maxIndex() {
+                    return Math.max(0, total - perView());
+                }
+
+                function buildDots() {
+                    dotsWrap.innerHTML = '';
+                    for (let d = 0; d <= maxIndex(); d++) {
+                        const dot = document.createElement('button');
+                        dot.className = 'tslider-dot' + (d === index ? ' active' : '');
+                        dot.setAttribute('aria-label', 'Go to testimonial ' + (d + 1));
+                        dot.addEventListener('click', function() {
+                            index = d;
+                            update();
+                            restartAuto();
+                        });
+                        dotsWrap.appendChild(dot);
+                    }
+                }
+
+                function update() {
+                    if (index > maxIndex()) index = maxIndex();
+                    if (index < 0) index = 0;
+                    const card = track.children[0];
+                    const style = window.getComputedStyle(track);
+                    const gap = parseFloat(style.columnGap || style.gap) || 0;
+                    const step = card.getBoundingClientRect().width + gap;
+                    track.style.transform = 'translateX(' + (-index * step) + 'px)';
+                    prevBtn.disabled = index === 0;
+                    nextBtn.disabled = index === maxIndex();
+                    const dots = dotsWrap.querySelectorAll('.tslider-dot');
+                    dots.forEach(function(dot, i) {
+                        dot.classList.toggle('active', i === index);
+                    });
+                }
+
+                function next() {
+                    index = index >= maxIndex() ? 0 : index + 1;
+                    update();
+                }
+
+                function prev() {
+                    index = index <= 0 ? maxIndex() : index - 1;
+                    update();
+                }
+
+                function restartAuto() {
+                    if (autoTimer) clearInterval(autoTimer);
+                    autoTimer = setInterval(next, 4000);
+                }
+
+                prevBtn.addEventListener('click', function() { prev(); restartAuto(); });
+                nextBtn.addEventListener('click', function() { next(); restartAuto(); });
+
+                const wrapper = track.closest('.testimonials-cards-wrapper');
+                wrapper.addEventListener('mouseenter', function() {
+                    if (autoTimer) clearInterval(autoTimer);
+                });
+                wrapper.addEventListener('mouseleave', restartAuto);
+
+                let touchStartX = 0;
+                track.addEventListener('touchstart', function(e) {
+                    touchStartX = e.touches[0].clientX;
+                }, { passive: true });
+                track.addEventListener('touchend', function(e) {
+                    const diff = touchStartX - e.changedTouches[0].clientX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff > 0) next(); else prev();
+                        restartAuto();
+                    }
+                }, { passive: true });
+
+                window.addEventListener('resize', function() {
+                    buildDots();
+                    update();
+                });
+
+                buildDots();
+                update();
+                restartAuto();
+            }
         }
 
         // Section headers animation
