@@ -1254,32 +1254,6 @@
     </div>
 </section>
 
-<!-- COURSES GRID -->
-<section class="courses-section">
-    <div class="courses-grid">
-        {% for course in courses %}
-        <article class="course-card animate-on-scroll stagger-{{ forloop.counter }}">
-            <div class="thumb">
-                {% if course.image_url %}
-                <img src="{{ course.image_url }}" alt="{{ course.title }}">
-                {% elif course.image %}
-                <img src="{{ course.image.url }}" alt="{{ course.title }}">
-                {% endif %}
-            </div>
-            <div class="content">
-                <span class="badge">{{ course.category|default:"Islamic Learning" }}</span>
-                <h3>{{ course.title }}</h3>
-                <p>{{ course.description }}</p>
-                <div class="meta">
-                    <small>{{ course.duration|default:"6 weeks" }} · {{ course.level|default:"Beginner" }}</small>
-                    <a href="{% url 'courses:course_detail' course.slug %}">View Course →</a>
-                </div>
-            </div>
-        </article>
-        {% endfor %}
-    </div>
-</section>
-
 <!-- FAQ SECTION -->
 <section class="faq-section">
     <div class="container">
