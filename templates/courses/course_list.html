@@ -543,6 +543,212 @@
         color: #d4a574;
     }
 
+    /* COMING SOON SPOTLIGHT */
+    .coming-soon-section {
+        padding: 0 0 1rem;
+    }
+
+    .coming-soon-card {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #471820 0%, #2d0d0f 55%, #5c2029 100%);
+        border-radius: 20px;
+        border: 1px solid rgba(212, 165, 116, 0.35);
+        box-shadow: 0 20px 60px rgba(71, 24, 32, 0.25);
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        position: relative;
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .coming-soon-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 28px 70px rgba(71, 24, 32, 0.35);
+    }
+
+    .coming-soon-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.12'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .cs-body {
+        padding: 2.75rem 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cs-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(212, 165, 116, 0.15);
+        border: 1px solid rgba(212, 165, 116, 0.5);
+        color: var(--accent-gold);
+        padding: 0.35rem 1rem;
+        border-radius: 50px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.25rem;
+    }
+
+    .cs-pulse {
+        width: 8px;
+        height: 8px;
+        background: var(--accent-gold);
+        border-radius: 50%;
+        animation: csPulse 1.8s infinite;
+    }
+
+    @keyframes csPulse {
+        0% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.6); }
+        70% { box-shadow: 0 0 0 10px rgba(212, 165, 116, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0); }
+    }
+
+    .cs-academy {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.55);
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.35rem;
+    }
+
+    .cs-body h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.4rem;
+    }
+
+    .cs-tagline {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: 1rem;
+        color: var(--accent-gold);
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .cs-desc {
+        font-size: 0.92rem;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        max-width: 560px;
+    }
+
+    .cs-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .cs-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.9);
+        padding: 0.4rem 0.9rem;
+        border-radius: 50px;
+        font-size: 0.78rem;
+        font-weight: 500;
+    }
+
+    .cs-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .cs-btn-gold {
+        background: linear-gradient(135deg, #d4a574 0%, #c2905e 100%);
+        color: #2d0d0f;
+        box-shadow: 0 4px 20px rgba(212, 165, 116, 0.35);
+    }
+
+    .cs-btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(212, 165, 116, 0.5);
+        background: linear-gradient(135deg, #deb584 0%, #d4a574 100%);
+    }
+
+    .cs-btn-ghost {
+        background: transparent;
+        color: #ffffff;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .cs-btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.6);
+        transform: translateY(-2px);
+    }
+
+    .cs-side {
+        position: relative;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 1px solid rgba(212, 165, 116, 0.25);
+        padding: 2.75rem 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.25rem;
+        text-align: center;
+    }
+
+    .cs-price {
+        font-family: var(--font-serif);
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1;
+    }
+
+    .cs-price span {
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .cs-price-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.55);
+        margin-top: 0.3rem;
+    }
+
+    .cs-divider {
+        height: 1px;
+        background: rgba(212, 165, 116, 0.25);
+    }
+
+    .cs-fact-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--accent-gold);
+        margin-bottom: 0.25rem;
+    }
+
+    .cs-fact-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
     /* COURSES GRID */
     .courses-section {
         padding: 3rem 0 4rem;
@@ -744,6 +950,24 @@
         .courses-grid {
             grid-template-columns: 1fr;
         }
+
+        .coming-soon-card {
+            grid-template-columns: 1fr;
+        }
+
+        .cs-body {
+            padding: 2rem 1.5rem;
+        }
+
+        .cs-side {
+            border-left: none;
+            border-top: 1px solid rgba(212, 165, 116, 0.25);
+            padding: 1.75rem 1.5rem;
+        }
+
+        .cs-actions .btn {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
@@ -811,6 +1035,47 @@
             <a href="?category=kids" class="filter-btn {% if selected_category == 'kids' %}active{% endif %}">For Kids</a>
         </div>
         </form>
+    </div>
+</section>
+
+<!-- COMING SOON: EMOTIONAL INTELLIGENCE (EQ) -->
+<section class="coming-soon-section" style="padding-top: 2rem;">
+    <div class="container">
+        <div class="coming-soon-card animate-on-scroll">
+            <div class="cs-body">
+                <div class="cs-eyebrow"><span class="cs-pulse"></span> Coming Soon · New Course</div>
+                <div class="cs-academy">Muslimaa Academy · Online Learning</div>
+                <h2>Emotional Intelligence (EQ)</h2>
+                <div class="cs-tagline">Understand Your Emotions. Strengthen Your Character. Improve Your Relationships.</div>
+                <p class="cs-desc">Learn how to understand your emotions, respond thoughtfully, manage difficult feelings, and build healthier relationships through practical emotional intelligence lessons and Islamic perspectives.</p>
+                <div class="cs-chips">
+                    <span class="cs-chip">📅 Expected Launch: November 2026</span>
+                    <span class="cs-chip">📚 12-Month Learning Program</span>
+                    <span class="cs-chip">🕌 Islamic Perspectives</span>
+                    <span class="cs-chip">👩‍🎓 For Sisters</span>
+                </div>
+                <div class="cs-actions">
+                    <a class="btn cs-btn-gold" href="{% url 'courses:eq' %}">Explore Course</a>
+                    <a class="btn cs-btn-ghost" href="https://chat.whatsapp.com/By6RP0uCP3L9t8ybOPfT2N" target="_blank" rel="noopener">Get Launch Alerts</a>
+                </div>
+            </div>
+            <aside class="cs-side">
+                <div>
+                    <div class="cs-price">Rs. 1,500<span>/month</span></div>
+                    <div class="cs-price-label">Monthly course fee</div>
+                </div>
+                <div class="cs-divider"></div>
+                <div>
+                    <div class="cs-fact-label">Expected Launch</div>
+                    <div class="cs-fact-value">November 2026</div>
+                </div>
+                <div class="cs-divider"></div>
+                <div>
+                    <div class="cs-fact-label">Duration</div>
+                    <div class="cs-fact-value">12-Month Program</div>
+                </div>
+            </aside>
+        </div>
     </div>
 </section>
 

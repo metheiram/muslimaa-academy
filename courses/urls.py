@@ -9,6 +9,7 @@ urlpatterns = [
     path('tajweed/', views.tajweed_detail, name='tajweed'),
     path('hifz/', views.hifz_detail, name='hifz'),
     path('nazra/', views.nazra_detail, name='nazra'),
+    path('emotional-intelligence/', views.eq_detail, name='eq'),
     path('enrollments/', enrollment_views.my_enrollments, name='my_enrollments'),
     path('enrollment/<int:enrollment_id>/upload-screenshot/', enrollment_views.upload_screenshot, name='upload_screenshot'),
     path('rate/<int:course_id>/', enrollment_views.rate_course, name='rate_course'),

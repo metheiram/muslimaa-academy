@@ -68,3 +68,8 @@ def hifz_detail(request):
 def nazra_detail(request):
     """Display Nazra & Kids Quran Classes detail page."""
     return render(request, 'courses/nazra.html')
+
+
+def eq_detail(request):
+    """Display Emotional Intelligence (EQ) coming soon course page."""
+    return render(request, 'courses/eq.html')

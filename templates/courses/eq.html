@@ -1,0 +1,744 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Emotional Intelligence (EQ) — Coming Soon | Muslimaa Academy{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --brand-700: #471820;
+        --brand-800: #3d1319;
+        --accent-gold: #d4a574;
+        --text-secondary: #5a4a55;
+        --text-muted: #8a7a85;
+        --font-serif: 'Playfair Display', Georgia, serif;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: #faf6f1; color: #2d0d0f; }
+
+    /* ===================== HERO ===================== */
+    .course-hero {
+        background: linear-gradient(135deg, #471820 0%, #2d0d0f 50%, #d4a574 100%);
+        padding: 5rem 0 4rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .course-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .course-hero .container { position: relative; z-index: 1; }
+
+    .course-hero .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        transition: color 0.3s ease;
+    }
+
+    .course-hero .back-link:hover { color: #fff; }
+
+    .course-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(212, 165, 116, 0.2);
+        border: 1px solid rgba(212, 165, 116, 0.5);
+        color: var(--accent-gold);
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 1.5rem;
+    }
+
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent-gold);
+        border-radius: 50%;
+        animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.6); }
+        70% { box-shadow: 0 0 0 10px rgba(212, 165, 116, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0); }
+    }
+
+    .course-hero h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+    }
+
+    .course-hero .tagline {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: clamp(1rem, 2.2vw, 1.25rem);
+        color: var(--accent-gold);
+        margin-bottom: 1.25rem;
+    }
+
+    .course-hero p {
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.85);
+        max-width: 680px;
+        margin: 0 auto 2rem;
+        line-height: 1.7;
+    }
+
+    .course-hero-meta {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .course-hero-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* ===================== COUNTDOWN ===================== */
+    .countdown {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 2.25rem;
+    }
+
+    .countdown-item {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(212, 165, 116, 0.35);
+        backdrop-filter: blur(6px);
+        border-radius: 14px;
+        padding: 0.9rem 1.4rem;
+        min-width: 88px;
+    }
+
+    .countdown-item .num {
+        font-family: var(--font-serif);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.1;
+    }
+
+    .countdown-item .lbl {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(212, 165, 116, 0.95);
+        font-weight: 600;
+        margin-top: 0.25rem;
+    }
+
+    .hero-cta {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* ===================== SECTIONS ===================== */
+    .section { padding: 4rem 0; }
+    .section-alt { background: #f5ede4; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .section-header h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .section-header p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        max-width: 550px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* ===================== ABOUT ===================== */
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+
+    .about-content h3 {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 1rem;
+    }
+
+    .about-content p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 1rem;
+    }
+
+    .about-visual {
+        background: linear-gradient(135deg, rgba(71, 24, 32, 0.06) 0%, rgba(212, 165, 116, 0.1) 100%);
+        border-radius: 16px;
+        padding: 3rem;
+        text-align: center;
+        border: 2px solid rgba(212, 165, 116, 0.2);
+    }
+
+    .about-visual .icon-large {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 3px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .about-visual h4 {
+        font-family: var(--font-serif);
+        font-size: 1.2rem;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .about-visual p {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* ===================== PILLARS ===================== */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .feature-card {
+        background: #ffffff;
+        padding: 2rem 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        box-shadow: 0 2px 10px rgba(71, 24, 32, 0.04);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(71, 24, 32, 0.1);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: rgba(71, 24, 32, 0.06);
+        border-radius: 50%;
+        border: 2px solid var(--accent-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .feature-card h4 {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* ===================== CURRICULUM ===================== */
+    .curriculum-list {
+        max-width: 720px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .curriculum-item {
+        background: #ffffff;
+        padding: 1.25rem 1.5rem;
+        border-radius: 10px;
+        border: 1px solid rgba(71, 24, 32, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .curriculum-item:hover {
+        border-color: var(--accent-gold);
+        box-shadow: 0 4px 15px rgba(71, 24, 32, 0.06);
+    }
+
+    .curriculum-num {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        background: var(--brand-700);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .curriculum-item h4 {
+        font-family: var(--font-serif);
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--brand-700);
+        margin-bottom: 0.15rem;
+    }
+
+    .curriculum-item p {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    /* ===================== PRICING ===================== */
+    .pricing-section {
+        background: linear-gradient(135deg, #471820 0%, #6b2530 100%);
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pricing-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C15 15 5 30 15 45C25 55 45 50 50 35C55 20 45 5 30 5Z' fill='none' stroke='%23d4a574' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+
+    .pricing-section .container { position: relative; z-index: 1; }
+
+    .pricing-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .pricing-header h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+    }
+
+    .pricing-header p {
+        font-size: 0.95rem;
+        color: rgba(255,255,255,0.8);
+    }
+
+    .pricing-card {
+        max-width: 420px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        border-top: 5px solid var(--accent-gold);
+    }
+
+    .pricing-card .launch-chip {
+        display: inline-block;
+        background: rgba(71, 24, 32, 0.08);
+        color: var(--brand-700);
+        border: 1px solid rgba(71, 24, 32, 0.12);
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1.25rem;
+    }
+
+    .pricing-card .price {
+        font-family: var(--font-serif);
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: var(--brand-700);
+        line-height: 1;
+    }
+
+    .pricing-card .price span {
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    .pricing-card .price-note {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        margin: 0.5rem 0 1.5rem;
+    }
+
+    .pricing-list {
+        list-style: none;
+        text-align: left;
+        margin-bottom: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+
+    .pricing-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .pricing-list li svg { flex-shrink: 0; }
+
+    /* ===================== BUTTONS ===================== */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 2rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        text-decoration: none;
+        line-height: 1.4;
+    }
+
+    .btn-white {
+        background: #ffffff;
+        color: var(--brand-700);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-white:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-gold {
+        background: var(--accent-gold);
+        color: var(--brand-800);
+        box-shadow: 0 4px 20px rgba(212, 165, 116, 0.35);
+    }
+
+    .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(212, 165, 116, 0.5);
+    }
+
+    .btn-outline-white {
+        background: transparent;
+        color: #ffffff;
+        border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    .btn-outline-white:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.6);
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 768px) {
+        .about-grid { grid-template-columns: 1fr; }
+        .features-grid { grid-template-columns: 1fr; }
+        .course-hero-meta { gap: 1rem; }
+        .countdown-item { min-width: 72px; padding: 0.7rem 1rem; }
+        .countdown-item .num { font-size: 1.4rem; }
+    }
+
+    .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+    .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    .stagger-6 { transition-delay: 0.6s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="course-hero">
+    <div class="container">
+        <a href="{% url 'courses:course_list' %}" class="back-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Courses
+        </a>
+        <div class="course-hero-badge"><span class="pulse-dot"></span> Coming Soon</div>
+        <h1>Emotional Intelligence (EQ)</h1>
+        <div class="tagline">Understand Your Emotions. Strengthen Your Character. Improve Your Relationships.</div>
+        <p>Muslimaa Academy · Online Learning — Learn how to understand your emotions, respond thoughtfully, manage difficult feelings, and build healthier relationships through practical emotional intelligence lessons and Islamic perspectives.</p>
+
+        <div class="course-hero-meta">
+            <span>📅 Expected Launch: November 2026</span>
+            <span>📚 12-Month Learning Program</span>
+            <span>👩‍🎓 For Sisters</span>
+            <span>📹 Online Classes</span>
+        </div>
+
+        <div class="countdown" id="eq-countdown">
+            <div class="countdown-item"><div class="num" id="cd-days">--</div><div class="lbl">Days</div></div>
+            <div class="countdown-item"><div class="num" id="cd-hours">--</div><div class="lbl">Hours</div></div>
+            <div class="countdown-item"><div class="num" id="cd-mins">--</div><div class="lbl">Minutes</div></div>
+            <div class="countdown-item"><div class="num" id="cd-secs">--</div><div class="lbl">Seconds</div></div>
+        </div>
+
+        <div class="hero-cta">
+            <a class="btn btn-gold" href="#pricing">View Course Fee</a>
+            <a class="btn btn-outline-white" href="https://chat.whatsapp.com/By6RP0uCP3L9t8ybOPfT2N" target="_blank" rel="noopener">Get Launch Alerts</a>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section">
+    <div class="container">
+        <div class="about-grid animate-on-scroll">
+            <div class="about-content">
+                <h3>Emotional Wellness Rooted in Faith</h3>
+                <p>Emotional Intelligence is the ability to understand, manage, and express your emotions while navigating relationships with empathy and wisdom. In Islam, self-mastery and beautiful character (akhlaq) are among the highest goals of a believer.</p>
+                <p>This 12-month program blends practical EQ techniques with Quranic guidance and Prophetic wisdom — helping you pause before reacting, handle difficult feelings with grace, and build healthier relationships with your family, friends, and community.</p>
+            </div>
+            <div class="about-visual">
+                <div class="icon-large">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 42C24 42 8 32 8 20C8 14 12.5 10 17.5 10C20.5 10 23 11.5 24 14C25 11.5 27.5 10 30.5 10C35.5 10 40 14 40 20C40 32 24 42 24 42Z" stroke="#471820" stroke-width="1.8" stroke-linejoin="round"/>
+                        <path d="M16 22C18 20 21 20 24 23C27 20 30 20 32 22" stroke="#471820" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h4>Feel. Understand. Respond.</h4>
+                <p>Transform your inner world — and every relationship around you</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PILLARS -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header">
+            <h2>What You'll Develop</h2>
+            <p>Core emotional intelligence skills, taught through an Islamic lens</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card animate-on-scroll stagger-1">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="#471820"/></svg>
+                </div>
+                <h4>Self-Awareness</h4>
+                <p>Recognize and name your emotions as they arise, and understand what triggers them</p>
+            </div>
+            <div class="feature-card animate-on-scroll stagger-2">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+                <h4>Emotion Regulation</h4>
+                <p>Manage anger, anxiety, and stress with proven techniques and dhikr-based calming practices</p>
+            </div>
+            <div class="feature-card animate-on-scroll stagger-3">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                </div>
+                <h4>Thoughtful Responses</h4>
+                <p>Pause between stimulus and response — choose your words and actions with intention</p>
+            </div>
+            <div class="feature-card animate-on-scroll stagger-4">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                </div>
+                <h4>Healthier Relationships</h4>
+                <p>Build stronger bonds with family and community through empathy, boundaries, and communication</p>
+            </div>
+            <div class="feature-card animate-on-scroll stagger-5">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <h4>Islamic Perspective</h4>
+                <p>Connect every lesson to the Quran and Sunnah — the Prophetic model of perfect character</p>
+            </div>
+            <div class="feature-card animate-on-scroll stagger-6">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                </div>
+                <h4>Practical Exercises</h4>
+                <p>Weekly journals, scenarios, and reflections you apply to real life — not just theory</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CURRICULUM -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>12-Month Learning Journey</h2>
+            <p>A progressive program from self-understanding to mastered character</p>
+        </div>
+        <div class="curriculum-list">
+            <div class="curriculum-item animate-on-scroll stagger-1">
+                <div class="curriculum-num">01</div>
+                <div>
+                    <h4>Months 1–3: Understanding Your Emotions</h4>
+                    <p>Emotional self-awareness, identifying triggers, mood journaling, and the Islamic view of the nafs</p>
+                </div>
+            </div>
+            <div class="curriculum-item animate-on-scroll stagger-2">
+                <div class="curriculum-num">02</div>
+                <div>
+                    <h4>Months 4–6: Managing Difficult Feelings</h4>
+                    <p>Anger management, anxiety & stress relief, patience (sabr), and Prophetic calming techniques</p>
+                </div>
+            </div>
+            <div class="curriculum-item animate-on-scroll stagger-3">
+                <div class="curriculum-num">03</div>
+                <div>
+                    <h4>Months 7–9: Thoughtful Responses & Empathy</h4>
+                    <p>Pause-and-respond practice, active listening, empathy building, and beautiful speech (husn al-kalam)</p>
+                </div>
+            </div>
+            <div class="curriculum-item animate-on-scroll stagger-4">
+                <div class="curriculum-num">04</div>
+                <div>
+                    <h4>Months 10–12: Healthier Relationships & Character</h4>
+                    <p>Boundaries, conflict resolution, family dynamics, and building lasting akhlaq through daily habits</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+    <div class="container">
+        <div class="pricing-header">
+            <h2>Simple, Transparent Pricing</h2>
+            <p>Invest in your emotional and spiritual growth</p>
+        </div>
+        <div class="pricing-card animate-on-scroll">
+            <div class="launch-chip">Expected Launch: November 2026</div>
+            <div class="price">Rs. 1,500<span>/month</span></div>
+            <div class="price-note">Monthly course fee · 12-month learning program</div>
+            <ul class="pricing-list">
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    Live online classes with expert instructors
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    Practical exercises, journals & reflections
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    Quranic & Prophetic guidance in every module
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#471820" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    Certificate on completion of the program
+                </li>
+            </ul>
+            <div class="hero-cta">
+                <a class="btn btn-white" href="https://chat.whatsapp.com/By6RP0uCP3L9t8ybOPfT2N" target="_blank" rel="noopener">Notify Me at Launch</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) { entry.target.classList.add('is-visible'); }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.animate-on-scroll').forEach(function(el) { observer.observe(el); });
+
+    var launchDate = new Date('2026-11-01T00:00:00').getTime();
+    var daysEl = document.getElementById('cd-days');
+    var hoursEl = document.getElementById('cd-hours');
+    var minsEl = document.getElementById('cd-mins');
+    var secsEl = document.getElementById('cd-secs');
+    var cd = document.getElementById('eq-countdown');
+
+    function pad(n) { return n < 10 ? '0' + n : n; }
+
+    function tick() {
+        var now = Date.now();
+        var diff = launchDate - now;
+        if (diff <= 0) {
+            cd.innerHTML = '<div class="countdown-item"><div class="num">Now</div><div class="lbl">Launching</div></div>';
+            return;
+        }
+        daysEl.textContent = pad(Math.floor(diff / 86400000));
+        hoursEl.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+        minsEl.textContent = pad(Math.floor((diff % 3600000) / 60000));
+        secsEl.textContent = pad(Math.floor((diff % 60000) / 1000));
+    }
+    tick();
+    setInterval(tick, 1000);
+});
+</script>
+{% endblock %}
